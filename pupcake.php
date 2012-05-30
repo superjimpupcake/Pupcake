@@ -177,6 +177,10 @@ class Pupcake
     return $this->match($route_pattern, $callback)->via('OPTIONS');
   }
 
+  public function any($route_pattern, $callback){
+    return $this->match($route_pattern, $callback)->via('GET','POST','DELETE','PUT','OPTIONS');
+  } 
+
   public function notFound($callback){
     $router = Router::instance();
     $router->setRouteNotFoundHanlder($callback);
