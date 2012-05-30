@@ -7,6 +7,7 @@ class Router
   private static $instance;
   private $route_map;
   private $params;
+  private $route_not_found_handler;
 
   public function __construct()
   {
@@ -87,6 +88,29 @@ class Router
     return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
   }
 
+  private function defaultRouteNotFoundHandler(){
+    return "Invalid Request!";
+  }
+
+  /**
+   * set route not found handler
+   */
+  public function setRouteNotFoundHanlder($callback){
+    $this->route_not_found_handler = $callback;
+  }
+
+  /**
+   * process route not found 
+   */
+  public function processRouteNotFound(){
+    if(!isset($this->route_not_found_handler)){
+      return $this->defaultRouteNotFoundHandler();
+    }
+    else{
+      $callback = $this->route_not_found_handler;
+      return $callback();
+    }
+  }
 
 }
 
@@ -153,6 +177,11 @@ class Pupcake
     return $this->match($route_pattern, $callback)->via('OPTIONS');
   }
 
+  public function notFound($callback){
+    $router = Router::instance();
+    $router->setRouteNotFoundHanlder($callback);
+  }
+
   public function run()
   {
     $router = Router::instance();
@@ -178,6 +207,10 @@ class Pupcake
 
     if($request_matched){
       print $output;
+    }
+    else{
+      //route not found
+      print $router->processRouteNotFound();
     }
   }
 }
