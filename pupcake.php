@@ -132,6 +132,9 @@ class Route
 
   public function __construct($route_pattern, $callback)
   {
+    if($route_pattern[0] != '/'){
+      $route_pattern = "/".$route_pattern;
+    }
     $this->route_pattern = $route_pattern;
     $this->callback = $callback;
   }

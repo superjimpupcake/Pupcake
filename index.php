@@ -7,7 +7,7 @@ $app->get("/hello/:name", function($name){
   return $name;
 });
 
-$app->get("/test", function(){
+$app->get("test", function(){
    return \Pupcake\Router::instance()->redirect("test2");
 });
 
