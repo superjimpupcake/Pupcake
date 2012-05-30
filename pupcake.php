@@ -30,13 +30,15 @@ class Router
     return $result;
   }
 
-  public function addRoute($route_pattern, $callback){
+  public function addRoute($route_pattern, $callback)
+  {
     if(!isset($this->route_map[$route_pattern])){ //make sure later added route pattern will not affect the previous added one
       $this->route_map[$route_pattern] = $callback;
     }
   }
 
-  public function getRouteMap(){
+  public function getRouteMap()
+  {
     return $this->route_map;
   }
 
@@ -51,7 +53,8 @@ class Router
    * @param   string  $uri A Request URI
    * @return  bool
    */
-  public function matches( $uri, $route_pattern ) {
+  public function matches( $uri, $route_pattern ) 
+  {
     //Extract URL params
     preg_match_all('@:([\w]+)@', $route_pattern, $paramNames, PREG_PATTERN_ORDER);
     $paramNames = $paramNames[0];
@@ -83,26 +86,30 @@ class Router
    * @param   array   URL parameters
    * @return  string  Regular expression for URL parameter
    */
-  private function convertPatternToRegex( $matches ) {
+  private function convertPatternToRegex( $matches ) 
+  {
     $key = str_replace(':', '', $matches[0]);
     return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
   }
 
-  private function defaultRouteNotFoundHandler(){
+  private function defaultRouteNotFoundHandler()
+  {
     return "Invalid Request!";
   }
 
   /**
    * set route not found handler
    */
-  public function setRouteNotFoundHanlder($callback){
+  public function setRouteNotFoundHanlder($callback)
+  {
     $this->route_not_found_handler = $callback;
   }
 
   /**
    * process route not found 
    */
-  public function processRouteNotFound(){
+  public function processRouteNotFound()
+  {
     if(!isset($this->route_not_found_handler)){
       return $this->defaultRouteNotFoundHandler();
     }
@@ -112,6 +119,9 @@ class Router
     }
   }
 
+  public function redirect($uri){
+    header("Location: ".$_SERVER['PHP_SELF']."/?q=".$uri);
+  }
 }
 
 class Route
@@ -126,7 +136,8 @@ class Route
     $this->callback = $callback;
   }
 
-  public function getPattern(){
+  public function getPattern()
+  {
     return $this->route_pattern;
   }
 
@@ -157,31 +168,38 @@ class Pupcake
     return $route;
   }
 
-  public function get($route_pattern, $callback){
+  public function get($route_pattern, $callback)
+  {
     return $this->match($route_pattern, $callback)->via('GET');
   }
 
-  public function post($route_pattern, $callback){
+  public function post($route_pattern, $callback)
+  {
     return $this->match($route_pattern, $callback)->via('POST');
   }
 
-  public function delete($route_pattern, $callback){
+  public function delete($route_pattern, $callback)
+  {
     return $this->match($route_pattern, $callback)->via('DELETE');
   }
 
-  public function put($route_pattern, $callback){
+  public function put($route_pattern, $callback)
+  {
     return $this->match($route_pattern, $callback)->via('PUT');
   }
 
-  public function options($route_pattern, $callback){
+  public function options($route_pattern, $callback)
+  {
     return $this->match($route_pattern, $callback)->via('OPTIONS');
   }
 
-  public function any($route_pattern, $callback){
+  public function any($route_pattern, $callback)
+  {
     return $this->match($route_pattern, $callback)->via('GET','POST','DELETE','PUT','OPTIONS');
   } 
 
-  public function notFound($callback){
+  public function notFound($callback)
+  {
     $router = Router::instance();
     $router->setRouteNotFoundHanlder($callback);
   }
@@ -214,6 +232,7 @@ class Pupcake
     }
     else{
       //route not found
+      header("HTTP/1.0 404 Not Found");
       print $router->processRouteNotFound();
     }
   }

@@ -8,7 +8,7 @@ $app->get("/hello/:name", function($name){
 });
 
 $app->get("/test", function(){
-   return "test";
+   return \Pupcake\Router::instance()->redirect("test2");
 });
 
 $app->any("/:year/:month/:day", function($year, $month, $day){
