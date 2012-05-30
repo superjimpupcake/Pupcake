@@ -1,0 +1,183 @@
+<?php
+
+namespace Pupcake;
+
+class Router
+{
+  private static $instance;
+  private $route_map;
+  private $params;
+
+  public function __construct()
+  {
+    $this->route_map = array(); //initialize the route map, only storing related routes for the current request type
+  }
+
+  public static function instance()
+  {
+    if(!isset(static::$instance)){
+      static::$instance = new self();
+    }
+    return static::$instance; 
+  }
+
+  public function getMatchParams(){
+    $result = array();
+    if(count($this->params) > 0){
+      $result = $this->params;
+    }
+    return $result;
+  }
+
+  public function addRoute($route_pattern, $callback){
+    if(!isset($this->route_map[$route_pattern])){ //make sure later added route pattern will not affect the previous added one
+      $this->route_map[$route_pattern] = $callback;
+    }
+  }
+
+  public function getRouteMap(){
+    return $this->route_map;
+  }
+
+  /**
+   * Matches URI?
+   *
+   * Parse this route's pattern, and then compare it to an HTTP resource URI
+   * This method was modeled after the techniques demonstrated by Dan Sosedoff at:
+   *
+   * http://blog.sosedoff.com/2009/09/20/rails-like-php-url-router/
+   *
+   * @param   string  $uri A Request URI
+   * @return  bool
+   */
+  public function matches( $uri, $route_pattern ) {
+    //Extract URL params
+    preg_match_all('@:([\w]+)@', $route_pattern, $paramNames, PREG_PATTERN_ORDER);
+    $paramNames = $paramNames[0];
+
+    //Convert URL params into regex patterns, construct a regex for this route
+    $patternAsRegex = preg_replace_callback('@:[\w]+@', array($this, 'convertPatternToRegex'), $route_pattern);
+    if ( substr($route_pattern, -1) === '/' ) {
+      $patternAsRegex = $patternAsRegex . '?';
+    }
+    $patternAsRegex = '@^' . $patternAsRegex . '$@';
+
+    //Cache URL params' names and values if this route matches the current HTTP request
+    if ( preg_match($patternAsRegex, $uri, $paramValues) ) {
+      array_shift($paramValues);
+      foreach ( $paramNames as $index => $value ) {
+        $val = substr($value, 1);
+        if ( isset($paramValues[$val]) ) {
+          $this->params[$val] = urldecode($paramValues[$val]);
+        }
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Convert a URL parameter (ie. ":id") into a regular expression
+   * @param   array   URL parameters
+   * @return  string  Regular expression for URL parameter
+   */
+  private function convertPatternToRegex( $matches ) {
+    $key = str_replace(':', '', $matches[0]);
+    return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
+  }
+
+
+}
+
+class Route
+{
+
+  private $route_pattern;
+  private $callback;
+
+  public function __construct($route_pattern, $callback)
+  {
+    $this->route_pattern = $route_pattern;
+    $this->callback = $callback;
+  }
+
+  public function getPattern(){
+    return $this->route_pattern;
+  }
+
+
+  public function via()
+  {
+    $router = Router::instance();
+    $request_types = func_get_args();
+    $request_types_count = count($request_types);
+    if($request_types_count > 0){
+      for($k=0;$k<$request_types_count;$k++){
+        if($request_types[$k] == $_SERVER['REQUEST_METHOD']){
+          //add route to the map only when there is a request type matching
+          $router->addRoute($this->route_pattern, $this->callback);
+          break;
+        }
+      } 
+    }
+  }
+}
+
+class Pupcake
+{
+
+  public function match($route_pattern, $callback)
+  {
+    $route = new Route($route_pattern, $callback);
+    return $route;
+  }
+
+  public function get($route_pattern, $callback){
+    return $this->match($route_pattern, $callback)->via('GET');
+  }
+
+  public function post($route_pattern, $callback){
+    return $this->match($route_pattern, $callback)->via('POST');
+  }
+
+  public function delete($route_pattern, $callback){
+    return $this->match($route_pattern, $callback)->via('DELETE');
+  }
+
+  public function put($route_pattern, $callback){
+    return $this->match($route_pattern, $callback)->via('PUT');
+  }
+
+  public function options($route_pattern, $callback){
+    return $this->match($route_pattern, $callback)->via('OPTIONS');
+  }
+
+  public function run()
+  {
+    $router = Router::instance();
+    $route_map = $router->getRouteMap();
+    $request_matched = false;
+    $query_path = trim($_GET['q']);
+    if(strlen($query_path) > 0 && $query_path[0] != '/'){
+      $query_path = "/".$query_path;
+    }
+    $output = "";
+    if(count($route_map) > 0){
+      foreach($route_map as $route_pattern => $callback){
+        //once we found there is a matching route, stop
+        if($router->matches($query_path, $route_pattern)){
+          $request_matched = true;
+          ob_start();
+          $output = call_user_func_array($callback, $router->getMatchParams());
+          ob_end_clean();
+          break;
+        }
+      }
+    }
+
+    if($request_matched){
+      print $output;
+    }
+  }
+}
