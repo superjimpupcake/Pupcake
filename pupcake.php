@@ -120,7 +120,7 @@ class Router
   }
 
   public function redirect($uri){
-    header("Location: ".$_SERVER['PHP_SELF']."/?q=".$uri);
+    header("Location: ?q=".$uri);
   }
 }
 
