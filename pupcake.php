@@ -254,8 +254,6 @@ class Pupcake
 
   public function run()
   {
-    ob_start();
-
     $route_map = $this->router->getRouteMap();
     $request_matched = false;
     if($this->request_mode == 'external'){
@@ -289,15 +287,14 @@ class Pupcake
       $output = $this->router->processRouteNotFound();
     }
 
-    print $output;  
-    $output = ob_get_contents();
-
-    ob_end_clean();
-
     if($this->return_output){
       return $output;
     }
     else{
+      ob_start();
+      print $output;
+      $output = ob_get_contents();
+      ob_end_clean();
       print $output;
     }
   }
