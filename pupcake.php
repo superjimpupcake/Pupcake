@@ -126,10 +126,6 @@ class Router
     }
   }
 
-  public function redirect($uri)
-  {
-    header("Location: ".$uri);
-  }
 
 }
 
@@ -316,4 +312,10 @@ class Pupcake
   {
     $this->request_mode = $request_mode; 
   }
+
+  public function redirect($uri)
+  {
+    header("Location: ".$uri);
+  }
+
 }

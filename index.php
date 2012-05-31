@@ -15,8 +15,8 @@ $app->post("/hello/:name", function($name){
   return "posting $name to hello";
 });
 
-$app->get("test", function(){
-   return \Pupcake\Router::instance()->redirect("test2");
+$app->get("test", function() use ($app){
+   return $app->redirect("test2");
 });
 
 $app->any("/:year/:month/:day", function($year, $month, $day){
