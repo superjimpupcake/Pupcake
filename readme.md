@@ -3,6 +3,10 @@ Pubcake, a micro framework for PHP 5.3+
 
 Pubcake is a micro framework for PHP 5.3+
 
+Usage:
+
+1. Simple get request
+
 ```php
 <?php
 require "pupcake.php";
