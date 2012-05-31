@@ -7,6 +7,7 @@ Usage:
 
 1. Simple get request
 
+'''php
 <?php
 require "pupcake.php";
 
