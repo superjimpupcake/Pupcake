@@ -246,6 +246,11 @@ class Pupcake
     return $output;
   }
 
+  public function forward($request_type, $query_path)
+  {
+    return $this->sendInternalRequest($request_type, $query_path);
+  }
+
   public function run()
   {
     ob_start();
