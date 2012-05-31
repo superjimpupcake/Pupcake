@@ -227,9 +227,12 @@ class Pupcake
     $router = Router::instance();
     $route_map = $router->getRouteMap();
     $request_matched = false;
-    $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
-    if(strlen($query_path) > 0 && $query_path[0] != '/'){
-      $query_path = "/".$query_path;
+    $query_path = "/";
+    if($_SERVER['PHP_SELF'] != '/index.php'){
+      $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
+      if(strlen($query_path) > 0 && $query_path[0] != '/'){
+        $query_path = "/".$query_path;
+      }
     }
     $output = "";
     if(count($route_map) > 0){
@@ -252,7 +255,7 @@ class Pupcake
     print $output;  
     $output = ob_get_contents();
     ob_end_clean();
-  
+
     print $output;
   }
 }

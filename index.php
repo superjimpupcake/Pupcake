@@ -3,6 +3,10 @@ require "pupcake.php";
 
 $app = new \Pupcake\Pupcake();
 
+$app->get("/", function(){
+  return "default response";
+});
+
 $app->get("/hello/:name", function($name){
   return $name;
 });
