@@ -221,6 +221,9 @@ class Pupcake
 
   public function run()
   {
+
+    ob_start();
+
     $router = Router::instance();
     $route_map = $router->getRouteMap();
     $request_matched = false;
@@ -234,21 +237,22 @@ class Pupcake
         //once we found there is a matching route, stop
         if($router->matches($query_path, $route_pattern)){
           $request_matched = true;
-          ob_start();
           $output = call_user_func_array($callback, $router->getMatchParams());
-          ob_end_clean();
           break;
         }
       }
     }
 
-    if($request_matched){
-      print $output;
-    }
-    else{
+    if(!$request_matched){
       //route not found
       header("HTTP/1.0 404 Not Found");
-      print $router->processRouteNotFound();
+      $output = $router->processRouteNotFound();
     }
+
+    print $output;  
+    $output = ob_get_contents();
+    ob_end_clean();
+  
+    print $output;
   }
 }
