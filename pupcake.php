@@ -235,6 +235,11 @@ class Pupcake
 
   public function sendInternalRequest($request_type, $query_path)
   {
+    $is_nested_internal_request = false;
+    if($this->request_mode == 'internal'){ //this is a nested interal request
+      $is_nested_internal_request = true;
+    }
+
     $this->setRequestMode("internal");
     $current_request_type = $_SERVER['REQUEST_METHOD'];
     $_SERVER['REQUEST_METHOD'] = $request_type; 
@@ -242,8 +247,11 @@ class Pupcake
     $this->setReturnOutput(true);
     $output = $this->run();
     $_SERVER['REQUEST_METHOD'] = $current_request_type;
-    $this->setReturnOutput(false);
-    $this->setRequestMode("external");
+    if(!$is_nested_internal_request){
+      $this->setReturnOutput(false);
+      $this->setRequestMode("external");
+    }
+
     return $output;
   }
 
@@ -319,7 +327,12 @@ class Pupcake
 
   public function redirect($uri)
   {
-    header("Location: ".$uri);
+    if($this->request_mode == 'external'){
+      header("Location: ".$uri);
+    }
+    else if($this->request_mode == 'internal'){
+      return $this->forward('GET', $uri);
+    }
   }
 
 }

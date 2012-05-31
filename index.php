@@ -40,7 +40,7 @@ $app->get("test_internal", function() use ($app) {
   $content .= $app->forward("POST", "hello/world")."<br/>";
   $content .= $app->forward("GET", "hello/world2")."<br/>";
   $content .= $app->forward("GET", "hello/world3")."<br/>";
-  $content .= $app->forward("GET", "test2")."<br/>";
+  $content .= $app->forward("GET", "test")."<br/>";
   $content .= $app->forward("POST", "2012/05/30")."<br/>";
   return $content;
 });
