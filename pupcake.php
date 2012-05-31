@@ -154,7 +154,7 @@ class Route
     $request_types_count = count($request_types);
     if($request_types_count > 0){
       for($k=0;$k<$request_types_count;$k++){
-        if($request_types[$k] == $_SERVER['REQUEST_METHOD']){
+        if($request_types[$k] == $_SERVER['REQUEST_METHOD'] || $request_types[$k] == '*'){
           //add route to the map only when there is a request type matching
           $router->addRoute($this->route_pattern, $this->callback);
           break;
@@ -210,7 +210,7 @@ class Pupcake
 
   public function any($route_pattern, $callback)
   {
-    return $this->match($route_pattern, $callback)->via('GET','POST','DELETE','PUT','OPTIONS');
+    return $this->match($route_pattern, $callback)->via('*');
   } 
 
   public function notFound($callback)
