@@ -260,8 +260,9 @@ class Pupcake
     $request_matched = false;
     if($this->request_mode == 'external'){
       $query_path = "/";
-      if($_SERVER['PHP_SELF'] != '/index.php'){
-        $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
+      $script_base_name = basename($_SERVER['SCRIPT_FILENAME']);
+      if($_SERVER['PHP_SELF'] != '/'.$script_base_name){
+        $query_path = str_replace($script_base_name."/", "", $_SERVER['PHP_SELF']);
       }
       $this->setQueryPath($query_path);
     }
