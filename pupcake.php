@@ -177,10 +177,11 @@ class Pupcake
   private $query_path;
   private $router;
   private $return_output;
+  private $request_mode; 
 
   public function __construct()
   {
-    $this->query_path = "";
+    $this->request_mode = "external"; //default request mode is external
     $this->return_output = false;
     $this->router = Router::instance();
   }
@@ -237,6 +238,7 @@ class Pupcake
 
   public function sendInternalRequest($request_type, $query_path)
   {
+    $this->setRequestMode("internal");
     $current_request_type = $_SERVER['REQUEST_METHOD'];
     $_SERVER['REQUEST_METHOD'] = $request_type; 
     $this->setQueryPath($query_path);
@@ -244,6 +246,7 @@ class Pupcake
     $output = $this->run();
     $_SERVER['REQUEST_METHOD'] = $current_request_type;
     $this->setReturnOutput(false);
+    $this->setRequestMode("external");
     return $output;
   }
 
@@ -253,7 +256,7 @@ class Pupcake
 
     $route_map = $this->router->getRouteMap();
     $request_matched = false;
-    if(strlen($this->query_path) == 0){
+    if($this->request_mode == 'external'){
       $query_path = "/";
       if($_SERVER['PHP_SELF'] != '/index.php'){
         $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
@@ -296,7 +299,7 @@ class Pupcake
     }
   }
 
-  private function setQueryPath($query_path)
+  public function setQueryPath($query_path)
   {
     if(strlen($query_path) > 0 && $query_path[0] != '/'){
       $query_path = "/".$query_path;
@@ -304,8 +307,13 @@ class Pupcake
     $this->query_path = $query_path;
   }
 
-  private function setReturnOutput($return_output)
+  public function setReturnOutput($return_output)
   {
     $this->return_output = $return_output;
+  }
+
+  public function setRequestMode($request_mode)
+  {
+    $this->request_mode = $request_mode; 
   }
 }

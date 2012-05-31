@@ -41,7 +41,7 @@ $app->get("test_internal", function() use ($app) {
   $content .= $app->sendInternalRequest("GET", "hello/world2")."<br/>";
   $content .= $app->sendInternalRequest("GET", "hello/world3")."<br/>";
   $content .= $app->sendInternalRequest("GET", "test2")."<br/>";
-  $content .= $app->sendInternalRequest("POST", "2012/05/30");
+  $content .= $app->sendInternalRequest("POST", "2012/05/30")."<br/>";
   return $content;
 });
 
