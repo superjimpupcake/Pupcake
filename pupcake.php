@@ -30,14 +30,17 @@ class Router
     return $result;
   }
 
-  public function addRoute($route_pattern, $callback)
+  public function addRoute($request_type, $route_pattern, $callback)
   {
-    if(!isset($this->route_map[$route_pattern])){ //make sure later added route pattern will not affect the previous added one
-      if($route_pattern == "/*"){
-        $route_pattern = "/:path";
-      }
-      $this->route_map[$route_pattern] = $callback;
+    if($route_pattern == "/*"){
+      $route_pattern = "/:path";
     }
+
+    if(!isset($this->route_map[$request_type])){
+      $this->route_map[$request_type] = array();
+    }
+
+    $this->route_map[$request_type][$route_pattern] = $callback;
   }
 
   public function getRouteMap()
@@ -58,6 +61,7 @@ class Router
    */
   public function matches( $uri, $route_pattern ) 
   {
+    $this->params = array(); //clear possible previous matched params
     //Extract URL params
     preg_match_all('@:([\w]+)@', $route_pattern, $param_names, PREG_PATTERN_ORDER);
     $param_names = $param_names[0];
@@ -149,6 +153,9 @@ class Route
     return $this->route_pattern;
   }
 
+  public function getCallback(){
+    return $this->callback;
+  }
 
   public function via()
   {
@@ -157,11 +164,7 @@ class Route
     $request_types_count = count($request_types);
     if($request_types_count > 0){
       for($k=0;$k<$request_types_count;$k++){
-        if($request_types[$k] == $_SERVER['REQUEST_METHOD'] || $request_types[$k] == '*'){
-          //add route to the map only when there is a request type matching
-          $router->addRoute($this->route_pattern, $this->callback);
-          break;
-        }
+        $router->addRoute($request_types[$k], $this->route_pattern, $this->callback);
       } 
     }
   }
@@ -170,6 +173,17 @@ class Route
 class Pupcake
 {
   private static $instance;
+  private $request_type;
+  private $query_path;
+  private $router;
+  private $return_output;
+
+  public function __construct()
+  {
+    $this->query_path = "";
+    $this->return_output = false;
+    $this->router = Router::instance();
+  }
 
   public static function instance()
   {
@@ -218,33 +232,47 @@ class Pupcake
 
   public function notFound($callback)
   {
-    $router = Router::instance();
-    $router->setRouteNotFoundHanlder($callback);
+    $this->router->setRouteNotFoundHanlder($callback);
+  }
+
+  public function sendInternalRequest($request_type, $query_path)
+  {
+    $current_request_type = $_SERVER['REQUEST_METHOD'];
+    $_SERVER['REQUEST_METHOD'] = $request_type; 
+    $this->setQueryPath($query_path);
+    $this->setReturnOutput(true);
+    $output = $this->run();
+    $_SERVER['REQUEST_METHOD'] = $current_request_type;
+    $this->setReturnOutput(false);
+    return $output;
   }
 
   public function run()
   {
-
     ob_start();
 
-    $router = Router::instance();
-    $route_map = $router->getRouteMap();
+    $route_map = $this->router->getRouteMap();
     $request_matched = false;
-    $query_path = "/";
-    if($_SERVER['PHP_SELF'] != '/index.php'){
-      $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
-      if(strlen($query_path) > 0 && $query_path[0] != '/'){
-        $query_path = "/".$query_path;
+    if(strlen($this->query_path) == 0){
+      $query_path = "/";
+      if($_SERVER['PHP_SELF'] != '/index.php'){
+        $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
       }
+      $this->setQueryPath($query_path);
     }
     $output = "";
     if(count($route_map) > 0){
-      foreach($route_map as $route_pattern => $callback){
-        //once we found there is a matching route, stop
-        if($router->matches($query_path, $route_pattern)){
-          $request_matched = true;
-          $output = call_user_func_array($callback, $router->getMatchParams());
-          break;
+      $request_types = array($_SERVER['REQUEST_METHOD'], "*");
+      foreach($request_types as $request_type){
+        if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
+          foreach($route_map[$request_type] as $route_pattern => $callback){
+            //once we found there is a matching route, stop
+            if($this->router->matches($this->query_path, $route_pattern)){
+              $request_matched = true;
+              $output = call_user_func_array($callback, $this->router->getMatchParams());
+              break 2;
+            }
+          }
         }
       }
     }
@@ -252,13 +280,32 @@ class Pupcake
     if(!$request_matched){
       //route not found
       header("HTTP/1.0 404 Not Found");
-      $output = $router->processRouteNotFound();
+      $output = $this->router->processRouteNotFound();
     }
 
     print $output;  
     $output = ob_get_contents();
+
     ob_end_clean();
 
-    print $output;
+    if($this->return_output){
+      return $output;
+    }
+    else{
+      print $output;
+    }
+  }
+
+  private function setQueryPath($query_path)
+  {
+    if(strlen($query_path) > 0 && $query_path[0] != '/'){
+      $query_path = "/".$query_path;
+    }
+    $this->query_path = $query_path;
+  }
+
+  private function setReturnOutput($return_output)
+  {
+    $this->return_output = $return_output;
   }
 }
