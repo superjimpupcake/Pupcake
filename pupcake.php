@@ -49,7 +49,7 @@ class Router
   }
 
   /**
-   * Matches URI?
+   * Match URI
    *
    * Parse this route's pattern, and then compare it to an HTTP resource URI
    * This method was modeled after the techniques demonstrated by Dan Sosedoff at:
@@ -57,6 +57,7 @@ class Router
    * http://blog.sosedoff.com/2009/09/20/rails-like-php-url-router/
    *
    * @param   string  $uri A Request URI
+   * @param   string  $route_pattern The route pattern
    * @return  bool
    */
   public function matches( $uri, $route_pattern ) 
