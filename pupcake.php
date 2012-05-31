@@ -17,7 +17,7 @@ class Router
   public static function instance()
   {
     if(!isset(static::$instance)){
-      static::$instance = new self();
+      static::$instance = new static();
     }
     return static::$instance; 
   }
@@ -186,7 +186,7 @@ class Pupcake
   public static function instance()
   {
     if(!isset(static::$instance)){
-      static::$instance = new self();
+      static::$instance = new static();
     }
     return static::$instance; 
   }
