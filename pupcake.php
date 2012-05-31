@@ -121,7 +121,7 @@ class Router
 
   public function redirect($uri)
   {
-    header("Location: ?q=".$uri);
+    header("Location: ".$uri);
   }
 
 }
@@ -224,7 +224,7 @@ class Pupcake
     $router = Router::instance();
     $route_map = $router->getRouteMap();
     $request_matched = false;
-    $query_path = trim($_GET['q']);
+    $query_path = str_replace("index.php/", "", $_SERVER['PHP_SELF']);
     if(strlen($query_path) > 0 && $query_path[0] != '/'){
       $query_path = "/".$query_path;
     }
