@@ -11,7 +11,7 @@ class Router
 
   public function __construct()
   {
-    $this->route_map = array(); //initialize the route map, only storing related routes for the current request type
+    $this->route_map = array(); //initialize the route map
   }
 
   public static function instance()
