@@ -59,23 +59,23 @@ class Router
   public function matches( $uri, $route_pattern ) 
   {
     //Extract URL params
-    preg_match_all('@:([\w]+)@', $route_pattern, $paramNames, PREG_PATTERN_ORDER);
-    $paramNames = $paramNames[0];
+    preg_match_all('@:([\w]+)@', $route_pattern, $param_names, PREG_PATTERN_ORDER);
+    $param_names = $param_names[0];
 
     //Convert URL params into regex patterns, construct a regex for this route
-    $patternAsRegex = preg_replace_callback('@:[\w]+@', array($this, 'convertPatternToRegex'), $route_pattern);
+    $pattern_as_regex = preg_replace_callback('@:[\w]+@', array($this, 'convertPatternToRegex'), $route_pattern);
     if ( substr($route_pattern, -1) === '/' ) {
-      $patternAsRegex = $patternAsRegex . '?';
+      $pattern_as_regex = $pattern_as_regex . '?';
     }
-    $patternAsRegex = '@^' . $patternAsRegex . '$@';
+    $pattern_as_regex = '@^' . $pattern_as_regex . '$@';
 
     //Cache URL params' names and values if this route matches the current HTTP request
-    if ( preg_match($patternAsRegex, $uri, $paramValues) ) {
-      array_shift($paramValues);
-      foreach ( $paramNames as $index => $value ) {
+    if ( preg_match($pattern_as_regex, $uri, $param_values) ) {
+      array_shift($param_values);
+      foreach ( $param_names as $index => $value ) {
         $val = substr($value, 1);
-        if ( isset($paramValues[$val]) ) {
-          $this->params[$val] = urldecode($paramValues[$val]);
+        if ( isset($param_values[$val]) ) {
+          $this->params[$val] = urldecode($param_values[$val]);
         }
       }
       return true;
