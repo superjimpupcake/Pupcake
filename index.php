@@ -23,6 +23,10 @@ $app->get("/test2", function(){
   return "testing 2";
 });
 
+$app->any("*", function(){
+  return "all routes finally go here";
+});
+
 $app->notFound(function(){
   return "not found any routes!";
 });

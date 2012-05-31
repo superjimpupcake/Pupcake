@@ -33,6 +33,9 @@ class Router
   public function addRoute($route_pattern, $callback)
   {
     if(!isset($this->route_map[$route_pattern])){ //make sure later added route pattern will not affect the previous added one
+      if($route_pattern == "/*"){
+        $route_pattern = "/:path";
+      }
       $this->route_map[$route_pattern] = $callback;
     }
   }
