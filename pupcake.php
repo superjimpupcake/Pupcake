@@ -119,9 +119,11 @@ class Router
     }
   }
 
-  public function redirect($uri){
+  public function redirect($uri)
+  {
     header("Location: ?q=".$uri);
   }
+
 }
 
 class Route
@@ -164,6 +166,16 @@ class Route
 
 class Pupcake
 {
+  private static $instance;
+
+  public static function instance()
+  {
+    if(!isset(static::$instance)){
+      static::$instance = new self();
+    }
+    return static::$instance; 
+  }
+
 
   public function match($route_pattern, $callback)
   {
