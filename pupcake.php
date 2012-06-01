@@ -140,7 +140,14 @@ class Router
         $param_names = $param_names[0];
 
         //Convert URL params into regex patterns, construct a regex for this route
-        $pattern_as_regex = preg_replace_callback('@:[\w]+@', array($this, 'convertPatternToRegex'), $route_pattern);
+
+        $matching_callback = function($matches){
+            $key = str_replace(':', '', $matches[0]);
+            return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
+        };
+
+        $pattern_as_regex = preg_replace_callback('@:[\w]+@', $matching_callback,  $route_pattern);
+        
         if ( substr($route_pattern, -1) === '/' ) {
             $pattern_as_regex = $pattern_as_regex . '?';
         }
@@ -164,17 +171,6 @@ class Router
         } else {
             return false;
         }
-    }
-
-    /**
-     * Convert a URL parameter (ie. ":id") into a regular expression
-     * @param   array   URL parameters
-     * @return  string  Regular expression for URL parameter
-     */
-    private function convertPatternToRegex( $matches ) 
-    {
-        $key = str_replace(':', '', $matches[0]);
-        return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
     }
 
     public function executeRoute($route)
