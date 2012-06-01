@@ -29,6 +29,21 @@ $app->delete("/hello/:name", function($name){
 $app->run();
 ```
 
+###Multiple request methods for one route
+```php
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->map("/hello/:name", function($name){
+  return "hello ".$name." in get";
+})->via('GET','POST');
+
+$app->run();
+```
+
+
 ###Request redirection
 ```php
 <?php
