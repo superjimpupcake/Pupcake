@@ -186,6 +186,7 @@ $app->run();
 ```
 
 ###Advance Event Handling --- custom response output
+```php
 <?php
 require "pupcake.php";
 
