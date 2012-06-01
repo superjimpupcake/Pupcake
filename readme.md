@@ -33,8 +33,8 @@ Usage:
     $app->run();
     ```
 
-    3. Request redirection
-    ```php
+3. Request redirection
+```php
     <?php
     require "pupcake.php";
 
