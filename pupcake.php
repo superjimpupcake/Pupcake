@@ -325,6 +325,11 @@ class Pupcake
         $this->request_mode = $request_mode; 
     }
 
+    public function getRequestType()
+    {
+        return $_SERVER['REQUEST_METHOD'];
+    }
+
     public function redirect($uri)
     {
         if($this->request_mode == 'external'){
