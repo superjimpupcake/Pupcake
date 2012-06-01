@@ -37,7 +37,7 @@ class EventManager
         }
 
         if($callback == ""){
-            return $output;
+            return "";
         }
         else{
             return $callback();
