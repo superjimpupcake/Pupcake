@@ -309,7 +309,7 @@ class Pupcake
         if(!$request_matched){
             //route not found
             header("HTTP/1.0 404 Not Found");
-            $output = EventManager::instance()->trigger("system.request.notfound", function(){
+            $output = $this->event_manager->trigger("system.request.notfound", function(){
                 return "Invalid Request";
             });
         }
