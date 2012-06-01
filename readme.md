@@ -144,7 +144,7 @@ $app->get('test', function() use ($app) {
 $app->run();
 ```
 
-###Advance Event handling
+###Advance Event handling --- detect request not found
 ```php
 <?php
 require "pupcake.php";
@@ -165,7 +165,7 @@ $app->on('system.request.notfound', function(){
 $app->run();
 ```
 
-###Advance Error Handling
+###Advance Event Handling --- detect system error
 ```php
 <?php
 
