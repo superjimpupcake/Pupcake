@@ -228,6 +228,17 @@ class Pupcake
                 'Pupcake' => __DIR__."/components",
             ));
             $loader->register();
+
+            /**
+             * register more namesapces
+             */
+            $namespaces = EventManager::instance()->trigger('system.namespace.register', function(){
+                return array();
+            });
+            if(count($namespaces) > 0){
+                $loader->registerNamespaces($namespaces);
+                $loader->register();
+            }
         }
         return $loader;
     }
