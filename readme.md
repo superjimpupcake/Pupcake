@@ -6,7 +6,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ##Usage:
 
 ###Simple get request
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
@@ -21,7 +20,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ```
 
 ###Simple post request
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
@@ -36,7 +34,6 @@ Pupcake --- a micro framework for PHP 5.3+
     ```
 
 ###Request redirection
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
@@ -51,7 +48,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ```
 
 ###Request forwarding (internal request)
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
@@ -92,7 +88,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ```
 
 ###Custom request-not-found handler
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
@@ -107,7 +102,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ```
 
 ###Catch any requests
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
@@ -122,7 +116,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ```
 
 ###Request type detection in internal and external request
----------------------------------------
 ```php
     <?php
     require "pupcake.php";
