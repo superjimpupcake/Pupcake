@@ -33,7 +33,7 @@ Usage:
   $app->run();
 ```
 
-3. Request direction
+3. Request redirection
 ```php
   <?php
   require "pupcake.php";
@@ -42,6 +42,46 @@ Usage:
 
   $app->post("/hello/:name", function($name) use ($app) {
     $app->redirect("/test");
+  });
+
+  $app->run();
+```
+
+4. Request forwarding
+```php
+  <?php
+  require "pupcake.php";
+
+  $app = new \Pupcake\Pupcake();
+
+  $app->get("/hello/:name", function($name){
+    return $name;
+  });
+
+  $app->post("/hello/:name", function($name){
+    return "posting $name to hello";
+  });
+
+  $app->get("test", function() use ($app){
+     return $app->redirect("test2");
+  });
+
+  $app->any("date/:year/:month/:day", function($year, $month, $day){
+    return $year."-".$month."-".$day;
+  });
+
+  $app->get("/test2", function(){
+    return "testing 2";
+  });
+
+  $app->get("test_internal", function() use ($app) {
+    $content = "";
+    $content .= $app->forward("POST", "hello/world")."<br/>";
+    $content .= $app->forward("GET", "hello/world2")."<br/>";
+    $content .= $app->forward("GET", "hello/world3")."<br/>";
+    $content .= $app->forward("GET", "test")."<br/>";
+    $content .= $app->forward("POST", "date/2012/05/30")."<br/>";
+    return $content;
   });
 
   $app->run();
