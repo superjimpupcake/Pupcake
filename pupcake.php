@@ -32,7 +32,6 @@ class EventManager
 
     public function trigger($event_name, $callback = "")
     {
-        $output = "";
         if(isset($this->event_queue[$event_name])){
             $callback = $this->event_queue[$event_name];
         }
@@ -40,9 +39,9 @@ class EventManager
         if($callback == ""){
             return $output;
         }
-        
-        $output = $callback();
-        return $output;
+        else{
+            return $callback();
+        } 
     }
 }
 
