@@ -47,7 +47,7 @@ Usage:
   $app->run();
 ```
 
-4. Request forwarding
+4. Request forwarding (internal request)
 ```php
   <?php
   require "pupcake.php";
