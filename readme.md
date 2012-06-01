@@ -100,3 +100,17 @@ Usage:
 
     $app->run();
 ```
+
+6. Catch any requests
+```php
+    <?php
+    require "pupcake.php";
+
+    $app = new \Pupcake\Pupcake();
+
+    $app->any(":path", function($path){
+        return "the current path is ".$path;
+    });
+
+    $app->run();
+```
