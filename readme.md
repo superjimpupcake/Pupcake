@@ -186,7 +186,7 @@ $app->run();
 ```
 
 ###Advance Event Handling --- custom response output
-####We can "intercept" the output generation process when request a found and a route is matched
+####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
 require "pupcake.php";
