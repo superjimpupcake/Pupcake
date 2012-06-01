@@ -197,28 +197,8 @@ $app->get("/hello/:name", function($name){
   return $name;
 });
 
-$app->on('system.request.found', function($callback, $params){
-    return "prepend outputs".call_user_func_array($callback, $params);
-});
-
-$app->run();
-```
-####We can even define our own callback to generate our own output
-```php
-<?php
-require "pupcake.php";
-
-$app = new \Pupcake\Pupcake();
-
-$app->get("/hello/:name", function($name){
-  return $name;
-});
-
-$app->on('system.request.found', function($callback, $params){
-    $callback = function(){
-        return "flexible output";
-    };
-    return "prepend outputs".call_user_func_array($callback, $params);
+$app->on('system.request.found', function($route) use ($app) {
+    return "prepend outputs ".$app->executeRoute($route);
 });
 
 $app->run();

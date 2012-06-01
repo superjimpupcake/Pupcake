@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.3.0
+ * @version 0.4.0
  * @package Pupcake
  */
 
@@ -61,8 +61,8 @@ class EventManager
 class Router
 {
     private $route_map;
-    private $params;
     private $route_not_found_handler;
+    private $matched_route;
 
     public function __construct()
     {
@@ -78,19 +78,20 @@ class Router
         return $instance; 
     }
 
-    public function getMatchParams(){
-        $result = array();
-        if(count($this->params) > 0){
-            $result = $this->params;
-        }
-        return $result;
+    public function setMatchedRoute(Route $matched_route)
+    {
+        $this->matched_route = $matched_route;
     }
 
-    public function addRoute(Router $route)
+    public function getMatchedRoute()
+    {
+        return $this->matched_route;
+    }
+
+    public function addRoute(Route $route)
     {
         $request_type = $route->getRequestType();
         $route_pattern = $route->getPattern();
-        $callback = $route->getCallback();
 
         if($route_pattern == "/*"){
             $route_pattern = "/:path";
@@ -100,12 +101,22 @@ class Router
             $this->route_map[$request_type] = array();
         }
 
-        $this->route_map[$request_type][$route_pattern] = $callback;
+        $this->route_map[$request_type][$route_pattern] = $route;
+    }
+
+    public function getRoute($request_type, $route_pattern)
+    {
+        return $this->route_map[$request_type][$route_pattern];
     }
 
     public function getRouteMap()
     {
         return $this->route_map;
+    }
+
+    public function processRouteMatching($request_type, $uri, $route_pattern)
+    {
+       return $this->matches($request_type, $uri, $route_pattern); 
     }
 
     /**
@@ -116,13 +127,14 @@ class Router
      *
      * http://blog.sosedoff.com/2009/09/20/rails-like-php-url-router/
      *
+     * @param   string  $request_type The request type
      * @param   string  $uri A Request URI
      * @param   string  $route_pattern The route pattern
      * @return  bool
      */
-    public function matches( $uri, $route_pattern ) 
+    protected function matches( $request_type, $uri, $route_pattern ) 
     {
-        $this->params = array(); //clear possible previous matched params
+        $params = array(); //clear possible previous matched params
         //Extract URL params
         preg_match_all('@:([\w]+)@', $route_pattern, $param_names, PREG_PATTERN_ORDER);
         $param_names = $param_names[0];
@@ -140,9 +152,14 @@ class Router
             foreach ( $param_names as $index => $value ) {
                 $val = substr($value, 1);
                 if ( isset($param_values[$val]) ) {
-                    $this->params[$val] = urldecode($param_values[$val]);
+                    $params[$val] = urldecode($param_values[$val]);
                 }
             }
+
+            $route = $this->getRoute($request_type, $route_pattern);
+            $route->setParams($params);
+            $this->setMatchedRoute($route); 
+
             return true;
         } else {
             return false;
@@ -160,6 +177,10 @@ class Router
         return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
     }
 
+    public function executeRoute($route)
+    {
+        return call_user_func_array($route->getCallback(), $route->getParams());
+    }
 }
 
 class Route
@@ -167,8 +188,9 @@ class Route
     private $request_type;
     private $route_pattern;
     private $callback;
+    private $route_params;
 
-    public function __construct($request_type = "", $route_pattern, $callback)
+    public function __construct($request_type = "", $route_pattern, $callback="", $route_params = array())
     {
         if($route_pattern[0] != '/'){
             $route_pattern = "/".$route_pattern;
@@ -176,6 +198,12 @@ class Route
         $this->request_type = $request_type;
         $this->route_pattern = $route_pattern;
         $this->callback = $callback;
+        $this->route_params = $route_params;
+    }
+
+    public function setRequestType($request_type)
+    {
+        $this->request_type = $request_type;
     }
 
     public function getRequestType()
@@ -183,13 +211,33 @@ class Route
         return $this->request_type;
     }
 
+    public function setPattern($route_pattern)
+    {
+        $this->route_pattern = $route_pattern;
+    }
+
     public function getPattern()
     {
         return $this->route_pattern;
     }
 
+    public function setCallback($callback)
+    {
+        $this->callback = $callback;
+    }
+
     public function getCallback(){
         return $this->callback;
+    }
+
+    public function setParams($route_params)
+    {
+        $this->route_params = $route_params;
+    }
+
+    public function getParams()
+    {
+        return $this->route_params;
     }
 
     public function via()
@@ -317,18 +365,16 @@ class Pupcake
             $this->setQueryPath($query_path);
         }
         $output = "";
-        $matched_callback = "";
-        $matched_route_params = "";
+        $matched_route;
         if(count($route_map) > 0){
             $request_types = array($_SERVER['REQUEST_METHOD'], "*");
             foreach($request_types as $request_type){
                 if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                     foreach($route_map[$request_type] as $route_pattern => $callback){
                         //once we found there is a matching route, stop
-                        if($this->router->matches($this->query_path, $route_pattern)){
+                        if($this->router->processRouteMatching($request_type, $this->query_path, $route_pattern)){
                             $request_matched = true;
-                            $matched_callback = $callback;
-                            $matched_route_params = $this->router->getMatchParams();
+                            $matched_route = $this->router->getMatchedRoute();
                             break 2;
                         }
                     }
@@ -345,9 +391,9 @@ class Pupcake
         }
         else{
             //request matched
-            $output = $this->event_manager->trigger("system.request.found", function($callback, $params){
-                return call_user_func_array($callback, $params);
-            }, array($matched_callback, $matched_route_params));
+            $output = $this->event_manager->trigger("system.request.found", function($matched_route){
+                return call_user_func_array($matched_route->getCallback(), $matched_route->getParams());
+            }, array($matched_route));
         }
 
         if($this->return_output){
@@ -398,5 +444,10 @@ class Pupcake
     public function on($event_name, $callback)
     {
         $this->event_manager->register($event_name, $callback);
+    }
+
+    public function executeRoute(Route $route)
+    {
+        return $this->router->executeRoute($route);
     }
 }
