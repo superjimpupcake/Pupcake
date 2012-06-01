@@ -151,6 +151,13 @@ require "pupcake.php";
 
 $app = new \Pupcake\Pupcake();
 
+/**
+ * This is the same as 
+ * $app->notFound(function(){
+ *   return "request not found handler";
+ * });
+ */
+
 $app->on('system.request.notfound', function(){
     return "request not found handler";
 });
