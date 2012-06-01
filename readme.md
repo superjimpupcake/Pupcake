@@ -1,7 +1,7 @@
-Pubcake, a micro framework for PHP 5.3+
+Pupcake, a micro framework for PHP 5.3+
 =======================================
 
-Pubcake is a micro framework for PHP 5.3+
+Pupcake is a micro framework for PHP 5.3+
 
 Usage:
 
