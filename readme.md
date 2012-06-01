@@ -1,11 +1,11 @@
-Pupcake, a micro framework for PHP 5.3+
+Pupcake --- a micro framework for PHP 5.3+
 =======================================
 
-#Pupcake is a micro framework for PHP 5.3+
+##Pupcake is a micro framework for PHP 5.3+
 
-#Usage:
+##Usage:
 
-Simple get request
+###Simple get request
 ---------------------------------------
 ```php
     <?php
@@ -20,7 +20,7 @@ Simple get request
     $app->run();
 ```
 
-Simple post request
+###Simple post request
 ---------------------------------------
 ```php
     <?php
@@ -35,7 +35,7 @@ Simple post request
     $app->run();
     ```
 
-Request redirection
+###Request redirection
 ---------------------------------------
 ```php
     <?php
@@ -50,7 +50,7 @@ Request redirection
     $app->run();
 ```
 
-Request forwarding (internal request)
+###Request forwarding (internal request)
 ---------------------------------------
 ```php
     <?php
@@ -91,7 +91,7 @@ Request forwarding (internal request)
     $app->run();
 ```
 
-Custom request-not-found handler
+###Custom request-not-found handler
 ---------------------------------------
 ```php
     <?php
@@ -106,7 +106,7 @@ Custom request-not-found handler
     $app->run();
 ```
 
-6. Catch any requests
+###Catch any requests
 ---------------------------------------
 ```php
     <?php
@@ -121,7 +121,7 @@ Custom request-not-found handler
     $app->run();
 ```
 
-Request type detection in internal and external request
+###Request type detection in internal and external request
 ---------------------------------------
 ```php
     <?php
