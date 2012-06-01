@@ -37,7 +37,7 @@ require "pupcake.php";
 $app = new \Pupcake\Pupcake();
 
 $app->map("/hello/:name", function($name){
-  return "hello ".$name." in get";
+  return "hello ".$name." in get and post";
 })->via('GET','POST');
 
 $app->run();
