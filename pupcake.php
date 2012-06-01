@@ -33,12 +33,14 @@ class EventManager
     public function trigger($event_name, $callback = "")
     {
         $output = "";
+        if(isset($this->event_queue[$event_name])){
+            $callback = $this->event_queue[$event_name];
+        }
+
         if($callback == ""){
             return $output;
         }
-        else if(isset($this->event_queue[$event_name])){
-            $callback = $this->event_queue[$event_name];
-        }
+        
         $output = $callback();
         return $output;
     }
