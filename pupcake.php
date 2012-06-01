@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.2
+ * @version 0.2.1
  * @package Pupcake
  */
 
@@ -274,7 +274,7 @@ class Pupcake
 
     public function notFound($callback)
     {
-        EventManager::instance()->register('system.request.notfound', $callback);
+        $this->event_manager->register('system.request.notfound', $callback);
     }
 
     public function sendInternalRequest($request_type, $query_path)
