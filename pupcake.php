@@ -1,10 +1,23 @@
 <?php
 
+/**
+ * Pupcake --- a microframework for PHP 5.3+
+ *
+ * @author Zike(Jim) Huang
+ * @copyright 2012 Zike(Jim) Huang
+ * @version 0.1
+ * @package Pupcake
+ */
+
 namespace Pupcake;
 
 class EventManager
 {
-    private $event_queue;
+    /**
+     * @var array
+     * Pupcake Event Queue
+     */
+    private $event_queue; 
 
     public function __construct()
     {
