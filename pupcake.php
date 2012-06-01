@@ -32,7 +32,11 @@ class EventManager
 
     public function trigger($event_name, $callback = "")
     {
-        if(isset($this->event_queue[$event_name])){
+        $output = "";
+        if($callback == ""){
+            return $output;
+        }
+        else if(isset($this->event_queue[$event_name])){
             $callback = $this->event_queue[$event_name];
         }
         $output = $callback();
@@ -304,7 +308,7 @@ class Pupcake
             //route not found
             header("HTTP/1.0 404 Not Found");
             $output = EventManager::instance()->trigger("system.request.notfound", function(){
-                return "Invalid Request!";
+                return "Invalid Request";
             });
         }
 
