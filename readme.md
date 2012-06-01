@@ -203,3 +203,19 @@ $app->on('system.request.found', function($route) use ($app) {
 
 $app->run();
 ```
+###Advanced Event Handling --- system shutdown detection
+####We can hook into the system.shutdown event
+```php
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->on('system.shutdown', function(){
+    print "<br/>system is shutdown now<br/>";
+});
+
+$app->run();
+```
+
+

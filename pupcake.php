@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.4.1
+ * @version 0.5.0
  * @package Pupcake
  */
 
@@ -265,14 +265,19 @@ class Pupcake
 
     public function __construct()
     {
-        $this->request_mode = "external"; //default request mode is external
-        $this->return_output = false;
-        $this->router = Router::instance();
-        $this->event_manager = EventManager::instance();
         set_error_handler(function ($severity, $message, $filepath, $line){
             EventManager::instance()->trigger('system.error.detected', '', func_get_args());
             return true;
         }, E_ALL);
+
+        register_shutdown_function(function(){
+            EventManager::instance()->trigger('system.shutdown');
+        });
+
+        $this->request_mode = "external"; //default request mode is external
+        $this->return_output = false;
+        $this->router = Router::instance();
+        $this->event_manager = EventManager::instance();
     }
 
     public static function instance()
@@ -450,4 +455,5 @@ class Pupcake
     {
         return $this->router->executeRoute($route);
     }
+
 }
