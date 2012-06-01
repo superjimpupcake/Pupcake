@@ -13,7 +13,7 @@ Usage:
   $app = new \Pupcake\Pupcake();
 
   $app->get("/hello/:name", function($name){
-    return "hello ".$name;
+      return "hello ".$name;
   });
 
   $app->run();
@@ -27,7 +27,7 @@ Usage:
   $app = new \Pupcake\Pupcake();
 
   $app->post("/hello/:name", function($name){
-    return "hello ".$name;
+      return "hello ".$name;
   });
 
   $app->run();
@@ -41,7 +41,7 @@ Usage:
   $app = new \Pupcake\Pupcake();
 
   $app->post("/hello/:name", function($name) use ($app) {
-    $app->redirect("/test");
+      $app->redirect("/test");
   });
 
   $app->run();
@@ -55,11 +55,11 @@ Usage:
   $app = new \Pupcake\Pupcake();
 
   $app->get("/hello/:name", function($name){
-    return $name;
+      return $name;
   });
 
   $app->post("/hello/:name", function($name){
-    return "posting $name to hello";
+      return "posting $name to hello";
   });
 
   $app->get("test", function() use ($app){
@@ -67,21 +67,21 @@ Usage:
   });
 
   $app->any("date/:year/:month/:day", function($year, $month, $day){
-    return $year."-".$month."-".$day;
+      return $year."-".$month."-".$day;
   });
 
   $app->get("/test2", function(){
-    return "testing 2";
+      return "testing 2";
   });
 
   $app->get("test_internal", function() use ($app) {
-    $content = "";
-    $content .= $app->forward("POST", "hello/world")."<br/>";
-    $content .= $app->forward("GET", "hello/world2")."<br/>";
-    $content .= $app->forward("GET", "hello/world3")."<br/>";
-    $content .= $app->forward("GET", "test")."<br/>";
-    $content .= $app->forward("POST", "date/2012/05/30")."<br/>";
-    return $content;
+      $content = "";
+      $content .= $app->forward("POST", "hello/world")."<br/>";
+      $content .= $app->forward("GET", "hello/world2")."<br/>";
+      $content .= $app->forward("GET", "hello/world3")."<br/>";
+      $content .= $app->forward("GET", "test")."<br/>";
+      $content .= $app->forward("POST", "date/2012/05/30")."<br/>";
+      return $content;
   });
 
   $app->run();
