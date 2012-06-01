@@ -6,7 +6,7 @@ Pubcake is a micro framework for PHP 5.3+
 Usage:
 
 1. Simple get request
-```
+```php
     <?php
     require "pupcake.php";
 
@@ -21,7 +21,7 @@ Usage:
 
 2. Simple post request
 
-```
+```php
     <?php
     require "pupcake.php";
 
@@ -35,8 +35,7 @@ Usage:
 ```
 
 3. Request direction
-
-```
+```php
   <?php
   require "pupcake.php";
 
