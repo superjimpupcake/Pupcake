@@ -206,9 +206,6 @@ class Pupcake
 
     public function __construct()
     {
-        error_reporting(-1);
-        ini_set('display_errors', 1);
-
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
@@ -216,8 +213,7 @@ class Pupcake
         set_error_handler(function ($severity, $message, $filepath, $line){
             EventManager::instance()->trigger('system.error.detected', '', func_get_args());
             return true;
-        });
-
+        }, E_ALL);
     }
 
     public static function instance()
