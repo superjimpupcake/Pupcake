@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.5.0
+ * @version 0.5.1
  * @package Pupcake
  */
 
@@ -366,7 +366,6 @@ class Pupcake
             $this->setQueryPath($query_path);
         }
         $output = "";
-        $matched_route;
         if(count($route_map) > 0){
             $request_types = array($_SERVER['REQUEST_METHOD'], "*");
             foreach($request_types as $request_type){
@@ -375,7 +374,6 @@ class Pupcake
                         //once we found there is a matching route, stop
                         if($this->router->processRouteMatching($request_type, $this->query_path, $route_pattern)){
                             $request_matched = true;
-                            $matched_route = $this->router->getMatchedRoute();
                             break 2;
                         }
                     }
@@ -392,6 +390,7 @@ class Pupcake
         }
         else{
             //request matched
+            $matched_route = $this->router->getMatchedRoute();
             $output = $this->event_manager->trigger("system.request.found", function($matched_route){
                 return call_user_func_array($matched_route->getCallback(), $matched_route->getParams());
             }, array($matched_route));
