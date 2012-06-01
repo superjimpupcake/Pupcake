@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.1
+ * @version 0.2
  * @package Pupcake
  */
 
@@ -86,8 +86,12 @@ class Router
         return $result;
     }
 
-    public function addRoute($request_type, $route_pattern, $callback)
+    public function addRoute(Router $route)
     {
+        $request_type = $route->getRequestType();
+        $route_pattern = $route->getPattern();
+        $callback = $route->getCallback();
+
         if($route_pattern == "/*"){
             $route_pattern = "/:path";
         }
@@ -160,17 +164,23 @@ class Router
 
 class Route
 {
-
+    private $request_type;
     private $route_pattern;
     private $callback;
 
-    public function __construct($route_pattern, $callback)
+    public function __construct($request_type = "", $route_pattern, $callback)
     {
         if($route_pattern[0] != '/'){
             $route_pattern = "/".$route_pattern;
         }
+        $this->request_type = $request_type;
         $this->route_pattern = $route_pattern;
         $this->callback = $callback;
+    }
+
+    public function getRequestType()
+    {
+        return $this->request_type;
     }
 
     public function getPattern()
@@ -189,7 +199,8 @@ class Route
         $request_types_count = count($request_types);
         if($request_types_count > 0){
             for($k=0;$k<$request_types_count;$k++){
-                $router->addRoute($request_types[$k], $this->route_pattern, $this->callback);
+                $this->request_type = $request_types[$k];
+                $router->addRoute($this);
             } 
         }
     }
@@ -227,7 +238,7 @@ class Pupcake
 
     public function map($route_pattern, $callback)
     {
-        $route = new Route($route_pattern, $callback);
+        $route = new Route("", $route_pattern, $callback);
         return $route;
     }
 
