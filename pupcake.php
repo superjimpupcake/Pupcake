@@ -236,7 +236,7 @@ class Pupcake
     public function sendInternalRequest($request_type, $query_path)
     {
         $is_nested_internal_request = false;
-        if($this->request_mode == 'internal'){ //this is a nested interal request
+        if($this->request_mode == 'internal'){ //this is a nested internal request
             $is_nested_internal_request = true;
         }
 
