@@ -143,3 +143,17 @@ $app->get('test', function() use ($app) {
 
 $app->run();
 ```
+
+###Advance Event handling
+```php
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->on('system.request.notfound', function(){
+    return "request not found handler";
+});
+
+$app->run();
+```

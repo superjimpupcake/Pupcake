@@ -2,6 +2,44 @@
 
 namespace Pupcake;
 
+class EventManager
+{
+    private $event_queue;
+
+    public function __construct()
+    {
+        $this->event_queue = array();
+    }
+
+    public static function instance()
+    {
+        static $instance;
+        if(!isset($instance)){
+            $instance = new static();
+        }
+        return $instance; 
+    }
+
+    public function getEventQueue()
+    {
+        return $this->event_queue;
+    }
+
+    public function register($event_name, $callback)
+    {
+        $this->event_queue[$event_name] = $callback;
+    }
+
+    public function trigger($event_name, $callback = "")
+    {
+        if(isset($this->event_queue[$event_name])){
+            $callback = $this->event_queue[$event_name];
+        }
+        $output = $callback();
+        return $output;
+    }
+}
+
 class Router
 {
     private $route_map;
@@ -100,34 +138,6 @@ class Router
         return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
     }
 
-    private function defaultRouteNotFoundHandler()
-    {
-        return "Invalid Request!";
-    }
-
-    /**
-     * set route not found handler
-     */
-    public function setRouteNotFoundHanlder($callback)
-    {
-        $this->route_not_found_handler = $callback;
-    }
-
-    /**
-     * process route not found 
-     */
-    public function processRouteNotFound()
-    {
-        if(!isset($this->route_not_found_handler)){
-            return $this->defaultRouteNotFoundHandler();
-        }
-        else{
-            $callback = $this->route_not_found_handler;
-            return $callback();
-        }
-    }
-
-
 }
 
 class Route
@@ -174,12 +184,14 @@ class Pupcake
     private $router;
     private $return_output;
     private $request_mode; 
+    private $event_manager;
 
     public function __construct()
     {
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
+        $this->event_manager = EventManager::instance();
     }
 
     public static function instance()
@@ -229,7 +241,7 @@ class Pupcake
 
     public function notFound($callback)
     {
-        $this->router->setRouteNotFoundHanlder($callback);
+        EventManager::instance()->register('system.request.notfound', $callback);
     }
 
     public function sendInternalRequest($request_type, $query_path)
@@ -291,7 +303,9 @@ class Pupcake
         if(!$request_matched){
             //route not found
             header("HTTP/1.0 404 Not Found");
-            $output = $this->router->processRouteNotFound();
+            $output = EventManager::instance()->trigger("system.request.notfound", function(){
+                return "Invalid Request!";
+            });
         }
 
         if($this->return_output){
@@ -339,4 +353,8 @@ class Pupcake
         }
     }
 
+    public function on($event_name, $callback)
+    {
+        $this->event_manager->register($event_name, $callback);
+    }
 }
