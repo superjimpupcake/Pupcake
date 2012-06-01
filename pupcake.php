@@ -357,6 +357,7 @@ class Pupcake
 
     public function run()
     {
+        $this->turnOnComponentsAutoLoading();
         $route_map = $this->router->getRouteMap();
         $request_matched = false;
         if($this->request_mode == 'external'){
@@ -454,9 +455,9 @@ class Pupcake
     }
 
     /**
-     * turn on autoloading so we can hook up to 3rd party libraries
+     * turn on component autoloading so we can hook up to 3rd party components
      */
-    public function turnOnAutoLoading()
+    public function turnOnComponentsAutoLoading()
     {
         static $loader;
         if(!isset($loader)){
