@@ -164,3 +164,20 @@ $app->on('system.request.notfound', function(){
 
 $app->run();
 ```
+
+###Advance Error Handling
+```php
+<?php
+
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->on('system.error.detected', function($severity, $message, $filepath, $line){
+    print "$message in $filepath at line #$line<br/>";
+});
+
+print $output; //undefined variable
+
+$app->run();
+```

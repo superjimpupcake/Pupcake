@@ -30,7 +30,7 @@ class EventManager
         $this->event_queue[$event_name] = $callback;
     }
 
-    public function trigger($event_name, $callback = "")
+    public function trigger($event_name, $callback = "", $params = array())
     {
         if(isset($this->event_queue[$event_name])){
             $callback = $this->event_queue[$event_name];
@@ -40,7 +40,7 @@ class EventManager
             return "";
         }
         else{
-            return $callback();
+            return call_user_func_array($callback, $params);
         } 
     }
 }
@@ -193,10 +193,18 @@ class Pupcake
 
     public function __construct()
     {
+        error_reporting(-1);
+        ini_set('display_errors', 0);
+
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
         $this->event_manager = EventManager::instance();
+        set_error_handler(function ($severity, $message, $filepath, $line){
+            EventManager::instance()->trigger('system.error.detected', '', func_get_args());
+            return true;
+        });
+
     }
 
     public static function instance()
