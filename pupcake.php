@@ -11,7 +11,6 @@
 
 namespace Pupcake;
 
-
 class Pupcake
 {
     private $request_type;
