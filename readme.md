@@ -165,7 +165,7 @@ $app->on('system.request.notfound', function(){
 $app->run();
 ```
 
-###Advance Event Handling --- detect system error
+###Advanced Event Handling --- detect system error
 ```php
 <?php
 
@@ -185,7 +185,7 @@ print $output; //undefined variable
 $app->run();
 ```
 
-###Advance Event Handling --- custom response output
+###Advanced Event Handling --- custom response output
 ####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
