@@ -207,7 +207,7 @@ class Pupcake
     public function __construct()
     {
         error_reporting(-1);
-        ini_set('display_errors', 0);
+        ini_set('display_errors', 1);
 
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
