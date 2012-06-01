@@ -114,3 +114,21 @@ Usage:
 
     $app->run();
 ```
+
+7. Request type detection in internal and external request
+```php
+    <?php
+    require "pupcake.php";
+
+    $app = new \Pupcake\Pupcake();
+
+    $app->post('api/me/update', function() use ($app) {
+        return $app->getRequestType();
+    });
+
+    $app->get('test', function() use ($app) {
+        return $app->getRequestType().":".$app->forward('POST','api/me/update');
+    });
+
+    $app->run();
+```
