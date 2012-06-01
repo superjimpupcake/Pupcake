@@ -1,11 +1,9 @@
 Pupcake --- a micro framework for PHP 5.3+
 =======================================
 
-##Pupcake is a micro framework for PHP 5.3+
-
 ##Usage:
 
-###Simple get request
+###Simple get,post,put,delete requests
 ```php
 <?php
 require "pupcake.php";
@@ -13,21 +11,19 @@ require "pupcake.php";
 $app = new \Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
-  return "hello ".$name;
+  return "hello ".$name." in get";
 });
 
-$app->run();
-```
-
-###Simple post request
-```php
-<?php
-require "pupcake.php";
-
-$app = new \Pupcake\Pupcake();
-
 $app->post("/hello/:name", function($name){
-  return "hello ".$name;
+  return "hello ".$name." in post";
+});
+
+$app->put("/hello/:name", function($name){
+  return "hello ".$name." in put";
+});
+
+$app->delete("/hello/:name", function($name){
+  return "hello ".$name." in delete";
 });
 
 $app->run();
