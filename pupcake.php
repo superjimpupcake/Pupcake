@@ -4,7 +4,6 @@ namespace Pupcake;
 
 class Router
 {
-    private static $instance;
     private $route_map;
     private $params;
     private $route_not_found_handler;
@@ -16,10 +15,11 @@ class Router
 
     public static function instance()
     {
-        if(!isset(static::$instance)){
-            static::$instance = new static();
+        static $instance;
+        if(!isset($instance)){
+            $instance = new static();
         }
-        return static::$instance; 
+        return $instance; 
     }
 
     public function getMatchParams(){
@@ -169,7 +169,6 @@ class Route
 
 class Pupcake
 {
-    private static $instance;
     private $request_type;
     private $query_path;
     private $router;
@@ -185,10 +184,11 @@ class Pupcake
 
     public static function instance()
     {
-        if(!isset(static::$instance)){
-            static::$instance = new static();
+        static $instance;
+        if(!isset($instance)){
+            $instance = new static();
         }
-        return static::$instance; 
+        return $instance; 
     }
 
     public function map($route_pattern, $callback)
