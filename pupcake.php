@@ -11,6 +11,246 @@
 
 namespace Pupcake;
 
+class EventManager
+{
+    /**
+     * @var array
+     * Pupcake Event Queue
+     */
+    private $event_queue; 
+
+    public function __construct()
+    {
+        $this->event_queue = array();
+    }
+
+    public static function instance()
+    {
+        static $instance;
+        if(!isset($instance)){
+            $instance = new static();
+        }
+        return $instance; 
+    }
+
+    public function getEventQueue()
+    {
+        return $this->event_queue;
+    }
+
+    public function register($event_name, $callback)
+    {
+        $this->event_queue[$event_name] = $callback;
+    }
+
+    public function trigger($event_name, $callback = "", $params = array())
+    {
+        if(isset($this->event_queue[$event_name])){
+            $callback = $this->event_queue[$event_name];
+        }
+
+        if($callback == ""){
+            return "";
+        }
+        else{
+            return call_user_func_array($callback, $params);
+        } 
+    }
+}
+
+class Router
+{
+    private $route_map;
+    private $route_not_found_handler;
+    private $matched_route;
+
+    public function __construct()
+    {
+        $this->route_map = array(); //initialize the route map
+    }
+
+    public static function instance()
+    {
+        static $instance;
+        if(!isset($instance)){
+            $instance = new static();
+        }
+        return $instance; 
+    }
+
+    public function setMatchedRoute(Route $matched_route)
+    {
+        $this->matched_route = $matched_route;
+    }
+
+    public function getMatchedRoute()
+    {
+        return $this->matched_route;
+    }
+
+    public function addRoute(Route $route)
+    {
+        $request_type = $route->getRequestType();
+        $route_pattern = $route->getPattern();
+
+        if($route_pattern == "/*"){
+            $route_pattern = "/:path";
+        }
+
+        if(!isset($this->route_map[$request_type])){
+            $this->route_map[$request_type] = array();
+        }
+
+        $this->route_map[$request_type][$route_pattern] = $route;
+    }
+
+    public function getRoute($request_type, $route_pattern)
+    {
+        return $this->route_map[$request_type][$route_pattern];
+    }
+
+    public function getRouteMap()
+    {
+        return $this->route_map;
+    }
+
+    public function processRouteMatching($request_type, $uri, $route_pattern)
+    {
+       return $this->matches($request_type, $uri, $route_pattern); 
+    }
+
+    /**
+     * Match URI
+     *
+     * Parse this route's pattern, and then compare it to an HTTP resource URI
+     * This method was modeled after the techniques demonstrated by Dan Sosedoff at:
+     *
+     * http://blog.sosedoff.com/2009/09/20/rails-like-php-url-router/
+     *
+     * @param   string  $request_type The request type
+     * @param   string  $uri A Request URI
+     * @param   string  $route_pattern The route pattern
+     * @return  bool
+     */
+    protected function matches( $request_type, $uri, $route_pattern ) 
+    {
+        $params = array(); //clear possible previous matched params
+        //Extract URL params
+        preg_match_all('@:([\w]+)@', $route_pattern, $param_names, PREG_PATTERN_ORDER);
+        $param_names = $param_names[0];
+
+        //Convert URL params into regex patterns, construct a regex for this route
+
+        $matching_callback = function($matches){
+            $key = str_replace(':', '', $matches[0]);
+            return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
+        };
+
+        $pattern_as_regex = preg_replace_callback('@:[\w]+@', $matching_callback,  $route_pattern);
+        
+        if ( substr($route_pattern, -1) === '/' ) {
+            $pattern_as_regex = $pattern_as_regex . '?';
+        }
+        $pattern_as_regex = '@^' . $pattern_as_regex . '$@';
+
+        //Cache URL params' names and values if this route matches the current HTTP request
+        if ( preg_match($pattern_as_regex, $uri, $param_values) ) {
+            array_shift($param_values);
+            foreach ( $param_names as $index => $value ) {
+                $val = substr($value, 1);
+                if ( isset($param_values[$val]) ) {
+                    $params[$val] = urldecode($param_values[$val]);
+                }
+            }
+
+            $route = $this->getRoute($request_type, $route_pattern);
+            $route->setParams($params);
+            $this->setMatchedRoute($route); 
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function executeRoute($route)
+    {
+        return call_user_func_array($route->getCallback(), $route->getParams());
+    }
+}
+
+class Route
+{
+    private $request_type;
+    private $route_pattern;
+    private $callback;
+    private $route_params;
+
+    public function __construct($request_type = "", $route_pattern, $callback="", $route_params = array())
+    {
+        if($route_pattern[0] != '/'){
+            $route_pattern = "/".$route_pattern;
+        }
+        $this->request_type = $request_type;
+        $this->route_pattern = $route_pattern;
+        $this->callback = $callback;
+        $this->route_params = $route_params;
+    }
+
+    public function setRequestType($request_type)
+    {
+        $this->request_type = $request_type;
+    }
+
+    public function getRequestType()
+    {
+        return $this->request_type;
+    }
+
+    public function setPattern($route_pattern)
+    {
+        $this->route_pattern = $route_pattern;
+    }
+
+    public function getPattern()
+    {
+        return $this->route_pattern;
+    }
+
+    public function setCallback($callback)
+    {
+        $this->callback = $callback;
+    }
+
+    public function getCallback(){
+        return $this->callback;
+    }
+
+    public function setParams($route_params)
+    {
+        $this->route_params = $route_params;
+    }
+
+    public function getParams()
+    {
+        return $this->route_params;
+    }
+
+    public function via()
+    {
+        $router = Router::instance();
+        $request_types = func_get_args();
+        $request_types_count = count($request_types);
+        if($request_types_count > 0){
+            for($k=0;$k<$request_types_count;$k++){
+                $this->request_type = $request_types[$k];
+                $router->addRoute($this);
+            } 
+        }
+    }
+}
+
+
 class Pupcake
 {
     private $request_type;
@@ -31,8 +271,6 @@ class Pupcake
         register_shutdown_function(function(){
             EventManager::instance()->trigger('system.shutdown');
         });
-
-        $this->class_loader = $this->getClassLoader();
 
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
@@ -216,23 +454,18 @@ class Pupcake
     }
 
     /**
-     * get a universal class loader
+     * turn on autoloading so we can hook up to 3rd party libraries
      */
-    public function getClassLoader()
+    public function turnOnAutoLoading()
     {
         static $loader;
         if(!isset($loader)){
             require __DIR__."/components/Symfony/Component/ClassLoader/UniversalClassLoader.php";
             $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
-            $loader->registerNamespaces(array(
-                'Pupcake' => __DIR__."/components",
-            ));
-            $loader->register();
-
-            /**
+             /**
              * register more namesapces
              */
-            $namespaces = EventManager::instance()->trigger('system.namespace.register', function(){
+            $namespaces = $this->event_manager->trigger('system.components.autoloading', function(){
                 return array();
             });
             if(count($namespaces) > 0){
@@ -240,6 +473,5 @@ class Pupcake
                 $loader->register();
             }
         }
-        return $loader;
     }
 }
