@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.4.0
+ * @version 0.4.1
  * @package Pupcake
  */
 
@@ -370,7 +370,7 @@ class Pupcake
             $request_types = array($_SERVER['REQUEST_METHOD'], "*");
             foreach($request_types as $request_type){
                 if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
-                    foreach($route_map[$request_type] as $route_pattern => $callback){
+                    foreach($route_map[$request_type] as $route_pattern => $route){
                         //once we found there is a matching route, stop
                         if($this->router->processRouteMatching($request_type, $this->query_path, $route_pattern)){
                             $request_matched = true;
