@@ -203,7 +203,7 @@ $app->on('system.request.found', function($callback, $params){
 
 $app->run();
 ```
-####We can even define out own callback to generate our own output
+####We can even define our own callback to generate our own output
 ```php
 <?php
 require "pupcake.php";
