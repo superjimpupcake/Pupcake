@@ -186,6 +186,7 @@ $app->run();
 ```
 
 ###Advance Event Handling --- custom response output
+####We can "intercept" the output generation process when request a found and a route is matched
 ```php
 <?php
 require "pupcake.php";
@@ -197,6 +198,26 @@ $app->get("/hello/:name", function($name){
 });
 
 $app->on('system.request.found', function($callback, $params){
+    return "prepend outputs".call_user_func_array($callback, $params);
+});
+
+$app->run();
+```
+####We can even define out own callback to generate our own output
+```php
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->get("/hello/:name", function($name){
+  return $name;
+});
+
+$app->on('system.request.found', function($callback, $params){
+    $callback = function(){
+        return "flexible output";
+    };
     return "prepend outputs".call_user_func_array($callback, $params);
 });
 
