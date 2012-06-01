@@ -184,3 +184,20 @@ print $output; //undefined variable
 
 $app->run();
 ```
+
+###Advance Event Handling --- custom response output
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->get("/hello/:name", function($name){
+  return $name;
+});
+
+$app->on('system.request.found', function($callback, $params){
+    return "prepend outputs".call_user_func_array($callback, $params);
+});
+
+$app->run();
+```
