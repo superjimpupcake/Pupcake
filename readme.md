@@ -226,8 +226,8 @@ require "pupcake.php";
 
 $app = new \Pupcake\Pupcake();
 
-$app->get("/hello/:name", function($name) use ($app) {
-    $output = $app->bridge('jade_php')->render("!!! 5");
+$app->get("/jadedemo", function($name) use ($app) {
+    $output = $app->bridge('jade_php')->render("!!! 5\np testing");
     return $output;
 });
 
