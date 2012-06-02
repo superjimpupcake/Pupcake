@@ -168,7 +168,6 @@ $app->run();
 ###Advanced Event Handling --- detect system error
 ```php
 <?php
-
 require "pupcake.php";
 
 $app = new \Pupcake\Pupcake();
@@ -177,8 +176,10 @@ $app = new \Pupcake\Pupcake();
  * By defining custom callback for system.error.detected event, 
  * we can build a custom error handling system
  */
-$app->on('system.error.detected', function($severity, $message, $filepath, $line){
-    print "$message in $filepath at line #$line<br/>";
+$app->on('system.error.detected', function($error){
+    $message = $error->getMessage();
+    $line = $error->getLine();
+    print $message." at ".$line."\n";
 });
 
 print $output; //undefined variable
