@@ -217,7 +217,7 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
-###Get a jade_php component
+###Get a jade_php component to render jade template
 ```php
 <?php
 require "pupcake.php";
