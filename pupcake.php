@@ -459,20 +459,13 @@ class Pupcake
      */
     public function turnOnComponentsAutoLoading()
     {
-        static $loader;
-        if(!isset($loader)){
-            require __DIR__."/components/Symfony/Component/ClassLoader/UniversalClassLoader.php";
-            $loader = new \Symfony\Component\ClassLoader\UniversalClassLoader();
-             /**
-             * register more namesapces
-             */
-            $namespaces = $this->event_manager->trigger('system.components.autoloading', function(){
-                return array();
+        $this->event_manager->trigger('system.components.autoloading', function(){
+            spl_autoload_register(function($class){
+                $file_path = __DIR__."/components/$class.php";
+                if(file_exists($file_path)){
+                    require $file_path;
+                }
             });
-            if(count($namespaces) > 0){
-                $loader->registerNamespaces($namespaces);
-                $loader->register();
-            }
-        }
+        });
     }
 }
