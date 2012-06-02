@@ -217,29 +217,3 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
-###Advanced Event Handling --- component autoloading
-####We can auto load third party components by hooking into system.components.autoload.mapping event
-```php
-<?php
-
-require "pupcake.php";
-
-$app = new \Pupcake\Pupcake();
-
-$app->on('system.components.autoload.mapping', function(){
-    /**
-     * Usage: return array(
-     *   [namespace1] => [lookup directory1],
-     *   [namespace2] => [lookup directory2],
-     * );
-     */
-    return array('Test' => __DIR__.'/components');
-});
-
-$app->get("/hello/:name", function($name){
-    $test = new \Test\Test();
-    return $test->hello();
-});
-
-$app->run();
-```

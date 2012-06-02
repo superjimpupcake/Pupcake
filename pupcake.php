@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.6.1
+ * @version 0.6.2
  * @package Pupcake
  */
 
@@ -359,34 +359,6 @@ class Pupcake
 
     public function run()
     {
-
-        /**
-         * turn on component autoloading so we can hook up to 3rd party components only when request is found
-         */
-        if($this->request_mode == 'external'){ //make sure the auto loading only happen once
-            $components_lookup_map = $this->event_manager->trigger('system.components.autoload.mapping', function(){
-                return array();
-            });
-
-            if(count($components_lookup_map) > 0){
-                spl_autoload_register(function($class) use($components_lookup_map){
-                    $found_class_file = false;
-                    $file_path = "";
-                    foreach($components_lookup_map as $namespace => $class_lookup_path){
-                        $file = str_replace($namespace."/", "", $class);
-                        $file_path = $components_lookup_map[$namespace]."/".str_replace("\\","/",$file).".php";
-                        if(is_file($file_path)){
-                            $found_class_file = true;
-                            break;
-                        }
-                    }
-                    if($found_class_file){
-                        require $file_path;
-                    }
-                });
-            }
-        }
-
         $route_map = $this->router->getRouteMap();
         $request_matched = false;
         if($this->request_mode == 'external'){
@@ -481,5 +453,11 @@ class Pupcake
     public function executeRoute(Route $route)
     {
         return $this->router->executeRoute($route);
+    }
+
+    public function getComponent($component_name)
+    {
+        require __DIR__."/components/".$component_name."/".$component_name.".php";
+        return $jade;
     }
 }
