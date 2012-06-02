@@ -227,7 +227,13 @@ require "pupcake.php";
 $app = new \Pupcake\Pupcake();
 
 $app->on('system.components.autoload.mapping', function(){
-    return array('Test\Test' => __DIR__.'/components');
+    /**
+     * Usage: return array(
+     *   [namespace1] => [lookup directory1],
+     *   [namespace2] => [lookup directory2],
+     * );
+     */
+    return array('Test' => __DIR__.'/components');
 });
 
 $app->get("/hello/:name", function($name){

@@ -5,6 +5,6 @@ class Test
 {
     public function hello()
     {
-        return "hello";
+        return "hello test";
     }
 }
