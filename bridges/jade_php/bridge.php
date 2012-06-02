@@ -21,7 +21,7 @@ $parser = new Parser(new Lexer());
 $jade   = new Jade($parser, $dumper);
 
 /**
- * expose it to a component
+ * expose it as a bridge
  */
-$component = $jade;
+$bridge = $jade;
 

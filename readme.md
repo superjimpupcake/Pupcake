@@ -217,7 +217,8 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
-###Get a jade_php component to render jade template
+###Flexible bridging system
+####Render jade template by bridging jade_php 
 ```php
 <?php
 require "pupcake.php";
@@ -225,7 +226,7 @@ require "pupcake.php";
 $app = new \Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name) use ($app) {
-    $output = $app->getComponent('jade_php')->render("!!! 5");
+    $output = $app->bridge('jade_php')->render("!!! 5");
     return $output;
 });
 

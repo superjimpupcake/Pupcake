@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.1
+ * @version 0.8.2
  * @package Pupcake
  */
 
@@ -460,9 +460,9 @@ class Pupcake
         return $this->router->executeRoute($route);
     }
 
-    public function getComponent($component_name)
+    public function bridge($bridge_name)
     {
-        require __DIR__."/components/".$component_name."/".$component_name.".php";
-        return $component;
+        require __DIR__."/bridges/".$bridge_name."/bridge.php";
+        return $bridge;
     }
 }
