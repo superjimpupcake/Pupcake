@@ -259,10 +259,12 @@ class Pupcake
     private $return_output;
     private $request_mode; 
     private $event_manager;
-    private $class_loader;
+    private $components_lookup_map;
 
     public function __construct()
     {
+        $this->event_manager = EventManager::instance();
+        
         set_error_handler(function ($severity, $message, $filepath, $line){
             EventManager::instance()->trigger('system.error.detected', '', func_get_args());
             return true;
@@ -272,10 +274,10 @@ class Pupcake
             EventManager::instance()->trigger('system.shutdown');
         });
 
+
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
-        $this->event_manager = EventManager::instance();
     }
 
     public static function instance()
@@ -357,7 +359,6 @@ class Pupcake
 
     public function run()
     {
-        $this->turnOnComponentsAutoLoading();
         $route_map = $this->router->getRouteMap();
         $request_matched = false;
         if($this->request_mode == 'external'){
@@ -393,6 +394,28 @@ class Pupcake
         }
         else{
             //request matched
+
+            /**
+             * turn on component autoloading so we can hook up to 3rd party components only when request is found
+             */
+            if($this->request_mode == 'external'){ //make sure the auto loading only happen once
+                $components_lookup_map = $this->event_manager->trigger('system.components.autoload.mapping', function(){
+                    return array();
+                });
+
+                if(count($components_lookup_map) > 0){
+                    spl_autoload_register(function($class) use($components_lookup_map){
+                        if(isset($components_lookup_map[$class])){
+                            $class_path = str_replace("\\","/",$class);
+                            $file_path = $components_lookup_map[$class].'/'.$class_path.'.php';
+                            if(file_exists($file_path)){
+                                require $file_path;
+                            }
+                        }
+                    });
+                }
+            }
+
             $matched_route = $this->router->getMatchedRoute();
             $output = $this->event_manager->trigger("system.request.found", function($matched_route){
                 return call_user_func_array($matched_route->getCallback(), $matched_route->getParams());
@@ -452,20 +475,5 @@ class Pupcake
     public function executeRoute(Route $route)
     {
         return $this->router->executeRoute($route);
-    }
-
-    /**
-     * turn on component autoloading so we can hook up to 3rd party components
-     */
-    public function turnOnComponentsAutoLoading()
-    {
-        $this->event_manager->trigger('system.components.autoloading', function(){
-            spl_autoload_register(function($class){
-                $file_path = __DIR__."/components/$class.php";
-                if(file_exists($file_path)){
-                    require $file_path;
-                }
-            });
-        });
     }
 }
