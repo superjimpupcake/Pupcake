@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.0
+ * @version 0.8.1
  * @package Pupcake
  */
 
@@ -448,6 +448,11 @@ class Pupcake
     public function on($event_name, $callback)
     {
         $this->event_manager->register($event_name, $callback);
+    }
+
+    public function trigger($event_name)
+    {
+        $this->event_manager->trigger($event_name);
     }
 
     public function executeRoute(Route $route)
