@@ -19,3 +19,9 @@ $dumper->registerFilter('style', new CSSFilter());
 // Initialize parser & Jade
 $parser = new Parser(new Lexer());
 $jade   = new Jade($parser, $dumper);
+
+/**
+ * expose it to a component
+ */
+$component = $jade;
+

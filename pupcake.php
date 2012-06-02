@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.7.0
+ * @version 0.8.0
  * @package Pupcake
  */
 
@@ -458,6 +458,6 @@ class Pupcake
     public function getComponent($component_name)
     {
         require __DIR__."/components/".$component_name."/".$component_name.".php";
-        return $jade;
+        return $component;
     }
 }
