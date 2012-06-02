@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.2.2
+ * @version 0.8.2.3
  * @package Pupcake
  */
 
@@ -501,7 +501,7 @@ class Pupcake
     {
         $bridge = null;
         $bridge_path = __DIR__."/bridges/".$bridge_name."/bridge.php";
-        if(is_file($bridge_path)){
+        if(is_readable($bridge_path)){
             require $bridge_path;
         }
         return $bridge;
