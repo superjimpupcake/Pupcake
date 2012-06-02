@@ -217,3 +217,17 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
+####Get a jade_php component
+```php
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->get("/hello/:name", function($name) use ($app) {
+    $output = $app->getComponent('jade_php')->render("!!! 5");
+    return $output;
+});
+
+$app->run();
+```
