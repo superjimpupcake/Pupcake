@@ -379,23 +379,22 @@ class Pupcake
 
     public function sendInternalRequest($request_type, $query_path)
     {
-        $pupcake = Pupcake::instance();
         $is_nested_internal_request = false;
-        if($pupcake->getRequestMode() == 'internal'){ //this is a nested internal request
+        if($this->getRequestMode() == 'internal'){ //this is a nested internal request
             $is_nested_internal_request = true;
         }
 
-        $pupcake->setRequestMode("internal");
+        $this->setRequestMode("internal");
         $current_request_type = $_SERVER['REQUEST_METHOD'];
         $_SERVER['REQUEST_METHOD'] = $request_type; 
-        $pupcake->setQueryPath($query_path);
-        $pupcake->setReturnOutput(true);
-        $output = $pupcake->run();
+        $this->setQueryPath($query_path);
+        $this->setReturnOutput(true);
+        $output = $this->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
         
         if(!$is_nested_internal_request){
-            $pupcake->setReturnOutput(false);
-            $pupcake->setRequestMode("external");
+            $this->setReturnOutput(false);
+            $this->setRequestMode("external");
         }
 
         return $output;
@@ -408,9 +407,9 @@ class Pupcake
 
     public function run()
     {
-        $request_matched = EventManager::instance()->trigger('system.request.routing', function(){
-            $app = Pupcake::instance();
-            $router = Router::instance();
+        $app = $this; //use the current app instance
+        $router = $this->router; //use the current router
+        $request_matched = EventManager::instance()->trigger('system.request.routing', function() use($app, $router){
             $route_map = $router->getRouteMap();
             $request_matched = false;
             if($app->getRequestMode() == 'external'){
@@ -509,12 +508,11 @@ class Pupcake
 
     public function redirect($uri)
     {
-        $pupcake = Pupcake::instance();
-        if($pupcake->getRequestMode() == 'external'){
+        if($this->getRequestMode() == 'external'){
             header("Location: ".$uri);
         }
-        else if($pupcake->getRequestMode() == 'internal'){
-            return $pupcake->forward('GET', $uri);
+        else if($this->getRequestMode() == 'internal'){
+            return $this->forward('GET', $uri);
         }
     }
 
