@@ -401,7 +401,7 @@ class Pupcake
 
     public function run()
     {
-        $request_matched = $this->event_manager->trigger('system.routing.start', function(){
+        $request_matched = $this->event_manager->trigger('system.request.routing', function(){
             $app = Pupcake::instance();
             $router = Router::instance();
             $route_map = $router->getRouteMap();
