@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.5
+ * @version 0.8.6
  * @package Pupcake
  */
 
@@ -535,11 +535,14 @@ class Pupcake
 
     public function bridge($bridge_name)
     {
-        $bridge = null;
-        $bridge_path = __DIR__."/bridges/".$bridge_name."/bridge.php";
-        if(is_readable($bridge_path)){
-            require $bridge_path;
+        static $bridges = array();
+        if(!isset($bridges[$bridge_name])){
+            $bridge_path = __DIR__."/bridges/".$bridge_name."/bridge.php";
+            if(is_readable($bridge_path)){
+                require $bridge_path;
+                $bridges[$bridge_name] = $bridge;
+            }
         }
-        return $bridge;
+        return $bridges[$bridge_name];
     }
 }
