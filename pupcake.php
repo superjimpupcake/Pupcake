@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.4.2
+ * @version 0.8.4.3
  * @package Pupcake
  */
 
@@ -374,21 +374,23 @@ class Pupcake
 
     public function sendInternalRequest($request_type, $query_path)
     {
+        $pupcake = Pupcake::instance();
         $is_nested_internal_request = false;
-        if($this->request_mode == 'internal'){ //this is a nested internal request
+        if($pupcake->getRequestMode() == 'internal'){ //this is a nested internal request
             $is_nested_internal_request = true;
         }
 
-        $this->setRequestMode("internal");
+        $pupcake->setRequestMode("internal");
         $current_request_type = $_SERVER['REQUEST_METHOD'];
         $_SERVER['REQUEST_METHOD'] = $request_type; 
-        $this->setQueryPath($query_path);
-        $this->setReturnOutput(true);
+        $pupcake->setQueryPath($query_path);
+        $pupcake->setReturnOutput(true);
         $output = $this->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
+        
         if(!$is_nested_internal_request){
-            $this->setReturnOutput(false);
-            $this->setRequestMode("external");
+            $pupcake->setReturnOutput(false);
+            $pupcake->setRequestMode("external");
         }
 
         return $output;
@@ -401,7 +403,7 @@ class Pupcake
 
     public function run()
     {
-        $request_matched = $this->event_manager->trigger('system.request.routing', function(){
+        $request_matched = EventManager::instance()->trigger('system.request.routing', function(){
             $app = Pupcake::instance();
             $router = Router::instance();
             $route_map = $router->getRouteMap();
@@ -450,7 +452,7 @@ class Pupcake
             }, array(Router::instance()->getMatchedRoute()));
         }
 
-        if($this->return_output){
+        if(Pupcake::instance()->isReturnOutput()){
             return $output;
         }
         else{
@@ -480,6 +482,11 @@ class Pupcake
         $this->return_output = $return_output;
     }
 
+    public function isReturnOutput()
+    {
+        return $this->return_output;
+    }
+
     public function setRequestMode($request_mode)
     {
         $this->request_mode = $request_mode; 
@@ -497,11 +504,12 @@ class Pupcake
 
     public function redirect($uri)
     {
-        if($this->request_mode == 'external'){
+        $pupcake = Pupcake::instance();
+        if($pupcake->request_mode == 'external'){
             header("Location: ".$uri);
         }
-        else if($this->request_mode == 'internal'){
-            return $this->forward('GET', $uri);
+        else if($pupcake->request_mode == 'internal'){
+            return $pupcake->forward('GET', $uri);
         }
     }
 
