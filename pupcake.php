@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.3.0
+ * @version 0.8.4.0
  * @package Pupcake
  */
 
@@ -421,8 +421,11 @@ class Pupcake
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
                             //once we found there is a matching route, stop
-                            if($router->processRouteMatching($request_type, $app->getQueryPath(), $route_pattern)){
-                                $request_matched = true;
+                            $request_matched = EventManager::instance()->trigger('system.request.route.matching', 
+                                array($router, 'processRouteMatching'), 
+                                array($request_type,$app->getQueryPath(), $route_pattern)
+                            );
+                            if($request_matched){
                                 break 2;
                             }
                         }
