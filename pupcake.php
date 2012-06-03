@@ -505,10 +505,10 @@ class Pupcake
     public function redirect($uri)
     {
         $pupcake = Pupcake::instance();
-        if($pupcake->request_mode == 'external'){
+        if($pupcake->getRequestMode() == 'external'){
             header("Location: ".$uri);
         }
-        else if($pupcake->request_mode == 'internal'){
+        else if($pupcake->getRequestMode() == 'internal'){
             return $pupcake->forward('GET', $uri);
         }
     }
