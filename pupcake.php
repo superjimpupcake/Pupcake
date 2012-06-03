@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.4.1
+ * @version 0.8.4.2
  * @package Pupcake
  */
 
@@ -445,10 +445,9 @@ class Pupcake
         }
         else{
             //request matched
-            $matched_route = $this->router->getMatchedRoute();
             $output = $this->event_manager->trigger("system.request.found", function($matched_route){
                 return call_user_func_array($matched_route->getCallback(), $matched_route->getParams());
-            }, array($matched_route));
+            }, array(Router::instance()->getMatchedRoute()));
         }
 
         if($this->return_output){
