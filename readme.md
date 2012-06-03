@@ -234,3 +234,26 @@ $app->get("/jadedemo", function($name) use ($app) {
 
 $app->run();
 ```
+####Validation on route parameters by bridging respect_validation
+#####For detail usage of Respect/Validation, see: https://github.com/Respect/Validation 
+```php
+<?php
+require "pupcake.php";
+
+use Respect\Validation\Validator as v;
+
+$app = new \Pupcake\Pupcake();
+
+$app->get("/hello/:number", function($number) use ($app) {
+    $app->bridge('respect_validation');
+    $is_numeric = v::numeric()->validate($number);
+    if($is_numeric){
+        return "this is a numeric value";
+    }
+    else{
+        return "this is a non-numeric value";
+    }
+});
+
+$app->run();
+```
