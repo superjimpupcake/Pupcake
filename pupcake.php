@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.6
+ * @version 0.8.7
  * @package Pupcake
  */
 
@@ -456,7 +456,7 @@ class Pupcake
             }, array(Router::instance()->getMatchedRoute()));
         }
 
-        if(Pupcake::instance()->isReturnOutput()){
+        if($this->isReturnOutput()){
             return $output;
         }
         else{
@@ -538,7 +538,12 @@ class Pupcake
             $bridge_path = __DIR__."/bridges/".$bridge_name."/bridge.php";
             if(is_readable($bridge_path)){
                 require $bridge_path;
-                $bridges[$bridge_name] = $bridge;
+                if(isset($bridge)){
+                    $bridges[$bridge_name] = $bridge;
+                }
+                else{
+                    $bridges[$bridge_name] = true;
+                }
             }
         }
         return $bridges[$bridge_name];
