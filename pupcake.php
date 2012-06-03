@@ -390,7 +390,7 @@ class Pupcake
         $_SERVER['REQUEST_METHOD'] = $request_type; 
         $pupcake->setQueryPath($query_path);
         $pupcake->setReturnOutput(true);
-        $output = $this->run();
+        $output = $pupcake->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
         
         if(!$is_nested_internal_request){
