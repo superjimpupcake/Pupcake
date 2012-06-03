@@ -221,6 +221,7 @@ $app->run();
 ```
 ###Flexible bridging system to 3rd party libraries
 ####Render jade template by bridging jade_php 
+####For detail usage of jade php, see: https://github.com/everzet/jade.php
 ```php
 <?php
 require "pupcake.php";
