@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.4.0
+ * @version 0.8.4.1
  * @package Pupcake
  */
 
@@ -437,9 +437,9 @@ class Pupcake
         });
 
         if(!$request_matched){
-            //request not found
-            header("HTTP/1.0 404 Not Found");
             $output = $this->event_manager->trigger("system.request.notfound", function(){
+                //request not found
+                header("HTTP/1.0 404 Not Found");
                 return "Invalid Request";
             });
         }
