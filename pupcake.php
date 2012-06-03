@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.4.3
+ * @version 0.8.5
  * @package Pupcake
  */
 
@@ -360,6 +360,11 @@ class Pupcake
     public function options($route_pattern, $callback)
     {
         return $this->map($route_pattern, $callback)->via('OPTIONS');
+    }
+
+    public function patch($route_pattern, $callback)
+    {
+        return $this->map($route_pattern, $callback)->via('PATCH');
     }
 
     public function any($route_pattern, $callback)
