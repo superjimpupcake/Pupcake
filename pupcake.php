@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.2.3
+ * @version 0.8.3.0
  * @package Pupcake
  */
 
@@ -326,6 +326,11 @@ class Pupcake
         return $instance; 
     }
 
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
     public function map($route_pattern, $callback)
     {
         $route = new Route("", $route_pattern, $callback);
@@ -396,31 +401,37 @@ class Pupcake
 
     public function run()
     {
-        $route_map = $this->router->getRouteMap();
-        $request_matched = false;
-        if($this->request_mode == 'external'){
-            $query_path = "/";
-            $script_base_name = basename($_SERVER['SCRIPT_FILENAME']);
-            if($_SERVER['PHP_SELF'] != '/'.$script_base_name){
-                $query_path = str_replace($script_base_name."/", "", $_SERVER['PHP_SELF']);
+        $request_matched = $this->event_manager->trigger('system.routing.start', function(){
+            $app = Pupcake::instance();
+            $router = Router::instance();
+            $route_map = $router->getRouteMap();
+            $request_matched = false;
+            if($app->getRequestMode() == 'external'){
+                $query_path = "/";
+                $script_base_name = basename($_SERVER['SCRIPT_FILENAME']);
+                if($_SERVER['PHP_SELF'] != '/'.$script_base_name){
+                    $query_path = str_replace($script_base_name."/", "", $_SERVER['PHP_SELF']);
+                }
+                $app->setQueryPath($query_path);
             }
-            $this->setQueryPath($query_path);
-        }
-        $output = "";
-        if(count($route_map) > 0){
-            $request_types = array($_SERVER['REQUEST_METHOD'], "*");
-            foreach($request_types as $request_type){
-                if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
-                    foreach($route_map[$request_type] as $route_pattern => $route){
-                        //once we found there is a matching route, stop
-                        if($this->router->processRouteMatching($request_type, $this->query_path, $route_pattern)){
-                            $request_matched = true;
-                            break 2;
+            $output = "";
+            if(count($route_map) > 0){
+                $request_types = array($_SERVER['REQUEST_METHOD'], "*");
+                foreach($request_types as $request_type){
+                    if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
+                        foreach($route_map[$request_type] as $route_pattern => $route){
+                            //once we found there is a matching route, stop
+                            if($router->processRouteMatching($request_type, $app->getQueryPath(), $route_pattern)){
+                                $request_matched = true;
+                                break 2;
+                            }
                         }
                     }
                 }
             }
-        }
+
+            return $request_matched;
+        });
 
         if(!$request_matched){
             //request not found
@@ -457,6 +468,11 @@ class Pupcake
         $this->query_path = $query_path;
     }
 
+    public function getQueryPath()
+    {
+        return $this->query_path;
+    }
+
     public function setReturnOutput($return_output)
     {
         $this->return_output = $return_output;
@@ -465,6 +481,11 @@ class Pupcake
     public function setRequestMode($request_mode)
     {
         $this->request_mode = $request_mode; 
+    }
+
+    public function getRequestMode()
+    {
+        return $this->request_mode;
     }
 
     public function getRequestType()
