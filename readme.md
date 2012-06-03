@@ -219,7 +219,7 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
-###Flexible bridging system
+###Flexible bridging system to 3rd party libraries
 ####Render jade template by bridging jade_php 
 ```php
 <?php
