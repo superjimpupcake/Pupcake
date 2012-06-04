@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.8.7.1
+ * @version 0.8.8
  * @package Pupcake
  */
 
@@ -529,23 +529,5 @@ class Pupcake
     public function executeRoute(Route $route)
     {
         return $this->router->executeRoute($route);
-    }
-
-    public function bridge($bridge_name)
-    {
-        static $bridges = array();
-        if(!isset($bridges[$bridge_name])){
-            $bridge_path = __DIR__."/bridges/".$bridge_name."/bridge.php";
-            if(is_readable($bridge_path)){
-                require $bridge_path;
-                if(isset($bridge)){
-                    $bridges[$bridge_name] = $bridge;
-                }
-                else{
-                    $bridges[$bridge_name] = true;
-                }
-            }
-        }
-        return $bridges[$bridge_name];
     }
 }
