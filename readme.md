@@ -5,9 +5,9 @@ Pupcake --- a micro framework for PHP 5.3+
 
 add "Pupcake/Pupcake": "*" to your composer.json
 also add this .htaccess file to your document root
-  RewriteEngine On
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^(.*)$ index.php/$1 [L]
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php/$1 [L]
 
 ##Usage:
 
