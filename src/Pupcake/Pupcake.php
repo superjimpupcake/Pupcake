@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.3
+ * @version 0.9.4
  * @package Pupcake
  */
 
@@ -18,10 +18,17 @@ class EventManager
      * Pupcake Event Queue
      */
     private $event_queue; 
+    
+    /**
+     * @var array
+     * @Pupcake Event execution result
+     */
+    private $event_execution_result;
 
     public function __construct()
     {
         $this->event_queue = array();
+        $this->event_execution_result = array();
     }
 
     public static function instance()
@@ -45,16 +52,22 @@ class EventManager
 
     public function trigger($event_name, $callback = "", $params = array())
     {
-        if(isset($this->event_queue[$event_name])){
-            $callback = $this->event_queue[$event_name];
-        }
 
-        if($callback == ""){
-            return "";
+        if($callback == "" && isset($this->event_execution_result[$event_name]) ){
+            return $this->event_execution_result[$event_name];
         }
         else{
-            return call_user_func_array($callback, $params);
-        } 
+            if(isset($this->event_queue[$event_name])){
+                $callback = $this->event_queue[$event_name];
+            }
+
+            $result = "";
+            if($callback != ""){
+                $result = call_user_func_array($callback, $params);
+                $this->event_execution_result[$event_name] = $result;
+            } 
+            return $result;
+        }
     }
 }
 
