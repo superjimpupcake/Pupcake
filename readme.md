@@ -279,7 +279,7 @@ $app->get("hello/:string", function($string) use ($app){
 $app->run();
 ```
 ###Custom Event Handling --- set up services to render php templates using kaloa/view
-####We can creaet arbitary service events to hook up to kaloa/view package (https://github.com/mermshaus/kaloa-view)
+####We can create arbitary service events to hook up to kaloa/view package (https://github.com/mermshaus/kaloa-view)
 ```php
 <?php
 /**
