@@ -217,3 +217,31 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
+###Advanced Event Handling --- set up services to do validation on route parameters
+####We can create arbitary service events to hook up to Respect/Validation package (https://github.com/Respect/Validation)
+```php
+<?php
+require "vendor/autoload.php";
+
+$app = new Pupcake\Pupcake();
+
+use Respect\Validation\Validator as v;
+
+$app->on('service.validation.numeric', function(){
+    return v::numeric();
+});
+
+$app->on('service.validation.email', function(){
+    return v::email();
+});
+
+$app->get("hello/:string", function($string) use ($app){
+    if($app->trigger('service.validation.numeric')->validate($string)){
+        return "number detected";
+    }
+    else if($app->trigger('service.validation.email')->validate($string)){
+        return "email detected";
+    }
+});
+$app->run();
+```
