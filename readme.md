@@ -278,3 +278,28 @@ $app->get("hello/:string", function($string) use ($app){
 });
 $app->run();
 ```
+###Custom Event Handling --- set up services to render php templates using kaloa/view
+####We can creaet arbitary service events to hook up to kaloa/view package (https://github.com/mermshaus/kaloa-view)
+```php
+<?php
+/**
+ * First, we need to make sure kaloa/view package is installed properly via composer
+ * Also, the views/index.phtml file should be created and has proper write permissions for the server
+ */
+
+require "vendor/autoload.php";
+
+$app = new Pupcake\Pupcake();
+
+$app->on('service.kaloa.view', function(){
+    $view = Kaloa\View\View();
+    return $view;
+});
+
+$app->get("hello/:string", function($string) use ($app){
+    $view = $app->trigger('service.kaloa.view');
+    $view->string = $string;
+    return $view->render("views/index.phtml");
+});
+$app->run();
+```
