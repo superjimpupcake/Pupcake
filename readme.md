@@ -225,23 +225,26 @@ require "vendor/autoload.php";
 
 $app = new Pupcake\Pupcake();
 
-use Respect\Validation\Validator as v;
-
-$app->on('service.validation.numeric', function(){
-    return v::numeric();
-});
-
-$app->on('service.validation.email', function(){
-    return v::email();
+$app->on('service.validation', function(){
+    $validator = array();
+    foreach(array('numeric','email','ip') as $type){
+        $validator[$type] = call_user_func("Respect\Validation\Validator::$type");
+    }
+    return $validator;
 });
 
 $app->get("hello/:string", function($string) use ($app){
-    if($app->trigger('service.validation.numeric')->validate($string)){
+    $validator = $app->trigger('service.validation');
+    if($validator['numeric']->validate($string)){
         return "number detected";
     }
-    else if($app->trigger('service.validation.email')->validate($string)){
+    else if($validator['email']->validate($string)){
         return "email detected";
     }
+    else if($validator['ip']->validate($string)){
+        return "ip detected";
+    }
+
 });
 $app->run();
 ```
