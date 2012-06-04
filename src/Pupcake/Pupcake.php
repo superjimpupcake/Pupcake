@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.0
+ * @version 0.9.1
  * @package Pupcake
  */
 
@@ -295,7 +295,6 @@ class Pupcake
     private $return_output;
     private $request_mode; 
     private $event_manager;
-    private $components_lookup_map;
 
     public function __construct()
     {
