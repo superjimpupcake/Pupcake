@@ -292,7 +292,7 @@ require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->on('service.kaloa.view', function(){
-    $view = Kaloa\View\View();
+    $view = new Kaloa\View\View();
     return $view;
 });
 
