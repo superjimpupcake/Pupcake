@@ -15,7 +15,7 @@ Pupcake --- a micro framework for PHP 5.3+
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
   return "hello ".$name." in get";
@@ -40,7 +40,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->map("/hello/:name", function($name){
   return "hello ".$name." in get and post";
@@ -54,7 +54,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->post("/hello/:name", function($name) use ($app) {
   $app->redirect("/test");
@@ -67,7 +67,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
   return $name;
@@ -106,7 +106,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->notFound(function(){
     return "not found any routes!";
@@ -120,7 +120,7 @@ $app->run();
 <?php
 require "vendor/autoload.php";
 
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->any(":path", function($path){
     return "the current path is ".$path;
@@ -133,7 +133,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->post('api/me/update', function() use ($app) {
     return $app->getRequestType();
@@ -150,7 +150,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 /**
  * This is the same as 
@@ -170,7 +170,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 /**
  * By defining custom callback for system.error.detected event, 
@@ -192,7 +192,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
   return $name;
@@ -209,7 +209,7 @@ $app->run();
 ```php
 <?php
 require "vendor/autoload.php";
-$app = new \Pupcake\Pupcake();
+$app = new Pupcake\Pupcake();
 
 $app->on('system.shutdown', function(){
     print "<br/>system is shutdown now<br/>";
