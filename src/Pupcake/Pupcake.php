@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.1
+ * @version 0.9.2
  * @package Pupcake
  */
 
@@ -93,10 +93,6 @@ class Router
         $request_type = $route->getRequestType();
         $route_pattern = $route->getPattern();
 
-        if($route_pattern == "/*"){
-            $route_pattern = "/:path";
-        }
-
         if(!isset($this->route_map[$request_type])){
             $this->route_map[$request_type] = array();
         }
@@ -116,7 +112,32 @@ class Router
 
     public function processRouteMatching($request_type, $uri, $route_pattern)
     {
-       return $this->matches($request_type, $uri, $route_pattern); 
+        $result = false;
+        $params = array();
+        if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/:path'){
+            $params = array(':path' => $uri);
+        }
+        else{
+            $params = $this->matches($request_type, $uri, $route_pattern); 
+        }
+
+        if($params){
+            $route = $this->getRoute($request_type, $route_pattern);
+
+            if(count($params) > 0){
+                foreach($params as $name => $val){
+                    if($val[0] == '/'){
+                        $val[0] = '';
+                        $params[$name] = $val;
+                    }
+                }
+            }
+
+            $route->setParams($params);
+            $this->setMatchedRoute($route); 
+            $result = true;
+        }
+        return $result;
     }
 
     /**
@@ -130,7 +151,7 @@ class Router
      * @param   string  $request_type The request type
      * @param   string  $uri A Request URI
      * @param   string  $route_pattern The route pattern
-     * @return  bool
+     * @return  params the query params of the match routes
      */
     protected function matches( $request_type, $uri, $route_pattern ) 
     {
@@ -147,7 +168,7 @@ class Router
         };
 
         $pattern_as_regex = preg_replace_callback('@:[\w]+@', $matching_callback,  $route_pattern);
-        
+
         if ( substr($route_pattern, -1) === '/' ) {
             $pattern_as_regex = $pattern_as_regex . '?';
         }
@@ -163,11 +184,7 @@ class Router
                 }
             }
 
-            $route = $this->getRoute($request_type, $route_pattern);
-            $route->setParams($params);
-            $this->setMatchedRoute($route); 
-
-            return true;
+            return $params;
         } else {
             return false;
         }
@@ -390,7 +407,7 @@ class Pupcake
         $this->setReturnOutput(true);
         $output = $this->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
-        
+
         if(!$is_nested_internal_request){
             $this->setReturnOutput(false);
             $this->setRequestMode("external");
