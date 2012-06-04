@@ -259,6 +259,7 @@ $app->run();
 <?php
 /**
  * First, we need to make sure twig/twig package is installed properly via composer
+ * Also, the views folder and views/index.html file should be created and has proper write permissions for the server
  */
 
 require "vendor/autoload.php";
