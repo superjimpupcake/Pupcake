@@ -3,7 +3,7 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ##Installation:
 
-###add "Pupcake/Pupcake": "*" to your composer.json
+####add "Pupcake/Pupcake": "*" to your composer.json and do composer update
 ###.htaccess File for Apache
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
