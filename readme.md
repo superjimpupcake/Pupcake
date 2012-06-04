@@ -146,7 +146,7 @@ $app->get('test', function() use ($app) {
 $app->run();
 ```
 
-###Advance Event handling --- detect request not found
+###Custom Event handling --- detect request not found
 ```php
 <?php
 require "vendor/autoload.php";
@@ -166,7 +166,7 @@ $app->on('system.request.notfound', function(){
 $app->run();
 ```
 
-###Advanced Event Handling --- detect system error
+###Custom Event Handling --- detect system error
 ```php
 <?php
 require "vendor/autoload.php";
@@ -187,7 +187,7 @@ print $output; //undefined variable
 $app->run();
 ```
 
-###Advanced Event Handling --- custom response output
+###Custom Event Handling --- custom response output
 ####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
@@ -204,7 +204,7 @@ $app->on('system.request.found', function($route) use ($app) {
 
 $app->run();
 ```
-###Advanced Event Handling --- system shutdown detection
+###Custom EEvent Handling --- system shutdown detection
 ####We can hook into the system.shutdown event
 ```php
 <?php
@@ -217,7 +217,7 @@ $app->on('system.shutdown', function(){
 
 $app->run();
 ```
-###Advanced Event Handling --- set up services to do validation on route parameters
+###Custom Event Handling --- set up services to do validation on route parameters
 ####We can create arbitary service events to hook up to Respect/Validation package (https://github.com/Respect/Validation)
 ```php
 <?php
@@ -250,6 +250,30 @@ $app->get("hello/:string", function($string) use ($app){
         return "ip detected";
     }
 
+});
+$app->run();
+```
+###Custom Event Handling --- set up services to render twig templates
+####We can create arbitary service events to hook up to twig/twig package (http://github.com/fabpot/Twig.git)
+```php
+<?php
+/**
+ * First, we need to make sure twig/twig package is installed properly via composer
+ */
+
+require "vendor/autoload.php";
+
+$app = new Pupcake\Pupcake();
+
+$app->on('service.twig.template', function(){
+    $loader = new Twig_Loader_Filesystem("views");
+    $twig = new Twig_Environment($loader);
+    return $twig;
+});
+
+$app->get("hello/:string", function($string) use ($app){
+    $template = $app->trigger('service.twig.template');
+    return $template->loadTemplate('index.html')->render(array('string' => $string));
 });
 $app->run();
 ```
