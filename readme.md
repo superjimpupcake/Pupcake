@@ -4,7 +4,8 @@ Pupcake --- a micro framework for PHP 5.3+
 ##Installation:
 
 add "Pupcake/Pupcake": "*" to your composer.json
-also add this .htaccess file to your document root
+.htaccess File for Apache
+-------------------------
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php/$1 [L]
