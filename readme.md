@@ -221,6 +221,11 @@ $app->run();
 ####We can create arbitary service events to hook up to Respect/Validation package (https://github.com/Respect/Validation)
 ```php
 <?php
+
+/**
+ * First, we need to make sure Respect/Validation package is installed properly via composer
+ */
+
 require "vendor/autoload.php";
 
 $app = new Pupcake\Pupcake();
