@@ -236,7 +236,7 @@ $app->get("/jadedemo", function($name) use ($app) {
 $app->run();
 ```
 ####Render twig template by bridging twig_php 
-####For detail usage of twig php, see: https://github.com/fabpot/Twig/blob/master/doc/api.rst 
+#####For detail usage of twig php, see: https://github.com/fabpot/Twig/blob/master/doc/api.rst 
 ```php
 <?php
 require "pupcake.php";
