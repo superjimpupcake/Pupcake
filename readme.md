@@ -6,8 +6,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ###Simple get,post,put,delete requests
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -32,8 +30,6 @@ $app->run();
 ###Multiple request methods for one route
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->map("/hello/:name", function($name){
@@ -47,8 +43,6 @@ $app->run();
 ###Request redirection
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->post("/hello/:name", function($name) use ($app) {
@@ -61,8 +55,6 @@ $app->run();
 ###Request forwarding (internal request)
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -101,8 +93,6 @@ $app->run();
 ###Custom request-not-found handler
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->notFound(function(){
@@ -129,8 +119,6 @@ $app->run();
 ###Request type detection in internal and external request
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->post('api/me/update', function() use ($app) {
@@ -147,8 +135,6 @@ $app->run();
 ###Advance Event handling --- detect request not found
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 /**
@@ -168,8 +154,6 @@ $app->run();
 ###Advanced Event Handling --- detect system error
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 /**
@@ -191,8 +175,6 @@ $app->run();
 ####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -209,8 +191,6 @@ $app->run();
 ####We can hook into the system.shutdown event
 ```php
 <?php
-require "pupcake.php";
-
 $app = new \Pupcake\Pupcake();
 
 $app->on('system.shutdown', function(){
