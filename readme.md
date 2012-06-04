@@ -13,8 +13,8 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ###Simple get,post,put,delete requests
 ```php
-require "vendor/autoload.php";
 <?php
+require "vendor/autoload.php";
 $app = new \Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
