@@ -235,6 +235,29 @@ $app->get("/jadedemo", function($name) use ($app) {
 
 $app->run();
 ```
+####Render twig template by bridging twig_php 
+####For detail usage of twig php, see: https://github.com/fabpot/Twig/blob/master/doc/api.rst 
+```php
+<?php
+require "pupcake.php";
+
+$app = new \Pupcake\Pupcake();
+
+$app->get("/twigdemo", function($name) use ($app) {
+    /**
+     * you must first create views/index.html in the current directory
+     */
+    $app->bridge('twig_php');
+    $loader = new Twig_Loader_Filesystem("views");
+    $twig = new Twig_Environment($loader);
+    $template = $twig->loadTemplate('index.html');
+    $output = $template->render(array('the' => 'variables', 'go' => 'here'));
+    return $output;
+});
+
+$app->run();
+```
+
 ####Validation on route parameters by bridging respect_validation
 #####For detail usage of Respect/Validation, see: https://github.com/Respect/Validation 
 ```php
