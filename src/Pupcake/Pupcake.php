@@ -135,6 +135,7 @@ class Router
 
         $result = false;
         $params = array();
+
         if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/:path'){
             $result = true;
             $params = array('path' => $uri);
@@ -145,7 +146,7 @@ class Router
             $route_pattern_comps = explode("/", $route_pattern);
             $route_pattern_comps_count = count($route_pattern_comps);
             if($uri_comps_count == $route_pattern_comps_count){
-                for($k=0;$k<$route_pattern_comps_count;$k++){
+                for($k=1;$k<$route_pattern_comps_count;$k++){ //we should start from index 1 since index 0 is the /
                     if($route_pattern_comps[$k][0] == ":"){
                         $token = $route_pattern_comps[$k];
                         $params[$token] = $uri_comps[$k];
