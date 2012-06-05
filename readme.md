@@ -2,8 +2,8 @@ Pupcake --- a micro framework for PHP 5.3+
 =======================================
 
 ##About Pupcake Framework
-Pupcake is a minimal but extensible microframework for PHP 5.3+, it does not have full-fledged built-in support for regular expressions in routes, it only matches route tokens,
-and no regular expression is used. The regular expression part ( or route validation ) can be handled with 3rd party packages with the framework's event-based system.
+Pupcake is a minimal but extensible microframework for PHP 5.3+, it does not have full-fledged built-in support for regular expressions in routes, it only matches name-based route tokens,
+The regular expression part ( or route validation ) can be handled with 3rd party packages with the framework's event-based system.
 
 ##Installation:
 
