@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.5
+ * @version 0.9.5.1
  * @package Pupcake
  */
 
@@ -136,7 +136,7 @@ class Router
         $result = false;
         if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/:path'){
             $result = true;
-            $params = array(':path' => $uri);
+            $params = array('path' => $uri);
         }
         else{
             $uri_comps = explode("/", $uri);
