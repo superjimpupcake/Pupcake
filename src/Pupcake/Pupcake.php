@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.4
+ * @version 0.9.5
  * @package Pupcake
  */
 
@@ -123,18 +123,48 @@ class Router
         return $this->route_map;
     }
 
+    /**
+     * process route matching
+     * @param string the request type
+     * @param string the uri
+     * @param the route pattern
+     * @return boolean whether the route matched the uri or not
+     */
     public function processRouteMatching($request_type, $uri, $route_pattern)
     {
+
         $result = false;
-        $params = array();
         if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/:path'){
+            $result = true;
             $params = array(':path' => $uri);
         }
         else{
-            $params = $this->matches($request_type, $uri, $route_pattern); 
+            $uri_comps = explode("/", $uri);
+            $uri_comps_count = count($uri_comps);
+            $route_pattern_comps = explode("/", $route_pattern);
+            $route_pattern_comps_count = count($route_pattern_comps);
+            if($uri_comps_count == $route_pattern_comps_count){
+                $params = array();
+                for($k=0;$k<$route_pattern_comps_count;$k++){
+                    if($route_pattern_comps[$k][0] == ":"){
+                        $token = $route_pattern_comps[$k];
+                        $token[0] = "";
+                        $params[$token] = $uri_comps[$k];
+                        $route_pattern_comps[$k] = "";
+                        $uri_comps[$k] = "";
+                    }
+                }
+
+                $uri_reformed = implode("/",$uri_comps);
+                $route_pattern_reformed = implode("/",$route_pattern_comps);
+
+                if($uri_reformed == $route_pattern_reformed){
+                    $result = true;
+                }
+            }
         }
 
-        if($params){
+        if($result){
             $route = $this->getRoute($request_type, $route_pattern);
 
             if(count($params) > 0){
@@ -148,59 +178,8 @@ class Router
 
             $route->setParams($params);
             $this->setMatchedRoute($route); 
-            $result = true;
         }
         return $result;
-    }
-
-    /**
-     * Match URI
-     *
-     * Parse this route's pattern, and then compare it to an HTTP resource URI
-     * This method was modeled after the techniques demonstrated by Dan Sosedoff at:
-     *
-     * http://blog.sosedoff.com/2009/09/20/rails-like-php-url-router/
-     *
-     * @param   string  $request_type The request type
-     * @param   string  $uri A Request URI
-     * @param   string  $route_pattern The route pattern
-     * @return  params the query params of the match routes
-     */
-    protected function matches( $request_type, $uri, $route_pattern ) 
-    {
-        $params = array(); //clear possible previous matched params
-        //Extract URL params
-        preg_match_all('@:([\w]+)@', $route_pattern, $param_names, PREG_PATTERN_ORDER);
-        $param_names = $param_names[0];
-
-        //Convert URL params into regex patterns, construct a regex for this route
-
-        $matching_callback = function($matches){
-            $key = str_replace(':', '', $matches[0]);
-            return '(?P<' . $key . '>[a-zA-Z0-9_\-\.\!\~\*\\\'\(\)\:\@\&\=\$\+,%]+)';
-        };
-
-        $pattern_as_regex = preg_replace_callback('@:[\w]+@', $matching_callback,  $route_pattern);
-
-        if ( substr($route_pattern, -1) === '/' ) {
-            $pattern_as_regex = $pattern_as_regex . '?';
-        }
-        $pattern_as_regex = '@^' . $pattern_as_regex . '$@';
-
-        //Cache URL params' names and values if this route matches the current HTTP request
-        if ( preg_match($pattern_as_regex, $uri, $param_values) ) {
-            array_shift($param_values);
-            foreach ( $param_names as $index => $value ) {
-                $val = substr($value, 1);
-                if ( isset($param_values[$val]) ) {
-                    $params[$val] = urldecode($param_values[$val]);
-                }
-            }
-
-            return $params;
-        } else {
-            return false;
-        }
     }
 
     public function executeRoute($route)
