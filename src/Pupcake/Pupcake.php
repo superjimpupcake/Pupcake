@@ -5,7 +5,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.5.1
+ * @version 0.9.6
  * @package Pupcake
  */
 
@@ -134,6 +134,7 @@ class Router
     {
 
         $result = false;
+        $params = array();
         if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/:path'){
             $result = true;
             $params = array('path' => $uri);
@@ -144,7 +145,6 @@ class Router
             $route_pattern_comps = explode("/", $route_pattern);
             $route_pattern_comps_count = count($route_pattern_comps);
             if($uri_comps_count == $route_pattern_comps_count){
-                $params = array();
                 for($k=0;$k<$route_pattern_comps_count;$k++){
                     if($route_pattern_comps[$k][0] == ":"){
                         $token = $route_pattern_comps[$k];
@@ -168,12 +168,13 @@ class Router
 
             if(count($params) > 0){
                 foreach($params as $name => $val){
-                    $name[0] = "";
-                    $name = trim($name);
+                    unset($params[$name]);
+                    $name = str_replace(":","",$name);
                     if($val[0] == '/'){
                         $val[0] = '';
-                        $params[$name] = $val;
+                        $val = trim($val);
                     }
+                    $params[$name] = $val;
                 }
             }
 
