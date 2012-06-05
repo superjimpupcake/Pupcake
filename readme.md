@@ -208,7 +208,7 @@ $app->on('system.request.found', function($route) use ($app) {
 
 $app->run();
 ```
-###Custom EEvent Handling --- system shutdown detection
+###Custom Event Handling --- system shutdown detection
 ####We can hook into the system.shutdown event
 ```php
 <?php
