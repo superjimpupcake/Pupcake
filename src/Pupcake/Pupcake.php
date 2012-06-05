@@ -148,7 +148,6 @@ class Router
                 for($k=0;$k<$route_pattern_comps_count;$k++){
                     if($route_pattern_comps[$k][0] == ":"){
                         $token = $route_pattern_comps[$k];
-                        $token[0] = "";
                         $params[$token] = $uri_comps[$k];
                         $route_pattern_comps[$k] = "";
                         $uri_comps[$k] = "";
@@ -169,6 +168,8 @@ class Router
 
             if(count($params) > 0){
                 foreach($params as $name => $val){
+                    $name[0] = "";
+                    $name = trim($name);
                     if($val[0] == '/'){
                         $val[0] = '';
                         $params[$name] = $val;
