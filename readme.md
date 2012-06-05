@@ -7,7 +7,10 @@ The regular expression part ( or route validation ) can be handled with 3rd part
 
 ##Installation:
 
-####add "Pupcake/Pucake" to your composer.json
+####install "Pupcake/Pucake" via composer (http://getcomposer.org/)
+####or manually include it by doing: 
+    require [PATH/TO/Pupcake]/Pupcake/Pupcake.php
+
 ###.htaccess File for Apache
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -18,7 +21,6 @@ The regular expression part ( or route validation ) can be handled with 3rd part
 ###Simple get,post,put,delete requests
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -43,7 +45,6 @@ $app->run();
 ###Multiple request methods for one route
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->map("/hello/:name", function($name){
@@ -57,7 +58,6 @@ $app->run();
 ###Request redirection
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->post("/hello/:name", function($name) use ($app) {
@@ -70,7 +70,6 @@ $app->run();
 ###Request forwarding (internal request)
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -109,7 +108,6 @@ $app->run();
 ###Custom request-not-found handler
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->notFound(function(){
@@ -136,7 +134,6 @@ $app->run();
 ###Request type detection in internal and external request
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->post('api/me/update', function() use ($app) {
@@ -153,7 +150,6 @@ $app->run();
 ###Custom Event handling --- detect request not found
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 /**
@@ -173,7 +169,6 @@ $app->run();
 ###Custom Event Handling --- detect system error
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 /**
@@ -195,7 +190,6 @@ $app->run();
 ####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -212,7 +206,6 @@ $app->run();
 ####We can hook into the system.shutdown event
 ```php
 <?php
-require "vendor/autoload.php";
 $app = new Pupcake\Pupcake();
 
 $app->on('system.shutdown', function(){
@@ -229,9 +222,6 @@ $app->run();
 /**
  * First, we need to make sure Respect/Validation package is installed properly via composer
  */
-
-require "vendor/autoload.php";
-
 $app = new Pupcake\Pupcake();
 
 $app->on('service.validation', function(){
@@ -265,9 +255,6 @@ $app->run();
  * First, we need to make sure twig/twig package is installed properly via composer
  * Also, the views folder and views/index.html file should be created and has proper write permissions for the server
  */
-
-require "vendor/autoload.php";
-
 $app = new Pupcake\Pupcake();
 
 $app->on('service.twig.template', function(){
@@ -290,9 +277,6 @@ $app->run();
  * First, we need to make sure kaloa/view package is installed properly via composer
  * Also, the views/index.phtml file should be created and has proper write permissions for the server
  */
-
-require "vendor/autoload.php";
-
 $app = new Pupcake\Pupcake();
 
 $app->on('service.kaloa.view', function(){
