@@ -120,8 +120,6 @@ $app->run();
 ###Catch any requests
 ```php
 <?php
-require "vendor/autoload.php";
-
 $app = new Pupcake\Pupcake();
 
 $app->any(":path", function($path){
