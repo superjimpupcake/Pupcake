@@ -9,7 +9,7 @@ The regular expression part ( or route validation ) can be handled with 3rd part
 
 ####install package "Pupcake/Pucake" using composer (http://getcomposer.org/)
 ####or manually include it by doing: 
-    require [PATH/TO/Pupcake]/Pupcake/Pupcake.php
+    require "[PATH/TO/Pupcake]/Pupcake/Pupcake.php"
 
 ###.htaccess File for Apache
     RewriteEngine On
