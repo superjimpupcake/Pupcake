@@ -1,17 +1,45 @@
 <?php
-
 /**
  * Pupcake --- a microframework for PHP 5.3+
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.6
+ * @version 0.9.7
  * @package Pupcake
  */
 
 namespace Pupcake;
 
-class EventManager
+class Object
+{
+
+    private $methods;
+
+    public static function instance()
+    {
+        static $instance;
+        if(!isset($instance)){
+            $instance = new static();
+        }
+        return $instance; 
+    }
+
+    public function __call($method_name, $params)
+    {
+        $class_name = get_class($this);
+        if(isset($this->methods[$class_name])){
+           return call_user_func_array($this->methods[$class_name], $params); 
+        }
+    }
+
+    final public function method($name, $callback)
+    {
+        $class_name = get_called_class(); 
+        $this->methods[$class_name] = $callback;
+    }
+}
+
+class EventManager extends Object
 {
     /**
      * @var array
@@ -31,14 +59,6 @@ class EventManager
         $this->event_execution_result = array();
     }
 
-    public static function instance()
-    {
-        static $instance;
-        if(!isset($instance)){
-            $instance = new static();
-        }
-        return $instance; 
-    }
 
     public function getEventQueue()
     {
@@ -71,7 +91,7 @@ class EventManager
     }
 }
 
-class Router
+class Router extends Object
 {
     private $route_map;
     private $route_not_found_handler;
@@ -80,15 +100,6 @@ class Router
     public function __construct()
     {
         $this->route_map = array(); //initialize the route map
-    }
-
-    public static function instance()
-    {
-        static $instance;
-        if(!isset($instance)){
-            $instance = new static();
-        }
-        return $instance; 
     }
 
     public function setMatchedRoute(Route $matched_route)
@@ -159,7 +170,9 @@ class Router
                 $route_pattern_reformed = implode("/",$route_pattern_comps);
 
                 if($uri_reformed == $route_pattern_reformed){
-                    $result = true;
+                    $result = EventManager::instance()->trigger("system.routing.route.matched", function(){
+                        return true;
+                    }); #fire the event system.routing.route.matched to allow future extension on route processing
                 }
             }
         }
@@ -191,7 +204,7 @@ class Router
     }
 }
 
-class Error
+class Error extends Object
 {
     private $severity;
     private $message;
@@ -227,7 +240,7 @@ class Error
     }
 }
 
-class Route
+class Route extends Object
 {
     private $request_type;
     private $route_pattern;
@@ -295,11 +308,13 @@ class Route
                 $router->addRoute($this);
             } 
         }
+
+        return $this; # return the route instance to allow future extension
     }
 }
 
 
-class Pupcake
+class Pupcake extends Object
 {
     private $request_type;
     private $query_path;
@@ -326,15 +341,6 @@ class Pupcake
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
-    }
-
-    public static function instance()
-    {
-        static $instance;
-        if(!isset($instance)){
-            $instance = new static();
-        }
-        return $instance; 
     }
 
     public function getRouter()
