@@ -289,14 +289,9 @@ $app->get("hello/:string", function($string) use ($app){
 });
 $app->run();
 ```
-###Advance Usage: add constraints in route by resetting route prototype and hook up to system.routing.route.matched event
+###Advance Usage: add constraints in route by hooking into system.routing.route.create event
 ```php
 <?php
-
-/**
- * First, we need to make sure Respect/Validation package is installed properly via composer
- */
-
 $app = new Pupcake\Pupcake();
 
 /**
@@ -342,9 +337,8 @@ class RespectRoute extends Pupcake\Route
     }
 }
 
-$app->setRoutePrototype("RespectRoute");
-$app->on("system.routing.route.matched", function($route){
-    return $route->matched();
+$app->on("system.routing.route.create", function(){
+    return new RespectRoute();
 });
 
 /**

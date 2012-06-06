@@ -4,7 +4,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.8
+ * @version 0.9.9
  * @package Pupcake
  */
 
@@ -173,7 +173,7 @@ class Router extends Object
                     $route = $this->getRoute($request_type, $route_pattern);
                     $route->setParams($params);
                     $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
-                        return true;
+                        return $route->matched();
                     }, array($route));
                     if($result){
                         if(count($params) > 0){
@@ -247,17 +247,6 @@ class Route extends Object
     private $callback;
     private $route_params;
 
-    public function __construct($request_type = "", $route_pattern, $callback="", $route_params = array())
-    {
-        if($route_pattern[0] != '/'){
-            $route_pattern = "/".$route_pattern;
-        }
-        $this->request_type = $request_type;
-        $this->route_pattern = $route_pattern;
-        $this->callback = $callback;
-        $this->route_params = $route_params;
-    }
-
     public function setRequestType($request_type)
     {
         $this->request_type = $request_type;
@@ -270,6 +259,10 @@ class Route extends Object
 
     public function setPattern($route_pattern)
     {
+        if($route_pattern[0] != '/'){
+            $route_pattern = "/".$route_pattern;
+        }
+
         $this->route_pattern = $route_pattern;
     }
 
@@ -311,6 +304,11 @@ class Route extends Object
 
         return $this; # return the route instance to allow future extension
     }
+
+    public function matched()
+    {
+        return true;
+    }
 }
 
 
@@ -322,7 +320,6 @@ class Pupcake extends Object
     private $return_output;
     private $request_mode; 
     private $event_manager;
-    private $route_prototype;
 
     public function __construct()
     {
@@ -341,7 +338,6 @@ class Pupcake extends Object
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
-        $this->setRoutePrototype(__NAMESPACE__."\Route");
     }
 
     public function setRoutePrototype($route_prototype)
@@ -361,8 +357,12 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback)
     {
-        $route_prototype = $this->route_prototype;
-        $route = new $route_prototype("", $route_pattern, $callback);
+        $route = $this->event_manager->trigger('system.routing.route.create', function(){
+            return new Route();
+        });
+        $route->setRequestType("");
+        $route->setPattern($route_pattern);
+        $route->setCallback($callback);
         return $route;
     }
 
