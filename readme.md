@@ -289,7 +289,8 @@ $app->get("hello/:string", function($string) use ($app){
 });
 $app->run();
 ```
-###Advance Usage: add constraints in route by hooking into system.routing.route.create event
+###Advance Usage: adding constraints in route
+####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
 ```php
 <?php
 /**
@@ -343,6 +344,9 @@ class RespectRoute extends Pupcake\Route
 $app->on("system.routing.route.create", function(){
     return new RespectRoute();
 });
+$app->on("system.routing.route.matched", function($route){
+    return $route->matched();
+});
 
 /**
  * match regex
@@ -356,11 +360,21 @@ $app->get("hello/:string", function($string){
 /**
  * match email 
  */
-$app->get("hello/:string", function($string){
+$app->get("api/email/:string", function($string){
     return $string;
 })->constraint(array(
     ':string' => '@email'
 ));
+
+/**
+ * match regular expression
+ */
+$app->get("api/regex/:string", function($string){
+    return $string;
+})->constraint(array(
+    ':string' => '/^[a-z]$/'
+));
+
 
 $app->run();
 ```
