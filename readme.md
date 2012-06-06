@@ -289,3 +289,81 @@ $app->get("hello/:string", function($string) use ($app){
 });
 $app->run();
 ```
+###Advance Usage: add constraints in route by resetting route prototype and hook up to system.routing.route.matched event
+```php
+<?php
+
+/**
+ * First, we need to make sure Respect/Validation package is installed properly via composer
+ */
+
+$app = new Pupcake\Pupcake();
+
+/**
+ * Define RespectRoute class, it can be in a separate package
+ */
+class RespectRoute extends Pupcake\Route
+{
+    private $route_constraint;
+
+    public function constraint($route_constraint = array())
+    {
+       $this->route_constraint = $route_constraint;
+    }
+
+    public function getConstraint()
+    {
+        return $this->route_constraint;
+    }
+
+    public function matched(){
+        $matched = true;
+        $constraint = $this->getConstraint();
+        $params = $this->getParams();
+        if(count($constraint) > 0){
+            $validator_params = array();
+            foreach($constraint as $token => $validator_name){
+                if($validator_name[0] == '@'){
+                    $validator_name[0] = '';
+                    $validator_name = trim($validator_name);
+                }
+                else{
+                    $validator_params = array($validator_name); //this is a regex!
+                    $validator_name = "regex";
+                }
+                $validator = call_user_func_array("Respect\Validation\Validator::$validator_name", $validator_params);
+                if(!$validator->validate($params[$token])){
+                    $matched = false;
+                    break;
+                }
+            }
+        } 
+        return $matched;
+    }
+}
+
+$app->setRoutePrototype("RespectRoute");
+$app->on("system.routing.route.matched", function($route){
+    return $route->matched();
+});
+
+/**
+ * match regex
+ */
+$app->get("hello/:string", function($string){
+    return $string;
+})->constraint(array(
+    ':string' => '/^[0-9]$/'
+));
+
+/**
+ * match email 
+ */
+$app->get("hello/:string", function($string){
+    return $string;
+})->constraint(array(
+    ':string' => '@email'
+));
+
+$app->run();
+```
