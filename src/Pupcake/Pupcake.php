@@ -171,25 +171,27 @@ class Router extends Object
 
                 if($uri_reformed == $route_pattern_reformed){
                     $route = $this->getRoute($request_type, $route_pattern);
+                    $route->setParams($params);
                     $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
                         return true;
                     }, array($route)); #fire the event system.routing.route.matched to allow future extension on route processing
 
-                    if(count($params) > 0){
-                        foreach($params as $name => $val){
-                            unset($params[$name]);
-                            $name = str_replace(":","",$name);
-                            if($val[0] == '/'){
-                                $val[0] = '';
-                                $val = trim($val);
+                    if($result){
+                        if(count($params) > 0){
+                            foreach($params as $name => $val){
+                                unset($params[$name]);
+                                $name = str_replace(":","",$name);
+                                if($val[0] == '/'){
+                                    $val[0] = '';
+                                    $val = trim($val);
+                                }
+                                $params[$name] = $val;
                             }
-                            $params[$name] = $val;
                         }
+
+                        $route->setParams($params);
+                        $this->setMatchedRoute($route); 
                     }
-
-                    $route->setParams($params);
-                    $this->setMatchedRoute($route); 
-
                 }
             }
         }
