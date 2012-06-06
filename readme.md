@@ -289,6 +289,16 @@ $app->get("hello/:string", function($string) use ($app){
 });
 $app->run();
 ```
+###Advance Usage: dynamic method creation
+####We can dynamically create new methods in pupcake system through the method call
+```php
+<?php
+$app = new Pupcake\Pupcake();
+$app->method("hello", function($string){
+    return "hello $string";
+});
+print $app->hello();
+```
 ###Advance Usage: adding constraints in route
 ####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
 ```php
@@ -374,7 +384,6 @@ $app->get("api/regex/:string", function($string){
 })->constraint(array(
     ':string' => '/^[a-z]$/'
 ));
-
 
 $app->run();
 ```
