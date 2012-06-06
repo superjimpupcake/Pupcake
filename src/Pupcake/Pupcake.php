@@ -4,7 +4,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 0.9.7
+ * @version 0.9.8
  * @package Pupcake
  */
 
@@ -174,8 +174,7 @@ class Router extends Object
                     $route->setParams($params);
                     $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
                         return true;
-                    }, array($route)); #fire the event system.routing.route.matched to allow future extension on route processing
-
+                    }, array($route));
                     if($result){
                         if(count($params) > 0){
                             foreach($params as $name => $val){
