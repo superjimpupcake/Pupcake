@@ -323,13 +323,11 @@ class Pupcake extends Object
     private $return_output;
     private $request_mode; 
     private $event_manager;
-    private $route_prototype_name;
+    private $route_prototype;
 
     public function __construct()
     {
         $this->event_manager = EventManager::instance();
-
-        $this->route_prototype_name = __NAMESPACE__."\Route";
 
         set_error_handler(function ($severity, $message, $file_path, $line){
             $error = new Error($severity, $message, $file_path, $line);
@@ -344,16 +342,17 @@ class Pupcake extends Object
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
+        $this->setRoutePrototype(__NAMESPACE__."\Route");
     }
 
-    public function setRoutePrototypeName($route_prototype_name)
+    public function setRoutePrototype($route_prototype)
     {
-        $this->route_prototype_name = $route_prototype_name;
+        $this->route_prototype = $route_prototype;
     }
 
-    public function getRoutePrototypeName()
+    public function getRoutePrototype()
     {
-        return $this->route_prototype_name;
+        return $this->route_prototype;
     }
 
     public function getRouter()
@@ -363,7 +362,8 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback)
     {
-        $route = new $this->route_prototype_name("", $route_pattern, $callback);
+        $route_prototype = $this->route_prototype;
+        $route = new $route_prototype("", $route_pattern, $callback);
         return $route;
     }
 
