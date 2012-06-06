@@ -7,7 +7,7 @@ The regular expression part ( or route validation ) can be handled with 3rd part
 
 ##Installation:
 
-####install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
+####install package "Pupcake/Pupcake" using composer (http://getcomposer.org/) (recommened)
 ####or manually include it by doing: 
     require "[PATH/TO/Pupcake]/Pupcake/Pupcake.php"
 
