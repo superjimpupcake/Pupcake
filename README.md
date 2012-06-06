@@ -325,6 +325,9 @@ class RespectRoute extends Pupcake\Route
         return $this->route_constraint;
     }
 
+    /**
+     * This is called after a route is matched
+     */
     public function matched(){
         $matched = true;
         $constraint = $this->getConstraint();
@@ -353,9 +356,6 @@ class RespectRoute extends Pupcake\Route
 
 $app->on("system.routing.route.create", function(){
     return new RespectRoute();
-});
-$app->on("system.routing.route.matched", function($route){
-    return $route->matched();
 });
 
 /**
