@@ -112,7 +112,7 @@ class Router extends Object
         return $this->matched_route;
     }
 
-    public function addRoute(Route $route)
+    public function addRoute($route)
     {
         $request_type = $route->getRequestType();
         $route_pattern = $route->getPattern();
@@ -170,31 +170,30 @@ class Router extends Object
                 $route_pattern_reformed = implode("/",$route_pattern_comps);
 
                 if($uri_reformed == $route_pattern_reformed){
-                    $result = EventManager::instance()->trigger("system.routing.route.matched", function(){
+                    $route = $this->getRoute($request_type, $route_pattern);
+                    $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
                         return true;
-                    }); #fire the event system.routing.route.matched to allow future extension on route processing
-                }
-            }
-        }
+                    }, array($route)); #fire the event system.routing.route.matched to allow future extension on route processing
 
-        if($result){
-            $route = $this->getRoute($request_type, $route_pattern);
-
-            if(count($params) > 0){
-                foreach($params as $name => $val){
-                    unset($params[$name]);
-                    $name = str_replace(":","",$name);
-                    if($val[0] == '/'){
-                        $val[0] = '';
-                        $val = trim($val);
+                    if(count($params) > 0){
+                        foreach($params as $name => $val){
+                            unset($params[$name]);
+                            $name = str_replace(":","",$name);
+                            if($val[0] == '/'){
+                                $val[0] = '';
+                                $val = trim($val);
+                            }
+                            $params[$name] = $val;
+                        }
                     }
-                    $params[$name] = $val;
+
+                    $route->setParams($params);
+                    $this->setMatchedRoute($route); 
+
                 }
             }
-
-            $route->setParams($params);
-            $this->setMatchedRoute($route); 
         }
+
         return $result;
     }
 
@@ -322,10 +321,13 @@ class Pupcake extends Object
     private $return_output;
     private $request_mode; 
     private $event_manager;
+    private $route_prototype_name;
 
     public function __construct()
     {
         $this->event_manager = EventManager::instance();
+
+        $this->route_prototype_name = __NAMESPACE__."\Route";
 
         set_error_handler(function ($severity, $message, $file_path, $line){
             $error = new Error($severity, $message, $file_path, $line);
@@ -337,10 +339,19 @@ class Pupcake extends Object
             EventManager::instance()->trigger('system.shutdown');
         });
 
-
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
+    }
+
+    public function setRoutePrototypeName($route_prototype_name)
+    {
+        $this->route_prototype_name = $route_prototype_name;
+    }
+
+    public function getRoutePrototypeName()
+    {
+        return $this->route_prototype_name;
     }
 
     public function getRouter()
@@ -350,7 +361,7 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback)
     {
-        $route = new Route("", $route_pattern, $callback);
+        $route = new $this->route_prototype_name("", $route_pattern, $callback);
         return $route;
     }
 
