@@ -312,7 +312,7 @@ $app = new Pupcake\Pupcake();
 
 /**
  * When a route object is being created, we add the constraint method 
- * to it and storage the constraint into this route object's storage
+ * to it and store the constraint into this route object's storage
  */
 $app->on("system.routing.route.create", function(){
     $route = new Pupcake\Route();
