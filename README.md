@@ -305,13 +305,14 @@ print $app->hello("world");
 ```php
 <?php
 /**
- * First, we need to make sure Respect/Validation package is installed properly via composer
+ * First, we need to make sure Respect/Validation package is installed 
+ * properly via composer
  */
 $app = new Pupcake\Pupcake();
 
 /**
- * When a route object is being created, we add the constraint method to it and storage the constraint
- * into this route object's storage
+ * When a route object is being created, we add the constraint method 
+ * to it and storage the constraint into this route object's storage
  */
 $app->on("system.routing.route.create", function(){
     $route = new Pupcake\Route();
@@ -322,8 +323,8 @@ $app->on("system.routing.route.create", function(){
 });
 
 /**
- * When a route object is initially matched, we add further checking logic to make sure the constraint
- * is applying toward the route matching process
+ * When a route object is initially matched, we add further checking logic 
+ * to make sure the constraint is applying toward the route matching process
  */
 $app->on("system.routing.route.matched", function($route){
     $matched = true;
