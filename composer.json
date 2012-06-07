@@ -1,7 +1,7 @@
 {
     "name": "Pupcake/Pupcake",
     "description": "A PHP Microframework for PHP 5.3+",
-    "keywords": ["microframework", "micro", "framework", "lightweight"],
+    "keywords": ["microframework", "micro", "framework", "lightweight", "extensible"],
     "homepage": "https://github.com/superjimpupcake/Pupcake",
     "license": "MIT",
     "authors": [
