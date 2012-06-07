@@ -300,7 +300,7 @@ $app->method("hello", function($string){
 print $app->hello("world");
 ```
 ###Advance Usage: adding constraints in route
-####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
+####We can create constraints in route by hooking into system.routing.route.create event
 ####Also Check out https://github.com/superjimpupcake/PupcakeRespectRoute, it is essentially doing this.
 ```php
 <?php
