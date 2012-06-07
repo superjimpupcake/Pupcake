@@ -108,6 +108,10 @@ class Router extends Object
         return $result;
     }
 
+    /**
+     * Execute a route
+     * @param route object
+     */
     public function executeRoute($route)
     {
         return call_user_func_array($route->getCallback(), $route->getParams());
