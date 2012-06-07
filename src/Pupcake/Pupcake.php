@@ -4,7 +4,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 1.0.2alpha
+ * @version 1.1alpha
  * @package Pupcake
  */
 
