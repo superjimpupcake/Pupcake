@@ -460,3 +460,30 @@ $app->get("api/validate/:token", function($token){
 
 $app->run();
 ```
+###Advance Usage: start using Pupcake services
+All of the code above on adding constraint to the route is great, but it might be tedious at some point, we can
+wrap most of them into a unit called "service", Pupcake by default comes with the service named "RouteConstraint"
+(for details, look into vendor/src/Pupcake/Pupcake/Service/RouteConstraint.php), we can simply use the getService
+method to start using the service
+```php
+<?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->getService("Pupcake\Service\RouteConstraint");
+
+$app->get("api/validate/:token", function($token){
+    return $token;
+})->constraint(array(
+    ':token' => function($value){
+        return Respect\Validation\Validator::date('Y-m-d')
+            ->between('1980-02-02', '2015-12-25')
+            ->validate($value);
+    }
+));
+
+$app->run();
+```
