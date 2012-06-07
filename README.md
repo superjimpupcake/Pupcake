@@ -290,7 +290,9 @@ $app->get("hello/:string", function($string) use ($app){
 $app->run();
 ```
 ###Advance Usage: dynamic method creation
-####We can dynamically create new methods in pupcake system through the method call
+####
+All Pupcake system objects, route, router... has a powerful a "method" method, it allows you to define a dynamic method that
+is not defined yet
 ```php
 <?php
 $app = new Pupcake\Pupcake();
