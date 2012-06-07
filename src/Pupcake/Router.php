@@ -83,7 +83,7 @@ class Router extends Object
                     $route = $this->getRoute($request_type, $route_pattern);
                     $route->setParams($params);
                     $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
-                        return $route->matched();
+                        return true;
                     }, array($route));
                     if($result){
                         if(count($params) > 0){

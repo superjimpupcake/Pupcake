@@ -65,13 +65,5 @@ class Route extends Object
 
         return $this; # return the route instance to allow future extension
     }
-
-    /**
-     * This is called when the current route is matched, by default return true
-     */
-    public function matched()
-    {
-        return true;
-    }
 }
 

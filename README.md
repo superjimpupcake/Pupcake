@@ -300,8 +300,8 @@ $app->method("hello", function($string){
 print $app->hello("world");
 ```
 ###Advance Usage: adding constraints in route
-####We can create constraints in route by hooking into system.routing.route.create event
-####Also Check out https://github.com/superjimpupcake/PupcakeRespectRoute, it is essentially doing this.
+####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
+####Also Check out https://github.com/superjimpupcake/PupcakeRespectRoute
 ```php
 <?php
 /**
@@ -309,81 +309,37 @@ print $app->hello("world");
  */
 $app = new Pupcake\Pupcake();
 
-/**
- * Define RespectRoute class, it can be in a separate package
- */
-class RespectRoute extends Pupcake\Route
-{
-    private $route_constraint;
+$app->on("system.routing.route.create", function(){
+    $route = new Pupcake\Route();
+    $route->method('constraint', function($constraint) use($route){
+        $route->storageSet('constraint', $constraint);
+    });
+    return $route;
+});
 
-    public function constraint($route_constraint = array())
-    {
-       $this->route_constraint = $route_constraint;
-    }
-
-    public function getConstraint()
-    {
-        return $this->route_constraint;
-    }
-
-    /**
-     * This is called after a route is matched
-     */
-    public function matched(){
-        $matched = true;
-        $constraint = $this->getConstraint();
-        $params = $this->getParams();
-        if(count($constraint) > 0){
-            $validator_params = array();
-            foreach($constraint as $token => $validator_name){
-                if($validator_name[0] == '@'){
-                    $validator_name[0] = '';
-                    $validator_name = trim($validator_name);
-                }
-                else{
-                    $validator_params = array($validator_name); //this is a regex!
-                    $validator_name = "regex";
-                }
-                $validator = call_user_func_array("Respect\Validation\Validator::$validator_name", $validator_params);
-                if(!$validator->validate($params[$token])){
+$app->on("system.routing.route.matched", function($route){
+    $matched = true;
+    $params = $route->getParams();
+    $constraint = $route->storageGet('constraint');
+    if(count($constraint) > 0){
+        foreach($constraint as $token => $validation_callback){
+            if(is_callable($validation_callback)){
+                if(!$validation_callback($params[$token])){
                     $matched = false;
                     break;
                 }
             }
-        } 
-        return $matched;
-    }
-}
-
-$app->on("system.routing.route.create", function(){
-    return new RespectRoute();
+        }
+    } 
+    return $matched;
 });
 
-/**
- * match regex
- */
-$app->get("hello/:string", function($string){
-    return $string;
+$app->get("api/validate/:token", function($token){
+    return $token;
 })->constraint(array(
-    ':string' => '/^[0-9]$/'
-));
-
-/**
- * match email 
- */
-$app->get("api/email/:string", function($string){
-    return $string;
-})->constraint(array(
-    ':string' => '@email'
-));
-
-/**
- * match regular expression
- */
-$app->get("api/regex/:string", function($string){
-    return $string;
-})->constraint(array(
-    ':string' => '/^[a-z]$/'
+    ':token' => function($value){
+        return Respect\Validation\Validator::date('Y-m-d')->between('1980-02-02', 'now')->validate($value);
+    }
 ));
 
 $app->run();
