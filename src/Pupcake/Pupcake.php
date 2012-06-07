@@ -4,7 +4,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 1.0.1alpha
+ * @version 1.0.2alpha
  * @package Pupcake
  */
 
@@ -36,16 +36,6 @@ class Pupcake extends Object
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
         $this->router = Router::instance();
-    }
-
-    public function setRoutePrototype($route_prototype)
-    {
-        $this->route_prototype = $route_prototype;
-    }
-
-    public function getRoutePrototype()
-    {
-        return $this->route_prototype;
     }
 
     public function getRouter()
