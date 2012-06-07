@@ -4,7 +4,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 1.1alpha
+ * @version 1.2alpha
  * @package Pupcake
  */
 
@@ -246,5 +246,19 @@ class Pupcake extends Object
     public function executeRoute(Route $route)
     {
         return $this->router->executeRoute($route);
+    }
+
+    /**
+     * get a pupcake service
+     */
+    public function getService($service_name, $config = array())
+    {
+        static $services = array();
+        if(!isset($services[$service_name])){
+            $service_instance = new $service_name();
+            $services[$service_name] = $service_instance;
+            $services[$service_name]->start($this, $config); //start the service
+        }
+        return $services[$service_name];
     }
 }
