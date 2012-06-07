@@ -309,6 +309,10 @@ print $app->hello("world");
  */
 $app = new Pupcake\Pupcake();
 
+/**
+ * When a route object is being created, we add the constraint method to it and storage the constraint
+ * into this route object's storage
+ */
 $app->on("system.routing.route.create", function(){
     $route = new Pupcake\Route();
     $route->method('constraint', function($constraint) use($route){
@@ -317,6 +321,10 @@ $app->on("system.routing.route.create", function(){
     return $route;
 });
 
+/**
+ * When a route object is initially matched, we add further checking logic to make sure the constraint
+ * is applying toward the route matching process
+ */
 $app->on("system.routing.route.matched", function($route){
     $matched = true;
     $params = $route->getParams();
