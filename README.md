@@ -244,6 +244,10 @@ $app->run();
 ####We can hook into the system.shutdown event
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->on('system.shutdown', function(){
