@@ -21,6 +21,10 @@ The regular expression part ( or route validation ) can be handled with 3rd part
 ###Simple get,post,put,delete requests
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -45,6 +49,10 @@ $app->run();
 ###Multiple request methods for one route
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->map("/hello/:name", function($name){
@@ -58,6 +66,10 @@ $app->run();
 ###Request redirection
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->post("/hello/:name", function($name) use ($app) {
@@ -70,6 +82,10 @@ $app->run();
 ###Request forwarding (internal request)
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -108,6 +124,10 @@ $app->run();
 ###Custom request-not-found handler
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->notFound(function(){
@@ -120,6 +140,10 @@ $app->run();
 ###Catch any requests
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->any(":path", function($path){
@@ -132,6 +156,10 @@ $app->run();
 ###Request type detection in internal and external request
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->post('api/me/update', function() use ($app) {
@@ -148,6 +176,10 @@ $app->run();
 ###Custom Event handling --- detect request not found
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 /**
@@ -167,6 +199,10 @@ $app->run();
 ###Custom Event Handling --- detect system error
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 /**
@@ -188,6 +224,10 @@ $app->run();
 ####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->get("/hello/:name", function($name){
@@ -216,6 +256,9 @@ $app->run();
 ####We can create arbitary service events to hook up to Respect/Validation package (https://github.com/Respect/Validation)
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
 
 /**
  * First, we need to make sure Respect/Validation package is installed properly via composer
@@ -249,14 +292,18 @@ $app->run();
 ####We can create arbitary service events to hook up to twig/twig package (http://github.com/fabpot/Twig.git)
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 /**
  * First, we need to make sure twig/twig package is installed properly via composer
- * Also, the views folder and views/index.html file should be created and has proper write permissions for the server
+ * Also, the views folder and ../views/index.html file should be created and has proper write permissions for the server
  */
 $app = new Pupcake\Pupcake();
 
 $app->on('service.twig.template', function(){
-    $loader = new Twig_Loader_Filesystem("views");
+    $loader = new Twig_Loader_Filesystem("../views");
     $twig = new Twig_Environment($loader);
     return $twig;
 });
@@ -271,9 +318,14 @@ $app->run();
 ####We can create arbitary service events to hook up to kaloa/view package (https://github.com/mermshaus/kaloa-view)
 ```php
 <?php
+
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 /**
  * First, we need to make sure kaloa/view package is installed properly via composer
- * Also, the views/index.phtml file should be created and has proper write permissions for the server
+ * Also, the ../views/index.phtml file should be created and has proper write permissions for the server
  */
 $app = new Pupcake\Pupcake();
 
@@ -285,26 +337,74 @@ $app->on('service.kaloa.view', function(){
 $app->get("hello/:string", function($string) use ($app){
     $view = $app->trigger('service.kaloa.view');
     $view->string = $string;
-    return $view->render("views/index.phtml");
+    return $view->render("../views/index.phtml");
 });
 $app->run();
 ```
 ###Advance Usage: dynamic method creation
-All Pupcake system objects (EventManager, Route, Router, Pupcake) has a powerful method named "method", it allows you to dynamically define a  method that
+All Pupcake system objects (Object, EventManager, Route, Router, Pupcake) has a powerful method named "method", it allows you to dynamically define a  method that
 is not defined yet
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 $app->method("hello", function($string){
     return "hello $string";
 });
 print $app->hello("world");
 ```
+###Advance Usage: use dynamic method creation on Pupcake\Ojbect to create a twig rendering service
+In The previous example on twig template rendering, we need to use 
+```php 
+$template->loadTemplate('index.html')->render(array('string' => $string));
+```
+to render the template, what if we want something like
+```php
+$view->render([template], array('[token1] => '[value1],'[token2] => '[value2]')) 
+```
+similar to what codeigniter does?
+We can achieve this with dynamic method creation without even defining our own class
+```php
+<?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+/**
+ * Make sure ../views/index.html exists and twig/twig package is installed properly through composer
+ */
+$app = new Pupcake\Pupcake();
+
+$app->on('service.view.twig', function(){
+    $view = new Pupcake\Object();
+    //we add a dynamic method named render
+    $view->method("render", function($template_file,$data = array() ){
+        $loader = new Twig_Loader_Filesystem(dirname($template_file));
+        $twig = new Twig_Environment($loader);
+        return $twig->loadTemplate(basename($template_file))->render($data);
+    });
+    return $view;
+});
+
+$app->get("twigdemo", function() use ($app){
+    $view = $app->trigger('service.view.twig');
+    return $view->render("../views/index.html", array('string' => 'jim')); //now we can render the template similar to the codeigniter way!
+});
+
+$app->run();
+```
 ###Advance Usage: adding constraints in route
 ####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
 ####Also Check out https://github.com/superjimpupcake/PupcakeRespectRoute
 ```php
 <?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 /**
  * First, we need to make sure Respect/Validation package is installed 
  * properly via composer
