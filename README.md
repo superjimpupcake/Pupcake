@@ -347,7 +347,9 @@ $app->get("api/validate/:token", function($token){
     return $token;
 })->constraint(array(
     ':token' => function($value){
-        return Respect\Validation\Validator::date('Y-m-d')->between('1980-02-02', 'now')->validate($value);
+        return Respect\Validation\Validator::date('Y-m-d')
+        ->between('1980-02-02', 'now')
+        ->validate($value);
     }
 ));
 
