@@ -1,11 +1,9 @@
 <?php
 namespace Pupcake\Tests;
 
-require __DIR__."/../TestCase.php";
-
 use Pupcake;
 
-class SimpleRequestTest extends TestCase
+class SimpleRequestTest extends Pupcake\TestCase
 {
     public function testSimpleGetRequest()
     {

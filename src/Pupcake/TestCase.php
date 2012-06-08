@@ -1,5 +1,8 @@
 <?php
-namespace Pupcake\Tests;
+/**
+ * A phpunit based test case class to help writing testcase easy
+ */
+namespace Pupcake;
 
 class TestCase extends \PHPUnit_Framework_TestCase
 {
