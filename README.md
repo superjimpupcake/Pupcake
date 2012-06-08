@@ -514,3 +514,45 @@ $app->get("date/:year/:month/:day", function($req, $res){
 
 $app->run();
 ```
+Redirecting, Forwarding in express style
+```php
+<?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->getService("Pupcake\Service\Express");
+
+$app->get("/hello/:name", function($req, $res){
+    $res->send($req->params('name'));
+});
+$app->post("/hello/:name", function($req, $res){
+    $res->send( "posting ".$req->params('name')." to hello");
+});
+
+$app->get("test", function($req, $res){
+    return $res->redirect("test2");
+});
+
+$app->any("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year')."-".$req->params('month')."-".$req->params('day');
+    $res->send($output);
+});
+
+$app->get("/test2", function($req, $res){
+    $res->send("tesing 2");
+});
+
+$app->get("test_internal", function($req, $res){
+    $content = "";
+    $content .= $res->forward("POST", "hello/world")."<br/>";
+    $content .= $res->forward("GET", "hello/world2")."<br/>";
+    $content .= $res->forward("GET", "hello/world3")."<br/>";
+    $content .= $res->forward("GET", "test")."<br/>";
+    $content .= $res->forward("POST", "date/2012/05/30")."<br/>";
+    $res->send($content);
+});
+
+$app->run();
+```
