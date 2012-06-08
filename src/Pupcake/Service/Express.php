@@ -26,11 +26,8 @@ class Express extends Pupcake\Service
                $route->storageSet('output', $output); 
             });
 
-            $res->method('redirect', function($uri){
-                if($uri[0] != "/"){
-                    $uri = "/".$uri;
-                }
-                header("Location: $uri");
+            $res->method('redirect', function($uri) use($app) {
+                $app->redirect($uri);
             });
 
             call_user_func_array($route->getCallback(), array($req, $res));
