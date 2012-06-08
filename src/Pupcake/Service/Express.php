@@ -30,6 +30,12 @@ class Express extends Pupcake\Service
                 $app->redirect($uri);
             });
 
+            $res->method('forward', function($request_type, $uri) use($app, $req, $res) {
+                $app->forward($request_type, $uri);
+                $route = $app->getRouter()->getMatchedRoute();
+                return $route->storageGet('output');
+            });
+
             call_user_func_array($route->getCallback(), array($req, $res));
             return $route->storageGet('output');
         });

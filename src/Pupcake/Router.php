@@ -96,7 +96,6 @@ class Router extends Object
                         return true;
                     }, array($route));
                     if($result){ 
-                        $route->setParams($params);
                         $this->setMatchedRoute($route); 
                     }
                 }
