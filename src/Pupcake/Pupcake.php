@@ -20,6 +20,7 @@ class Pupcake extends Object
 
     public function __construct()
     {
+        $this->query_path = $_SERVER['PATH_INFO'];
         $this->event_manager = EventManager::instance();
 
         set_error_handler(function ($severity, $message, $file_path, $line){
@@ -128,14 +129,6 @@ class Pupcake extends Object
         $request_matched = EventManager::instance()->trigger('system.request.routing', function() use($app, $router){
             $route_map = $router->getRouteMap();
             $request_matched = false;
-            if($app->getRequestMode() == 'external'){
-                $query_path = "/";
-                $script_base_name = basename($_SERVER['SCRIPT_FILENAME']);
-                if($_SERVER['PHP_SELF'] != '/'.$script_base_name){
-                    $query_path = str_replace($script_base_name."/", "", $_SERVER['PHP_SELF']);
-                }
-                $app->setQueryPath($query_path);
-            }
             $output = "";
             if(count($route_map) > 0){
                 $request_types = array($_SERVER['REQUEST_METHOD'], "*");
