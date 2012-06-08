@@ -13,7 +13,7 @@ class Express extends Pupcake\Service
         $app->on("system.request.found", function($route){
             $req = new Pupcake\Object();
             $res = new Pupcake\Object();
-            $req->method('params', function($param_name) use ($req,$route){
+            $req->method('params', function($param_name) use ($route){
                 $params = $route->getParams();
                 $result = "";
                 if(isset($params[$param_name])){
@@ -21,12 +21,12 @@ class Express extends Pupcake\Service
                 }
                 return $result;
             });
-            $res->method('send', function($output) use ($res,$route){
-               $res->storageSet('output', $output); 
+            $res->method('send', function($output) use ($route){
+               $route->storageSet('output', $output); 
             });
 
             call_user_func_array($route->getCallback(), array($req, $res));
-            return $res->storageGet('output');
+            return $route->storageGet('output');
         });
     }
 }
