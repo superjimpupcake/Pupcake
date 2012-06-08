@@ -532,7 +532,7 @@ $app->post("/hello/:name", function($req, $res){
 });
 
 $app->get("test", function($req, $res){
-    return $res->redirect("test2");
+    $res->redirect("test2");
 });
 
 $app->any("date/:year/:month/:day", function($req, $res){
