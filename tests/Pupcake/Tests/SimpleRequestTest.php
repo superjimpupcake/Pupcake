@@ -9,9 +9,8 @@ class SimpleRequestTest extends TestCase
 {
     public function testSimpleGetRequest()
     {
-        $this->setupServerEnvironment();
-
         $this->simulateRequest("get", "/hello");
+
         $app = new Pupcake\Pupcake();
         $app->get("hello", function(){
             return "hello world";
@@ -24,7 +23,6 @@ class SimpleRequestTest extends TestCase
 
     public function testRequestForwarding()
     {
-        $this->setupServerEnvironment();
         $this->simulateRequest("get", "/test_internal");
 
         $app = new Pupcake\Pupcake();
