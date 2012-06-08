@@ -36,6 +36,10 @@ class Router extends Object
 
     public function getRoute($request_type, $route_pattern)
     {
+        if($route_pattern[0] != '/'){
+            $route_pattern = '/'.$route_pattern;
+        }
+        $request_type = strtoupper($request_type);
         return $this->route_map[$request_type][$route_pattern];
     }
 
