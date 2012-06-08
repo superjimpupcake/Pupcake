@@ -24,15 +24,15 @@ class Object
     public function __call($method_name, $params)
     {
         $class_name = get_class($this);
-        if(isset($this->methods[$class_name])){
-            return call_user_func_array($this->methods[$class_name], $params); 
+        if(isset($this->methods[$class_name][$method_name])){
+            return call_user_func_array($this->methods[$class_name][$method_name], $params); 
         }
     }
 
     final public function method($name, $callback)
     {
         $class_name = get_called_class(); 
-        $this->methods[$class_name] = $callback;
+        $this->methods[$class_name][$name] = $callback;
     }
 
     final public function storageSet($key, $val)
