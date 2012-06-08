@@ -3,7 +3,10 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ##About Pupcake Framework
 Pupcake is a minimal but extensible microframework for PHP 5.3+. Unlike many other frameworks, it does not have built-in support for regular expressions in route matching, it only matches name-based route tokens.
-The regular expression part ( or route validation ) can be handled with 3rd party packages through the framework's event-based system.
+The regular expression part ( or route validation ) can be handled with 3rd party packages through the framework's event-based system and the service system.
+
+For developer who is interested also in Express framework in node.js, Pupcake also provide a service named "Express" so that you can use similar api calls like Express, the Express service is under active development,
+but you can see some simple demos.
 
 ##Installation:
 
@@ -483,6 +486,31 @@ $app->get("api/validate/:token", function($token){
             ->validate($value);
     }
 ));
+
+$app->run();
+```
+####Advance Usae: use Pupcake like Express Node.js framework!
+For all developers who are also a Express Node.js framework user, you will probably want to use something like the following:
+```php
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
+```
+Pupcake provide the service named "Express" to help with that
+```php
+<?php
+//Assiming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->getService("Pupcake\Service\Express");
+
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
 
 $app->run();
 ```
