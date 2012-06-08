@@ -10,7 +10,7 @@ class Express extends Pupcake\Service
 {
     public function start($app)
     {
-        $app->on("system.request.found", function($route){
+        $app->on("system.request.found", function($route) use ($app) {
             $req = new Pupcake\Object();
             $res = new Pupcake\Object();
             $req->method('params', function($param_name) use ($route){
@@ -21,8 +21,16 @@ class Express extends Pupcake\Service
                 }
                 return $result;
             });
+
             $res->method('send', function($output) use ($route){
                $route->storageSet('output', $output); 
+            });
+
+            $res->method('redirect', function($uri){
+                if($uri[0] != "/"){
+                    $uri = "/".$uri;
+                }
+                header("Location: $uri");
             });
 
             call_user_func_array($route->getCallback(), array($req, $res));
