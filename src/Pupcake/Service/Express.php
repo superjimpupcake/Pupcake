@@ -14,7 +14,7 @@ class Express extends Pupcake\Service
             $req = new Pupcake\Object();
             $res = new Pupcake\Object();
             $req->method('params', function($param_name) use ($req,$route){
-                $params = $req->storageGet('params');
+                $params = $route->getParams();
                 $result = "";
                 if(isset($params[$param_name])){
                     $result = $params[$param_name];
@@ -24,7 +24,6 @@ class Express extends Pupcake\Service
             $res->method('send', function($output) use ($res,$route){
                $res->storageSet('output', $output); 
             });
-            $req->storageSet('params', $route->getParams());
 
             call_user_func_array($route->getCallback(), array($req, $res));
             return $res->storageGet('output');
