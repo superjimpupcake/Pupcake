@@ -63,7 +63,7 @@ class Express extends Pupcake\Service
         $app->on("system.request.found", function($route) use ($app) {
             $req = new ExpressRequest($route);
             $res = new ExpressResponse($app, $route);
-            call_user_func_array($route->getCallback(), array($req, $res));
+            $route->execute(array($req, $res)); //execuite route and override params
             return $route->storageGet('output');
         });
     }
