@@ -65,5 +65,15 @@ class Route extends Object
 
         return $this; # return the route instance to allow future extension
     }
-}
 
+    /**
+     * Execute this route
+     */
+    public function execute($params = array())
+    {
+        if(count($params) == 0){
+            $params = $this->getParams();
+        }
+        return call_user_func_array($this->getCallback(), $params);
+    }
+}

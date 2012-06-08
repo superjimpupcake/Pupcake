@@ -4,7 +4,7 @@
  *
  * @author Zike(Jim) Huang
  * @copyright 2012 Zike(Jim) Huang
- * @version 1.3alpha
+ * @version 1.3.1alpha
  * @package Pupcake
  */
 
@@ -169,8 +169,8 @@ class Pupcake extends Object
         else{
             //request matched
             $output = $this->event_manager->trigger("system.request.found", function($matched_route){
-                return call_user_func_array($matched_route->getCallback(), $matched_route->getParams());
-            }, array(Router::instance()->getMatchedRoute()));
+                return $matched_route->execute();
+            }, array($this->router->getMatchedRoute()));
         }
 
         if($this->isReturnOutput()){
@@ -243,9 +243,9 @@ class Pupcake extends Object
         return $this->event_manager->trigger($event_name);
     }
 
-    public function executeRoute(Route $route)
+    public function executeRoute($route, $params = array())
     {
-        return $this->router->executeRoute($route);
+        return $this->router->executeRoute($route, $params);
     }
 
     /**
