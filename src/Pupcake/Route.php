@@ -43,6 +43,17 @@ class Route extends Object
 
     public function setParams($route_params)
     {
+        if(count($route_params) > 0){
+            foreach($route_params as $name => $val){
+                unset($route_params[$name]);
+                $name = str_replace(":","",$name);
+                if($val[0] == '/'){
+                    $val[0] = '';
+                    $val = trim($val);
+                }
+                $route_params[$name] = $val;
+            }
+        }
         $this->route_params = $route_params;
     }
 
@@ -75,5 +86,6 @@ class Route extends Object
             $params = $this->getParams();
         }
         return call_user_func_array($this->getCallback(), $params);
+
     }
 }

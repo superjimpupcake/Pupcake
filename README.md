@@ -149,7 +149,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
-$app->any(":path", function($path){
+$app->any("*path", function($path){
     return "the current path is ".$path;
 });
 
@@ -453,7 +453,7 @@ $app->on("system.routing.route.matched", function($route){
 $app->get("api/validate/:token", function($token){
     return $token;
 })->constraint(array(
-    ':token' => function($value){
+    'token' => function($value){
         return Respect\Validation\Validator::date('Y-m-d')
         ->between('1980-02-02', '2015-12-25')
         ->validate($value);
@@ -480,7 +480,7 @@ $app->getService("Pupcake\Service\RouteConstraint");
 $app->get("api/validate/:token", function($token){
     return $token;
 })->constraint(array(
-    ':token' => function($value){
+    'token' => function($value){
         return Respect\Validation\Validator::date('Y-m-d')
             ->between('1980-02-02', '2015-12-25')
             ->validate($value);

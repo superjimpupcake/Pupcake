@@ -61,9 +61,15 @@ class Router extends Object
         $result = false;
         $params = array();
 
-        if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/:path'){
-            $result = true;
+        if( ($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == '*') && $route_pattern == '/*path'){
+            $route = $this->getRoute($request_type, $route_pattern);
             $params = array('path' => $uri);
+            $route->setParams($params);
+            $this->setMatchedRoute($route); 
+            $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
+                return true;
+            }, array($route));
+
         }
         else{
             $uri_comps = explode("/", $uri);
@@ -89,19 +95,7 @@ class Router extends Object
                     $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
                         return true;
                     }, array($route));
-                    if($result){
-                        if(count($params) > 0){
-                            foreach($params as $name => $val){
-                                unset($params[$name]);
-                                $name = str_replace(":","",$name);
-                                if($val[0] == '/'){
-                                    $val[0] = '';
-                                    $val = trim($val);
-                                }
-                                $params[$name] = $val;
-                            }
-                        }
-
+                    if($result){ 
                         $route->setParams($params);
                         $this->setMatchedRoute($route); 
                     }
@@ -115,10 +109,10 @@ class Router extends Object
     /**
      * Execute a route
      * @param route object
-     */
-    public function executeRoute($route, $params = array())
-    {
-        return $route->execute($params);
-    }
+         */
+            public function executeRoute($route, $params = array())
+            {
+                return $route->execute($params);
+            }
 }
 
