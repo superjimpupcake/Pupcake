@@ -51,5 +51,15 @@ class EventManager extends Object
             return $result;
         }
     }
+
+    /**
+     * clean up all event queues and event result
+     */ 
+    public function cleanup()
+    {
+        $this->event_queue = array();
+        $this->event_execution_result = array();
+    }
+
 }
 
