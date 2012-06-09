@@ -18,6 +18,7 @@ class RouteConstraint extends Pupcake\Service
             $route = new Pupcake\Route();
             $route->method('constraint', function($constraint) use($route){
                 $route->storageSet('constraint', $constraint);
+                return $route; //return the route reference for futher extension
             });
             return $route;
         });
