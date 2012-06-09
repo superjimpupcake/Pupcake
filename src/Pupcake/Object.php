@@ -12,15 +12,6 @@ class Object
         $this->storage= array();
     }
 
-    public static function instance()
-    {
-        static $instance;
-        if(!isset($instance)){
-            $instance = new static();
-        }
-        return $instance; 
-    }
-
     public function __call($method_name, $params)
     {
         if(isset($this->methods[$method_name])){
