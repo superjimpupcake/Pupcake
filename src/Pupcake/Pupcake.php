@@ -17,9 +17,11 @@ class Pupcake extends Object
     private $return_output;
     private $request_mode; 
     private $event_manager;
+    private $services; //holding an array of services
 
     public function __construct()
     {
+        $this->services = array();
         $this->query_path = $_SERVER['PATH_INFO'];
         $this->event_manager = new EventManager();
         $this->event_manager->belongsTo($this);
@@ -256,12 +258,10 @@ class Pupcake extends Object
      */
     public function getService($service_name, $config = array())
     {
-        static $services = array();
-        if(!isset($services[$service_name])){
-            $service_instance = new $service_name();
-            $services[$service_name] = $service_instance;
-            $services[$service_name]->start($this, $config); //start the service
+        if(!isset($this->services[$service_name])){
+            $this->services[$service_name] = new $service_name();
+            $this->services[$service_name]->start($this, $config); //start the service
         }
-        return $services[$service_name];
+        return $this->services[$service_name];
     }
 }
