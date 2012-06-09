@@ -7,6 +7,12 @@ class Route extends Object
     private $route_pattern;
     private $callback;
     private $route_params;
+    private $router;
+
+    public function belongsTo($router)
+    {
+        $this->router = $router;
+    }
 
     public function setRequestType($request_type)
     {
@@ -64,13 +70,12 @@ class Route extends Object
 
     public function via()
     {
-        $router = Router::instance();
         $request_types = func_get_args();
         $request_types_count = count($request_types);
         if($request_types_count > 0){
             for($k=0;$k<$request_types_count;$k++){
                 $this->request_type = $request_types[$k];
-                $router->addRoute($this);
+                $this->router->addRoute($this);
             } 
         }
 

@@ -3,6 +3,7 @@ namespace Pupcake;
 
 class Router extends Object
 {
+    private $app;
     private $route_map;
     private $route_not_found_handler;
     private $matched_route;
@@ -10,6 +11,11 @@ class Router extends Object
     public function __construct()
     {
         $this->route_map = array(); //initialize the route map
+    }
+
+    public function belongsTo($app)
+    {
+        $this->app = $app;
     }
 
     public function setMatchedRoute(Route $matched_route)
@@ -66,7 +72,7 @@ class Router extends Object
             $params = array('path' => $uri);
             $route->setParams($params);
             $this->setMatchedRoute($route); 
-            $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
+            $result = $this->app->getEventManager()->trigger("system.routing.route.matched", function($route){
                 return true;
             }, array($route));
 
@@ -92,7 +98,7 @@ class Router extends Object
                 if($uri_reformed == $route_pattern_reformed){
                     $route = $this->getRoute($request_type, $route_pattern);
                     $route->setParams($params);
-                    $result = EventManager::instance()->trigger("system.routing.route.matched", function($route){
+                    $result = $this->app->getEventManager()->trigger("system.routing.route.matched", function($route){
                         return true;
                     }, array($route));
                     if($result){ 
@@ -112,14 +118,6 @@ class Router extends Object
     public function executeRoute($route, $params = array())
     {
         return $route->execute($params);
-    }
-
-    /**
-     * clean up all the routes in the router
-     */ 
-    public function cleanup()
-    {
-        $this->route_map = array();
     }
 }
 

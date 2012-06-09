@@ -21,21 +21,16 @@ class Pupcake extends Object
     public function __construct()
     {
         $this->query_path = $_SERVER['PATH_INFO'];
-        $this->event_manager = EventManager::instance();
-
-        set_error_handler(function ($severity, $message, $file_path, $line){
-            $error = new Error($severity, $message, $file_path, $line);
-            EventManager::instance()->trigger('system.error.detected', '', array($error));
-            return true;
-        }, E_ALL);
-
-        register_shutdown_function(function(){
-            EventManager::instance()->trigger('system.shutdown');
-        });
+        $this->event_manager = new EventManager();
+        $this->event_manager->belongsTo($this);
+        
+        set_error_handler(array($this, 'handleError'), E_ALL);
+        register_shutdown_function(array($this, 'handleShutdown'));
 
         $this->request_mode = "external"; //default request mode is external
         $this->return_output = false;
-        $this->router = Router::instance();
+        $this->router = new Router(); #initiate one router for this app instance
+        $this->router->belongsTo($this);
     }
 
     public function getRouter()
@@ -43,11 +38,28 @@ class Pupcake extends Object
         return $this->router;
     }
 
+    public function getEventManager()
+    {
+        return $this->event_manager;
+    }
+
+    public function handleError($severity, $message, $file_path, $line)
+    {
+        $error = new Error($severity, $message, $file_path, $line);
+        $this->event_manager->trigger('system.error.detected', '', array($error));
+    }
+
+    public function handleShutdown()
+    {
+        $this->event_manager->trigger('system.shutdown');
+    }
+
     public function map($route_pattern, $callback)
     {
         $route = $this->event_manager->trigger('system.routing.route.create', function(){
             return new Route();
         });
+        $route->belongsTo($this->router); #route belongs to router
         $route->setRequestType("");
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
@@ -125,9 +137,8 @@ class Pupcake extends Object
     public function run()
     {
         $app = $this; //use the current app instance
-        $router = $this->router; //use the current router
-        $request_matched = EventManager::instance()->trigger('system.request.routing', function() use($app, $router){
-            $route_map = $router->getRouteMap();
+        $request_matched = $this->event_manager->trigger('system.request.routing', function() use($app){ #pass dependency, app
+            $route_map = $app->getRouter()->getRouteMap();
             $request_matched = false;
             $output = "";
             if(count($route_map) > 0){
@@ -136,8 +147,8 @@ class Pupcake extends Object
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
                             //once we found there is a matching route, stop
-                            $request_matched = EventManager::instance()->trigger('system.request.route.matching', 
-                                array($router, 'processRouteMatching'), 
+                            $request_matched = $app->getEventManager()->trigger('system.request.route.matching', 
+                                array($app->getRouter(), 'processRouteMatching'), 
                                 array($request_type,$app->getQueryPath(), $route_pattern)
                             );
                             if($request_matched){

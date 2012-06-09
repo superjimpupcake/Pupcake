@@ -3,12 +3,21 @@ namespace Pupcake;
 
 class EventManager extends Object
 {
+
+    /**
+     * @var app
+     * The pupcake application instance
+     */
+    private $app;
+
     /**
      * @var array
      * Pupcake Event Queue
      */
     private $event_queue; 
-    
+
+     
+
     /**
      * @var array
      * @Pupcake Event execution result
@@ -21,6 +30,10 @@ class EventManager extends Object
         $this->event_execution_result = array();
     }
 
+    public function belongsTo($app)
+    {
+        $this->app = $app;
+    }
 
     public function getEventQueue()
     {
@@ -50,15 +63,6 @@ class EventManager extends Object
             } 
             return $result;
         }
-    }
-
-    /**
-     * clean up all event queues and event result
-     */ 
-    public function cleanup()
-    {
-        $this->event_queue = array();
-        $this->event_execution_result = array();
     }
 
 }
