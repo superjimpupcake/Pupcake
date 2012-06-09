@@ -11,13 +11,42 @@ class SimpleRequestTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
         $app->get("hello", function(){
-            return "hello world";
+            return "hello in get";
         });
 
         $app->run();
 
-        $this->assertEquals($this->getRequestOutput(), "hello world");
+        $this->assertEquals($this->getRequestOutput(), "hello in get");
     }
+
+    public function testSimpleGetRequestWithParams()
+    {
+        $this->simulateRequest("get", "/hello/world");
+
+        $app = new Pupcake\Pupcake();
+        $app->get("hello/:string", function($string){
+            return "hello $string in get";
+        });
+
+        $app->run();
+
+        $this->assertEquals($this->getRequestOutput(), "hello world in get");
+    }
+
+    public function testSimplePostRequest()
+    {
+        $this->simulateRequest("post", "/hello");
+
+        $app = new Pupcake\Pupcake();
+        $app->post("hello", function(){
+            return "hello in post";
+        });
+
+        $app->run();
+
+        $this->assertEquals($this->getRequestOutput(), "hello in post");
+    }
+
 
     public function testRequestForwarding()
     {
@@ -56,7 +85,7 @@ class SimpleRequestTest extends Pupcake\TestCase
         });
 
         $app->run();
-        
+
         $this->assertEquals($this->getRequestOutput(), "post 1get 2get 3testing 22012-05-30");
     }
 }
