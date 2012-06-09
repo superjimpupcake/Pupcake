@@ -108,10 +108,18 @@ class Router extends Object
     /**
      * Execute a route
      * @param route object
-         */
-            public function executeRoute($route, $params = array())
-            {
-                return $route->execute($params);
-            }
+     */
+    public function executeRoute($route, $params = array())
+    {
+        return $route->execute($params);
+    }
+
+    /**
+     * clean up all the routes in the router
+     */ 
+    public function cleanup()
+    {
+        $this->route_map = array();
+    }
 }
 

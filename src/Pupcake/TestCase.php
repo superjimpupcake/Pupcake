@@ -16,6 +16,7 @@ class TestCase extends \PHPUnit_Framework_TestCase
 
     protected function getRequestOutput()
     {
+        Router::instance()->cleanup(); //super tricky, clean up the router
         $output = ob_get_contents();
         ob_end_clean();
         return $output;
