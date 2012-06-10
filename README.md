@@ -370,7 +370,7 @@ $template->loadTemplate('index.html')->render(array('string' => $string));
 ```
 to render the template, what if we want something like
 ```php
-$view->render([template], array('[token1] => '[value1],'[token2] => '[value2]')) 
+$view->render([template], array('[token1]' => '[value1]','[token2]' => '[value2]')) 
 ```
 similar to what codeigniter does?
 We can achieve this with dynamic method creation without even defining our own class
