@@ -58,13 +58,15 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback)
     {
-        $route = $this->event_manager->trigger('system.routing.route.create', function(){
-            return new Route();
-        });
+        $route = new Route();
         $route->belongsTo($this->router); #route belongs to router
         $route->setRequestType("");
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
+
+        $this->event_manager->trigger('system.routing.route.create', function($route){
+        }, array($route));
+
         return $route;
     }
 

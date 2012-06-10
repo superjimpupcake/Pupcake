@@ -14,13 +14,11 @@ class RouteConstraint extends Pupcake\Service
          * When a route object is being created, we add the constraint method 
          * to it and store the constraint into this route object's storage
          */
-        $app->on("system.routing.route.create", function(){
-            $route = new Pupcake\Route();
+        $app->on("system.routing.route.create", function($route){
             $route->method('constraint', function($constraint) use($route){
                 $route->storageSet('constraint', $constraint);
                 return $route; //return the route reference for futher extension
             });
-            return $route;
         });
 
         /**
