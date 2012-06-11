@@ -105,7 +105,7 @@ class Pupcake extends Object
 
     public function notFound($callback)
     {
-        $this->event_manager->register('system.request.notfound', $callback);
+        $this->on('system.request.notfound', $callback);
     }
 
     public function sendInternalRequest($request_type, $query_path)
