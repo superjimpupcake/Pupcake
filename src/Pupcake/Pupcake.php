@@ -52,7 +52,7 @@ class Pupcake extends Object
 
     public function handleShutdown()
     {
-        $this->event_manager->trigger('system.shutdown');
+        $this->triggerEvent('system.shutdown');
     }
 
     public function map($route_pattern, $callback)
