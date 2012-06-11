@@ -47,7 +47,7 @@ class Pupcake extends Object
     public function handleError($severity, $message, $file_path, $line)
     {
         $error = new Error($severity, $message, $file_path, $line);
-        $this->triggerEvent('system.error.detected', array('error' => $error);
+        $this->triggerEvent('system.error.detected', array('error' => $error));
     }
 
     public function handleShutdown()
