@@ -155,7 +155,7 @@ class Pupcake extends Object
                                     'request_type', $request_type, 
                                     'query_path' => $app->getQueryPath(),
                                     'route_pattern' => $route_pattern
-                                ), array($app->getRouter(), 'processRouteMatching'));  
+                                ), array($app->getRouter(), 'processRouteMatching') 
                             );
                             if($request_matched){
                                 break 2;
