@@ -259,7 +259,7 @@ class Pupcake extends Object
             }
 
             $result = "";
-            if($callback != ""){
+            if(is_callable($callback)){
                 $result = call_user_func_array($callback, $params);
                 $this->event_execution_result[$event_name] = $result;
             } 
@@ -272,11 +272,20 @@ class Pupcake extends Object
      */
     public function triggerEvent($event_name, $event_properties = array(), $default_callback = '')
     {
-        $event = new Event($event_name);
-        $event->setProperties($event_properties);
-        $handler = new EventHandler($event);
-        $params = array($event, $handler);
-        return $this->trigger($event_name, $default_callback, $params); 
+        if(isset($this->event_execution_result[$event_name]) ){ //if the execution result is set, return it
+            return $this->event_execution_result[$event_name];
+        }
+        else{
+            if(isset($this->event_queue[$event_name])){
+                $default_callback = ''; #if there is at least one callback define for this event, disable the default callback
+            }
+
+            $event = new Event($event_name);
+            $event->setProperties($event_properties);
+            $handler = new EventHandler($event);
+            $params = array($event, $handler);
+            return $this->trigger($event_name, $default_callback, $params); 
+        }
     }
 
     public function executeRoute($route, $params = array())
