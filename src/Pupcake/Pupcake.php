@@ -16,15 +16,14 @@ class Pupcake extends Object
     private $router;
     private $return_output;
     private $request_mode; 
-    private $event_manager;
+    private $event_queue;
+    private $event_execution_result;
     private $services; //holding an array of services
 
     public function __construct()
     {
         $this->services = array();
         $this->query_path = $_SERVER['PATH_INFO'];
-        $this->event_manager = new EventManager();
-        $this->event_manager->belongsTo($this);
         
         set_error_handler(array($this, 'handleError'), E_ALL);
         register_shutdown_function(array($this, 'handleShutdown'));
@@ -48,7 +47,7 @@ class Pupcake extends Object
     public function handleError($severity, $message, $file_path, $line)
     {
         $error = new Error($severity, $message, $file_path, $line);
-        $this->event_manager->trigger('system.error.detected', '', array($error));
+        $this->triggerEvent('system.error.detected', array('error' => $error);
     }
 
     public function handleShutdown()
@@ -64,8 +63,7 @@ class Pupcake extends Object
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
 
-        $this->event_manager->trigger('system.routing.route.create', function($route){
-        }, array($route));
+        $this->triggerEvent('system.routing.route.create', array('route' => $route));
 
         return $route;
     }
@@ -141,7 +139,7 @@ class Pupcake extends Object
     public function run()
     {
         $app = $this; //use the current app instance
-        $request_matched = $this->event_manager->trigger('system.request.routing', function() use($app){ #pass dependency, app
+        $request_matched = $this->trigger('system.request.routing', function() use($app){ #pass dependency, app
             $route_map = $app->getRouter()->getRouteMap();
             $request_matched = false;
             $output = "";
@@ -151,9 +149,13 @@ class Pupcake extends Object
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
                             //once we found there is a matching route, stop
-                            $request_matched = $app->getEventManager()->trigger('system.request.route.matching', 
-                                array($app->getRouter(), 'processRouteMatching'), 
-                                array($request_type,$app->getQueryPath(), $route_pattern)
+                            $request_matched = $app->triggerEvent(
+                                'system.request.route.matching', 
+                                array(
+                                    'request_type', $request_type, 
+                                    'query_path' => $app->getQueryPath(),
+                                    'route_pattern' => $route_pattern
+                                ), array($app->getRouter(), 'processRouteMatching'));  
                             );
                             if($request_matched){
                                 break 2;
@@ -167,7 +169,7 @@ class Pupcake extends Object
         });
 
         if(!$request_matched){
-            $output = $this->event_manager->trigger("system.request.notfound", function(){
+            $output = $this->triggerEvent("system.request.notfound", array(), function(){
                 //request not found
                 header("HTTP/1.1 404 Not Found");
                 return "Invalid Request";
@@ -175,9 +177,12 @@ class Pupcake extends Object
         }
         else{
             //request matched
-            $output = $this->event_manager->trigger("system.request.found", function($matched_route){
-                return $matched_route->execute();
-            }, array($this->router->getMatchedRoute()));
+            $output = $this->triggerEvent("system.request.found", 
+                array('route' => $this->router->getMatchedRoute()), 
+                function($event, $handler){
+                    return $event->props('matched_route')->execute();
+                }
+            );
         }
 
         if($this->isReturnOutput()){
@@ -240,14 +245,43 @@ class Pupcake extends Object
         }
     }
 
+    /**
+     * add a callback to the event
+     */
     public function on($event_name, $callback)
     {
-        $this->event_manager->register($event_name, $callback);
+        $this->event_queue[$event_name] = $callback;
     }
 
-    public function trigger($event_name)
+    public function trigger($event_name, $callback = "", $params = array())
     {
-        return $this->event_manager->trigger($event_name);
+        if($callback == "" && isset($this->event_execution_result[$event_name]) ){
+            return $this->event_execution_result[$event_name];
+        }
+        else{
+            if(isset($this->event_queue[$event_name])){
+                $callback = $this->event_queue[$event_name];
+            }
+
+            $result = "";
+            if($callback != ""){
+                $result = call_user_func_array($callback, $params);
+                $this->event_execution_result[$event_name] = $result;
+            } 
+            return $result;
+        }
+    }
+
+    /**
+     * trigger an event with event properties
+     */
+    public function triggerEvent($event_name, $event_properties = array(), $default_callback = '')
+    {
+        $event = new Event($event_name);
+        $event->setProperties($event_properties);
+        $handler = new EventHandler($event);
+        $params = array($event, $handler);
+        return $this->trigger($event_name, $default_callback, $params); 
     }
 
     public function executeRoute($route, $params = array())

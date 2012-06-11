@@ -56,13 +56,14 @@ class Router extends Object
 
     /**
      * process route matching
-     * @param string the request type
-     * @param string the uri
-     * @param the route pattern
+     * @param Event the event object
      * @return boolean whether the route matched the uri or not
      */
-    public function processRouteMatching($request_type, $uri, $route_pattern)
+    public function processRouteMatching($event)
     {
+        $request_type = $event->props('request_type');
+        $uri = $event->props('uri');
+        $route_pattern= $event->props('route_pattern');
 
         $result = false;
         $params = array();
