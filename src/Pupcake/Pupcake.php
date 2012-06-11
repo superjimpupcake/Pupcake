@@ -39,11 +39,6 @@ class Pupcake extends Object
         return $this->router;
     }
 
-    public function getEventManager()
-    {
-        return $this->event_manager;
-    }
-
     public function handleError($severity, $message, $file_path, $line)
     {
         $error = new Error($severity, $message, $file_path, $line);
