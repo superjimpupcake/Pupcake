@@ -5,6 +5,10 @@ use Pupcake;
 
 class ExpressServiceTest extends Pupcake\TestCase
 {
+    public function testHolder()
+    {
+    }
+
     //public function testExpressSimpleRequest()
     //{
         //$this->simulateRequest("get", "/date/2012/12/25");

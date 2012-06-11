@@ -57,7 +57,6 @@ class Pupcake extends Object
         $route->setRequestType("");
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
-
         $this->triggerEvent('system.routing.route.create', array('route' => $route));
         return $route;
     }
@@ -114,6 +113,8 @@ class Pupcake extends Object
         $_SERVER['REQUEST_METHOD'] = $request_type; 
         $this->setQueryPath($query_path);
         $this->setReturnOutput(true);
+        $this->event_queue = array();
+        $this->event_execution_result = array();
         $output = $this->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
 
@@ -133,6 +134,7 @@ class Pupcake extends Object
     public function run()
     {
         $app = $this; //use the current app instance
+        $route_map = $app->getRouter()->getRouteMap();
         $request_matched = $this->trigger('system.request.routing', function() use($app){ #pass dependency, app
             $route_map = $app->getRouter()->getRouteMap();
             $request_matched = false;
@@ -271,20 +273,15 @@ class Pupcake extends Object
      */
     public function triggerEvent($event_name, $event_properties = array(), $default_callback = '')
     {
-        if(isset($this->event_execution_result[$event_name]) ){ //if the execution result is set, return it
-            return $this->event_execution_result[$event_name];
+        if(isset($this->event_queue[$event_name])){
+            $default_callback = ''; #if there is at least one callback define for this event, disable the default callback
         }
-        else{
-            if(isset($this->event_queue[$event_name])){
-                $default_callback = ''; #if there is at least one callback define for this event, disable the default callback
-            }
 
-            $event = new Event($event_name);
-            $event->setProperties($event_properties);
-            $handler = new EventHandler($event);
-            $params = array($event, $handler);
-            return $this->trigger($event_name, $default_callback, $params); 
-        }
+        $event = new Event($event_name);
+        $event->setProperties($event_properties);
+        $handler = new EventHandler($event);
+        $params = array($event, $handler);
+        return $this->trigger($event_name, $default_callback, $params); 
     }
 
     public function executeRoute($route, $params = array())

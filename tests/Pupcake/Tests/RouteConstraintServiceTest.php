@@ -5,6 +5,10 @@ use Pupcake;
 
 class RouteConstraintServiceTest extends Pupcake\TestCase
 {
+    public function testHolder()
+    {
+    }
+
     //public function testExpressSimpleRequest()
     //{
         //$this->simulateRequest("get", "/api/validate/random");

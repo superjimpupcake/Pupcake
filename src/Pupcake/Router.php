@@ -32,7 +32,6 @@ class Router extends Object
     {
         $request_type = $route->getRequestType();
         $route_pattern = $route->getPattern();
-
         if(!isset($this->route_map[$request_type])){
             $this->route_map[$request_type] = array();
         }
@@ -64,7 +63,6 @@ class Router extends Object
         $request_type = $event->props('request_type');
         $uri = $event->props('query_path');
         $route_pattern= $event->props('route_pattern');
-
         $result = false;
         $params = array();
 
@@ -108,7 +106,6 @@ class Router extends Object
                 }
             }
         }
-
         return $result;
     }
 
