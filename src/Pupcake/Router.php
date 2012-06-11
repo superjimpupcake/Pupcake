@@ -62,7 +62,7 @@ class Router extends Object
     public function processRouteMatching($event)
     {
         $request_type = $event->props('request_type');
-        $uri = $event->props('uri');
+        $uri = $event->props('query_path');
         $route_pattern= $event->props('route_pattern');
 
         $result = false;
