@@ -47,10 +47,10 @@ class Event
     public function props($key = "")
     {
         if($key == ""){
-            return $this->getProperty($key);
+            return $this->getProperties();
         }
         else{
-            return $this->getProperties();
+            return $this->getProperty($key);
         }
     }
 }

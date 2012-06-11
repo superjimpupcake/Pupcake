@@ -73,9 +73,9 @@ class Router extends Object
             $params = array('path' => $uri);
             $route->setParams($params);
             $this->setMatchedRoute($route); 
-            $result = $this->app->getEventManager()->trigger("system.routing.route.matched", function($route){
+            $result = $this->app->triggerEvent("system.routing.route.matched", array('route' => $route), function($event, $handler){
                 return true;
-            }, array($route));
+            });
 
         }
         else{
@@ -99,9 +99,9 @@ class Router extends Object
                 if($uri_reformed == $route_pattern_reformed){
                     $route = $this->getRoute($request_type, $route_pattern);
                     $route->setParams($params);
-                    $result = $this->app->getEventManager()->trigger("system.routing.route.matched", function($route){
+                    $result = $this->app->triggerEvent("system.routing.route.matched", array('route' => $route), function($event, $handler){
                         return true;
-                    }, array($route));
+                    });
                     if($result){ 
                         $this->setMatchedRoute($route); 
                     }
@@ -115,10 +115,10 @@ class Router extends Object
     /**
      * Execute a route
      * @param route object
-     */
-    public function executeRoute($route, $params = array())
-    {
-        return $route->execute($params);
-    }
+         */
+            public function executeRoute($route, $params = array())
+            {
+                return $route->execute($params);
+            }
 }
 
