@@ -42,12 +42,12 @@ class Pupcake extends Object
     public function handleError($severity, $message, $file_path, $line)
     {
         $error = new Error($severity, $message, $file_path, $line);
-        $this->triggerEvent('system.error.detected', array('error' => $error));
+        $this->trigger('system.error.detected', '', array('error' => $error));
     }
 
     public function handleShutdown()
     {
-        $this->triggerEvent('system.shutdown');
+        $this->trigger('system.shutdown');
     }
 
     public function map($route_pattern, $callback)
@@ -57,7 +57,7 @@ class Pupcake extends Object
         $route->setRequestType("");
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
-        $this->triggerEvent('system.routing.route.create', array('route' => $route));
+        $this->trigger('system.routing.route.create', '', array('route' => $route));
         return $route;
     }
 
@@ -114,7 +114,6 @@ class Pupcake extends Object
         $this->setQueryPath($query_path);
         $this->setReturnOutput(true);
         $this->event_queue = array();
-        $this->event_execution_result = array();
         $output = $this->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
 
@@ -145,13 +144,14 @@ class Pupcake extends Object
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
                             //once we found there is a matching route, stop
-                            $request_matched = $app->triggerEvent(
+                            $request_matched = $app->trigger(
                                 'system.request.route.matching', 
+                                array($app->getRouter(), 'processRouteMatching'),
                                 array(
                                     'request_type'=> $request_type, 
                                     'query_path' => $app->getQueryPath(),
                                     'route_pattern' => $route_pattern
-                                ), array($app->getRouter(), 'processRouteMatching') 
+                                )
                             );
                             if($request_matched){
                                 break 2;
@@ -165,7 +165,7 @@ class Pupcake extends Object
         });
 
         if(!$request_matched){
-            $output = $this->triggerEvent("system.request.notfound", array(), function(){
+            $output = $this->trigger("system.request.notfound", function(){
                 //request not found
                 header("HTTP/1.1 404 Not Found");
                 return "Invalid Request";
@@ -173,11 +173,11 @@ class Pupcake extends Object
         }
         else{
             //request matched
-            $output = $this->triggerEvent("system.request.found", 
-                array('route' => $this->router->getMatchedRoute()), 
+            $output = $this->trigger("system.request.found", 
                 function($event, $handler){
                     return $event->props('route')->execute();
-                }
+                },
+                array('route' => $this->router->getMatchedRoute())
             );
         }
 
@@ -242,46 +242,42 @@ class Pupcake extends Object
     }
 
     /**
-     * add a callback to the event
+     * add a callback to the event, one event, one handler callback
+     * the handler callback is swappable, so later handler callback can override previous handler callback
      */
-    public function on($event_name, $callback)
+    public function on($event_name, $handler_callback)
     {
-        $this->event_queue[$event_name] = $callback;
-    }
-
-    public function trigger($event_name, $callback = "", $params = array())
-    {
-        if($callback == "" && isset($this->event_execution_result[$event_name]) ){
-            return $this->event_execution_result[$event_name];
+        if(!isset($this->event_queue[$event_name])){
+            $event = new Event($event_name);
+            $this->event_queue[$event_name] = $event;
         }
         else{
-            if(isset($this->event_queue[$event_name])){
-                $callback = $this->event_queue[$event_name];
-            }
-
-            $result = "";
-            if(is_callable($callback)){
-                $result = call_user_func_array($callback, $params);
-                $this->event_execution_result[$event_name] = $result;
-            } 
-            return $result;
+            $event = $this->event_queue[$event_name];
         }
+        $event->setHandlerCallback($handler_callback);
     }
 
-    /**
-     * trigger an event with event properties
-     */
-    public function triggerEvent($event_name, $event_properties = array(), $default_callback = '')
+    public function trigger($event_name, $handler_callback = "", $event_properties = array())
     {
+        $event = null;
         if(isset($this->event_queue[$event_name])){
-            $default_callback = ''; #if there is at least one callback define for this event, disable the default callback
+            $event = $this->event_queue[$event_name];
+            if(is_callable($handler_callback)){
+                $event->setHandlerCallback($callback);
+                $result = call_user_func_array($callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+            }
         }
-
-        $event = new Event($event_name);
-        $event->setProperties($event_properties);
-        $handler = new EventHandler($event);
-        $params = array($event, $handler);
-        return $this->trigger($event_name, $default_callback, $params); 
+        else{
+            $event = new Event($event_name);
+            $event->setProperties($event_properties);
+            if(is_callable($handler_callback)){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+            }
+        }
+        return $event->getHandlerCallbackReturnValue();
     }
 
     public function executeRoute($route, $params = array())

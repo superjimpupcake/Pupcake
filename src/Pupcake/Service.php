@@ -57,17 +57,6 @@ abstract class Service
         }
     }
 
-
-    /**
-     * trigger an event in the service scope given an event object
-     */
-    public function triggerEvent($event)
-    {
-        $handler = new EventHandler($event); //create a new handler for this event object
-        $params = array($event, $handler);
-        return $this->trigger($event_name, '', $params); 
-    }
-
     /**
      * start the service
      * @return Service the service object, required for each service
