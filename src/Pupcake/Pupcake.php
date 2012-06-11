@@ -174,7 +174,7 @@ class Pupcake extends Object
             $output = $this->triggerEvent("system.request.found", 
                 array('route' => $this->router->getMatchedRoute()), 
                 function($event, $handler){
-                    return $event->props('matched_route')->execute();
+                    return $event->props('route')->execute();
                 }
             );
         }
