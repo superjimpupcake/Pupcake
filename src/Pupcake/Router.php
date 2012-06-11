@@ -96,33 +96,48 @@ class Router extends Object
 
                 $uri_reformed = implode("/",$uri_comps);
                 $route_pattern_reformed = implode("/",$route_pattern_comps);
+                $route = $this->getRoute($request_type, $route_pattern);
+                $route->setParams($params);
 
                 if($uri_reformed == $route_pattern_reformed){
-                    $route = $this->getRoute($request_type, $route_pattern);
-                    $route->setParams($params);
-                    $result = $this->app->trigger("system.routing.route.matched", 
+                    $results = $this->app->trigger("system.routing.route.matched", 
                         function($event, $handler){
                             return true;
                         }, 
                             array('route' => $route) 
                         );
 
+                    //the result can be either a boolean or an array 
+                    $result = true;
+                    if( is_array($results) && count($results) > 0 ){  //the result is an array
+                        foreach($results as $matched){
+                            if(!$matched){
+                                $result = false;
+                                break;
+                            }
+                        }
+                    }
+                    else if(!$results){
+                        $result = false; 
+                    }
+
                     if($result){ 
                         $this->setMatchedRoute($route); 
                     }
+
                 }
             }
         }
+
         return $result;
     }
 
     /**
      * Execute a route
      * @param route object
-         */
-            public function executeRoute($route, $params = array())
-            {
-                return $route->execute($params);
-            }
+     */
+    public function executeRoute($route, $params = array())
+    {
+        return $route->execute($params);
+    }
 }
-

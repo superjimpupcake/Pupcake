@@ -5,25 +5,20 @@
  */
 namespace Pupcake;
 
-abstract class Service
+class Service
 {
     /**
-     * the event queue that is dedicated to the service
+     * the event handlers that is dedicated to the service
      */
 
-    private $event_queue;
-
-    /**
-     * the event execution result
-     */
-    private $event_execution_result;
+    private $event_handlers;
 
     /**
      * the service constructor
      */
     public function __construct()
     {
-        $this->event_queue = array();
+        $this->event_handlers = array();
     }
 
     /**
@@ -31,36 +26,21 @@ abstract class Service
      */
     public function on($event_name, $callback)
     {
-        $this->event_queue[$event_name] = $callback;
+        $this->event_handlers[$event_name] = $callback;
     }
 
     /**
-     * trigger an event in the service scope
+     * get the service level event handler
      */
-    public function trigger($event_name, $callback = "", $params = array())
+    public function getEventHandler($event_name)
     {
-
-        if($callback == "" && isset($this->event_execution_result[$event_name]) ){
-            return $this->event_execution_result[$event_name];
-        }
-        else{
-            if(isset($this->event_queue[$event_name])){
-                $callback = $this->event_queue[$event_name];
-            }
-
-            $result = "";
-            if($callback != ""){
-                $result = call_user_func_array($callback, $params);
-                $this->event_execution_result[$event_name] = $result;
-            } 
-            return $result;
-        }
+        return $this->event_handlers[$event_name];
     }
 
     /**
      * start the service
      * @return Service the service object, required for each service
      */
-    abstract public function start($app);
+    abstract public function start($app, $config = array());
 
 }
