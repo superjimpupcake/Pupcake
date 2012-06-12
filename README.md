@@ -24,7 +24,7 @@ but you can see some simple demos.
 ###Simple get,post,put,delete requests
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -52,7 +52,7 @@ $app->run();
 ###Multiple request methods for one route
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -69,7 +69,7 @@ $app->run();
 ###Request redirection
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -85,7 +85,7 @@ $app->run();
 ###Request forwarding (internal request)
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -127,7 +127,7 @@ $app->run();
 ###Custom request-not-found handler
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -143,7 +143,7 @@ $app->run();
 ###Catch any requests
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -159,7 +159,7 @@ $app->run();
 ###Request type detection in internal and external request
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -179,7 +179,7 @@ $app->run();
 ###Custom Event handling --- detect request not found
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -202,7 +202,7 @@ $app->run();
 ###Custom Event Handling --- detect system error
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -227,7 +227,7 @@ $app->run();
 ####We can "intercept" the output generation process when request is found and a route is matched
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -247,7 +247,7 @@ $app->run();
 ####We can hook into the system.shutdown event
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -263,7 +263,7 @@ $app->run();
 ####We can create arbitary service events to hook up to Respect/Validation package (https://github.com/Respect/Validation)
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -299,7 +299,7 @@ $app->run();
 ####We can create arbitary service events to hook up to twig/twig package (http://github.com/fabpot/Twig.git)
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -326,7 +326,7 @@ $app->run();
 ```php
 <?php
 
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -353,7 +353,7 @@ All Pupcake system objects (Object, EventManager, Route, Router, Pupcake) has a 
 is not defined yet
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -376,7 +376,7 @@ similar to what codeigniter does?
 We can achieve this with dynamic method creation without even defining our own class
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -407,7 +407,7 @@ $app->run();
 ####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -468,7 +468,7 @@ wrap most of them into a unit called "service", Pupcake by default comes with th
 method to start using the service
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -499,7 +499,7 @@ $app->get("date/:year/:month/:day", function($req, $res){
 Pupcake provide the service named "Express" to help with that
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -516,7 +516,7 @@ $app->run();
 Redirecting, Forwarding in express style
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
