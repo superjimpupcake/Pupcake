@@ -77,6 +77,7 @@ class Event
     public function register($service_callbacks = array())
     {
         $this->service_callbacks = $service_callbacks;
+        return $this->run();
     }
 
     public function setHandlerCallbackReturnValue($handler_callback_return_value)
@@ -100,7 +101,7 @@ class Event
     /**
      * get a callback function from a specific service
      */
-    public function getEventHandlerFromService(Pupcake\Service $service)
+    public function getHandlerFromService(Pupcake\Service $service)
     {
         return $service->getEventHandler($this->getName());
     }
@@ -108,7 +109,7 @@ class Event
     /**
      * run this event
      */
-    public function run()
+    private function run()
     {
         $result = array();
         if(count($this->service_callbacks) > 0){

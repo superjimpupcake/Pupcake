@@ -19,10 +19,9 @@ class ExpressServiceTest extends Pupcake\TestCase
         $services['Express'] = $app->getService("Pupcake\Service\Express");
 
         $app->on("system.request.found", function($event) use ($services) {
-            $event->register(array(
-                $event->getEventHandlerFromService($services['Express']),
+            return $event->register(array(
+                $event->getHandlerFromService($services['Express']),
             ));
-            return $event->run();
         });
 
         $app->get("date/:year/:month/:day", function($req, $res){
@@ -49,11 +48,9 @@ class ExpressServiceTest extends Pupcake\TestCase
         $services['Express'] = $app->getService("Pupcake\Service\Express");
 
         $app->on("system.request.found", function($event) use ($services) {
-            $event->register(array(
-                $event->getEventHandlerFromService($services['Express']),
+            return $event->register(array(
+                $event->getHandlerFromService($services['Express']),
             ));
-
-            return $event->run();
         });
 
         $app->get("/hello/:name", function($req, $res){
