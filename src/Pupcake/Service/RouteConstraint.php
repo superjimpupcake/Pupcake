@@ -8,13 +8,13 @@ use Pupcake;
 
 class RouteConstraint extends Pupcake\Service
 {
-    public function start($app)
+    public function start($app, $config = array())
     {
         /**
          * When a route object is being created, we add the constraint method 
          * to it and store the constraint into this route object's storage
          */
-        $app->on("system.routing.route.create", function($event, $handler){
+        $this->on("system.routing.route.create", function($event){
             $route = $event->props('route');
             $route->method('constraint', function($constraint) use($route){
                 $route->storageSet('constraint', $constraint);
@@ -26,7 +26,8 @@ class RouteConstraint extends Pupcake\Service
          * When a route object is initially matched, we add further checking logic 
          * to make sure the constraint is applying toward the route matching process
          */
-        $app->on("system.routing.route.matched", function($route){
+        $this->on("system.routing.route.matched", function($event){
+            $route = $event->props('route');
             $matched = true;
             $params = $route->getParams();
             $constraint = $route->storageGet('constraint');

@@ -252,9 +252,8 @@ class Pupcake extends Object
             $event = new Event($event_name);
             $this->event_queue[$event_name] = $event;
         }
-        else{
-            $event = $this->event_queue[$event_name];
-        }
+        
+        $event = $this->event_queue[$event_name];
         $event->setHandlerCallback($handler_callback);
     }
 
@@ -264,18 +263,16 @@ class Pupcake extends Object
         if(isset($this->event_queue[$event_name])){
             $event = $this->event_queue[$event_name];
             $event->setProperties($event_properties);
-
-            if( is_callable($handler_callback) ){
-                $event->setHandlerCallback($handler_callback);
+            
+            $handler_callback = $event->getHandlerCallback();
+            if(is_callable($handler_callback)){
                 $result = call_user_func_array($handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
             }
-            else{
-                $handler_callback = $event->getHandlerCallback();
-                if(is_callable($handler_callback)){
-                    $result = call_user_func_array($handler_callback, array($event));
-                    $event->setHandlerCallbackReturnValue($result);
-                }
+            else if( is_callable($handler_callback) ){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
             }
         }
         else{

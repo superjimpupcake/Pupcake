@@ -5,7 +5,7 @@
  */
 namespace Pupcake;
 
-class Service
+abstract class Service
 {
     /**
      * the event handlers that is dedicated to the service
@@ -36,7 +36,7 @@ class Service
     {
         $result = function(){
         };
-        if(isset($this->event_handlers[$event_name]){
+        if(isset($this->event_handlers[$event_name])){
             $result = $this->event_handlers[$event_name];
         }
         return $result;
