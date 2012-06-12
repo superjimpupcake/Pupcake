@@ -265,7 +265,7 @@ class Pupcake extends Object
             $event = $this->event_queue[$event_name];
             $event->setProperties($event_properties);
 
-            if( is_callable($handler_callback) && $event->getHandlerCallback() !== $handler_callback ){
+            if( is_callable($handler_callback) ){
                 $event->setHandlerCallback($handler_callback);
                 $result = call_user_func_array($handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
