@@ -21,7 +21,7 @@ The regular expression part ( or route validation ) can be handled with 3rd part
 ###Simple get,post,put,delete requests
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -49,7 +49,7 @@ $app->run();
 ###Multiple request methods for one route
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -66,7 +66,7 @@ $app->run();
 ###Request redirection
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -82,7 +82,7 @@ $app->run();
 ###Request forwarding (internal request)
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -124,7 +124,7 @@ $app->run();
 ###Custom request-not-found handler
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -140,7 +140,7 @@ $app->run();
 ###Catch any requests
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -156,7 +156,7 @@ $app->run();
 ###Request type detection in internal and external request
 ```php
 <?php
-//Assiming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
 
 require_once __DIR__.'/../vendor/autoload.php';
 
