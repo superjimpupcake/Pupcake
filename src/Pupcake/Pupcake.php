@@ -160,7 +160,7 @@ class Pupcake extends Object
                     }
                 }
             }
-
+            
             return $request_matched;
         });
 
@@ -174,7 +174,7 @@ class Pupcake extends Object
         else{
             //request matched
             $output = $this->trigger("system.request.found", 
-                function($event, $handler){
+                function($event){
                     return $event->props('route')->execute();
                 },
                 array('route' => $this->router->getMatchedRoute())
