@@ -34,7 +34,12 @@ class Service
      */
     public function getEventHandler($event_name)
     {
-        return $this->event_handlers[$event_name];
+        $result = function(){
+        };
+        if(isset($this->event_handlers[$event_name]){
+            $result = $this->event_handlers[$event_name];
+        }
+        return $result;
     }
 
     /**

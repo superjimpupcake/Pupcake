@@ -100,6 +100,14 @@ class Event
     }
 
     /**
+     * get a callback function from a specific service
+     */
+    public function getEventHandlerFromService(Pupcake\Service $service)
+    {
+       return $service->getEventHandler($this->getName());
+    }
+
+    /**
      * run this event
      */
     public function run()
