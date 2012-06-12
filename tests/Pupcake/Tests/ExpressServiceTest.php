@@ -9,35 +9,35 @@ class ExpressServiceTest extends Pupcake\TestCase
     {
     }
 
-    //public function testExpressSimpleRequest()
-    //{
-        //$this->simulateRequest("get", "/date/2012/12/25");
+    public function testExpressSimpleRequest()
+    {
+        $this->simulateRequest("get", "/date/2012/12/25");
 
-        //$app = new Pupcake\Pupcake();
+        $app = new Pupcake\Pupcake();
 
-        //$services = array();
-        //$services['Express'] = $app->getService("Pupcake\Service\Express");
+        $services = array();
+        $services['Express'] = $app->getService("Pupcake\Service\Express");
 
-        //$app->on("system.request.found", function($event) use ($services) {
-            //$event->register(array(
-                //$event->getEventHandlerFromService($services['Express']),
-            //));
-            //return $event->run();
-        //});
+        $app->on("system.request.found", function($event) use ($services) {
+            $event->register(array(
+                $event->getEventHandlerFromService($services['Express']),
+            ));
+            return $event->run();
+        });
 
-        //$app->get("date/:year/:month/:day", function($req, $res){
-            //$output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
-            //$res->send($output);
-        //});
+        $app->get("date/:year/:month/:day", function($req, $res){
+            $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+            $res->send($output);
+        });
 
-        //$app->get("hello", function($req, $res){
-            //$res->send("hello world");
-        //});
+        $app->get("hello", function($req, $res){
+            $res->send("hello world");
+        });
 
-        //$app->run();
+        $app->run();
 
-        //$this->assertEquals($this->getRequestOutput(), "2012-12-25");
-    //}
+        $this->assertEquals($this->getRequestOutput(), "2012-12-25");
+    }
 
     public function testExpressRequestForwarding()
     {
