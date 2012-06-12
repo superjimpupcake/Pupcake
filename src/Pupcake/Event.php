@@ -11,14 +11,13 @@ class Event
     private $handler_callback; //the main handler callback for this event, one event => one handler callback
     private $service_callbacks; //the service callbacks for this event, one event => many service callbacks
     private $handler_callback_return_value; //store handler callback's return value
-    private $service_callbacks_service_callbacks_return_values; //storing all return values of the service callbacks
+    private $service_callbacks_return_values; //storing all return values of the service callbacks
 
     public function __construct($name = "")
     {
         $this->name = $name;
         $this->properties = array();
         $this->service_callbacks = array();
-        $this->service_callbacks_service_callbacks_return_values = array();
         $this->handler_callback = null;
         $this->handler_callback_return_value = null;
     }
@@ -104,7 +103,7 @@ class Event
      */
     public function getEventHandlerFromService(Pupcake\Service $service)
     {
-       return $service->getEventHandler($this->getName());
+        return $service->getEventHandler($this->getName());
     }
 
     /**
@@ -112,21 +111,16 @@ class Event
      */
     public function run()
     {
+        $result = array();
         if(count($this->service_callbacks) > 0){
-            //
             foreach($this->service_callbacks as $callback){
                 $return_value = call_user_func_array($callback, array($this));
-                if($return_value === NULL){
-                    $this->service_callbacks_return_values = NULL;
-                }
-                else{
-                    $this->service_callbacks_return_values[] = $return_value;
-                }
-            }
-            if(count($this->service_callbacks_return_values) == 1){ //the return value has only 1 value, return that value itself
-                $this->service_callbacks_return_values = $this->service_callbacks_return_values[0];
+                $result[] = $return_value;
             }
         }
-        return $this->service_callbacks_return_values;
+        if(count($result) == 1){ //if the array has only 1 elment, return it
+            $result = $result[0];
+        }
+        return $result;
     }
 }

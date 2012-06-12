@@ -79,10 +79,10 @@ class ExpressServiceTest extends Pupcake\TestCase
         $app->get("test_internal", function($req, $res){
             $content = "";
             $content .= $res->forward("POST", "hello/world");
-            //$content .= $res->forward("GET", "hello/world2");
-            //$content .= $res->forward("GET", "hello/world3");
-            //$content .= $res->forward("GET", "test");
-            //$content .= $res->forward("POST", "date/2012/05/30");
+            $content .= $res->forward("GET", "hello/world2");
+            $content .= $res->forward("GET", "hello/world3");
+            $content .= $res->forward("GET", "test");
+            $content .= $res->forward("POST", "date/2012/05/30");
             $res->send($content);
         });
 

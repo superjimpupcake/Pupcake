@@ -113,7 +113,6 @@ class Pupcake extends Object
         $_SERVER['REQUEST_METHOD'] = $request_type; 
         $this->setQueryPath($query_path);
         $this->setReturnOutput(true);
-        $this->event_queue = array();
         $output = $this->run();
         $_SERVER['REQUEST_METHOD'] = $current_request_type;
 
@@ -164,6 +163,8 @@ class Pupcake extends Object
             return $request_matched;
         });
 
+        $output = "";
+        $return_outputs = array();
         if(!$request_matched){
             $output = $this->trigger("system.request.notfound", function(){
                 //request not found
