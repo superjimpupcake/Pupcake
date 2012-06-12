@@ -247,6 +247,7 @@ class Pupcake extends Object
      */
     public function on($event_name, $handler_callback)
     {
+        $event = null;
         if(!isset($this->event_queue[$event_name])){
             $event = new Event($event_name);
             $this->event_queue[$event_name] = $event;
@@ -262,10 +263,19 @@ class Pupcake extends Object
         $event = null;
         if(isset($this->event_queue[$event_name])){
             $event = $this->event_queue[$event_name];
-            if(is_callable($handler_callback)){
-                $event->setHandlerCallback($callback);
-                $result = call_user_func_array($callback, array($event));
+            $event->setProperties($event_properties);
+
+            if( is_callable($handler_callback) && $event->getHandlerCallback() !== $handler_callback ){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
+            }
+            else{
+                $handler_callback = $event->getHandlerCallback();
+                if(is_callable($handler_callback)){
+                    $result = call_user_func_array($handler_callback, array($event));
+                    $event->setHandlerCallbackReturnValue($result);
+                }
             }
         }
         else{
@@ -275,9 +285,13 @@ class Pupcake extends Object
                 $event->setHandlerCallback($handler_callback);
                 $result = call_user_func_array($handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
+                $this->event_queue[$event_name] = $event;
             }
         }
-        return $event->getHandlerCallbackReturnValue();
+
+        $result = $event->getHandlerCallbackReturnValue();
+
+        return $result;
     }
 
     public function executeRoute($route, $params = array())
