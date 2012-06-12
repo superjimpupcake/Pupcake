@@ -20,7 +20,7 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app->on("system.request.found", function($event) use ($services) {
             return $event->register(array(
-                $event->getHandlerFromService($services['Express']),
+                $services['Express']->getEventHandler($event),
             ));
         });
 
@@ -49,7 +49,7 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app->on("system.request.found", function($event) use ($services) {
             return $event->register(array(
-                $event->getHandlerFromService($services['Express']),
+                $services['Express']->getEventHandler($event),
             ));
         });
 

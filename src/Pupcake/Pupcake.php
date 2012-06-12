@@ -304,7 +304,8 @@ class Pupcake extends Object
     {
         if(!isset($this->services[$service_name])){
             $this->services[$service_name] = new $service_name();
-            $this->services[$service_name]->start($this, $config); //start the service
+            $this->services[$service_name]->setContext(new ServiceContext($this));
+            $this->services[$service_name]->start($config); //start the service
         }
         return $this->services[$service_name];
     }

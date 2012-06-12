@@ -20,13 +20,13 @@ class RouteConstraintServiceTest extends Pupcake\TestCase
 
         $app->on('system.routing.route.create', function($event) use ($services) {
             return $event->register(array(
-                $event->getHandlerFromService($services['Route.Constraint']),
+                $services['Route.Constraint']->getEventHandler($event),
             ));
         });
 
         $app->on('system.routing.route.matched', function($event) use ($services) {
             return $event->register(array(
-                $event->getHandlerFromService($services['Route.Constraint']),
+                $services['Route.Constraint']->getEventHandler($event),
             ));
         });
 

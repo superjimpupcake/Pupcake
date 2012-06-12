@@ -8,7 +8,7 @@ use Pupcake;
 
 class RouteConstraint extends Pupcake\Service
 {
-    public function start($app, $config = array())
+    public function start($config = array())
     {
         /**
          * When a route object is being created, we add the constraint method 
