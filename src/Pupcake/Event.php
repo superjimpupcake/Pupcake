@@ -72,12 +72,18 @@ class Event
     }
 
     /**
-     * register an array of service callbacks to handle the event
+     * register an array of service objects and allow this service object to joint the process of handling this event
      */
-    public function register($service_callbacks = array())
+    public function register()
     {
-        $this->service_callbacks = $service_callbacks;
-        return $this->run();
+        $services = func_get_args();
+        if(count($services) > 0){
+            foreach($services as $service){
+                $this->service_callbacks[] = $service->getEventHandler($this);
+            }
+        }
+
+        return $this; //return the event object reference to allow chainable calls
     }
 
     public function setHandlerCallbackReturnValue($handler_callback_return_value)
@@ -99,9 +105,9 @@ class Event
     }
 
     /**
-     * run this event
+     * start this event
      */
-    private function run()
+    public function start()
     {
         $result = array();
         if(count($this->service_callbacks) > 0){
