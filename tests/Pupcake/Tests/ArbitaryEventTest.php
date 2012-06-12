@@ -10,28 +10,28 @@ class ArbitaryEventTest extends Pupcake\TestCase
     {
     }
 
-    //public function testRandomEventTheLegacyWay()
-    //{
+    public function testRandomEventTheLegacyWay()
+    {
 
-        //$this->simulateRequest("get", "/dummy");
+        $this->simulateRequest("get", "/dummy");
 
-        //$app = new Pupcake\Pupcake();
-        //$app->on("service.anything", function(){
-            //$s = new Pupcake\Object();
-            //$s->method('hello', function($word){
-                //return "hello $word";
-            //});
-            //return $s;
-        //});
+        $app = new Pupcake\Pupcake();
+        $app->on("service.anything", function(){
+            $s = new Pupcake\Object();
+            $s->method('hello', function($word){
+                return "hello $word";
+            });
+            return $s;
+        });
 
-        //$app->get("dummy", function() use ($app){
-            //$service = $app->trigger("service.anything");
-            //$word = $service->hello("test");
-            //return $word;
-        //});
+        $app->get("dummy", function() use ($app){
+            $service = $app->trigger("service.anything");
+            $word = $service->hello("test");
+            return $word;
+        });
 
-        //$app->run();
+        $app->run();
 
-        //$this->assertEquals($this->getRequestOutput(), "hello test");
-    //} 
+        $this->assertEquals($this->getRequestOutput(), "hello test");
+    } 
 }
