@@ -11,7 +11,6 @@ class Event
     private $handler_callback; //the main handler callback for this event, one event => one handler callback
     private $service_callbacks; //the service callbacks for this event, one event => many service callbacks
     private $handler_callback_return_value; //store handler callback's return value
-    private $service_callbacks_return_values; //storing all return values of the service callbacks
 
     public function __construct($name = "")
     {
