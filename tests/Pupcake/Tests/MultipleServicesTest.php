@@ -23,11 +23,13 @@ class MultipleServiceTest extends Pupcake\TestCase
 
             $app->get("api/ip/:ip", function($req, $res) use ($app) {
                 $res->send($app->getRouter()->getMatchedRoute()->getAction());
-            })->constraint(array(
+            })
+            ->to("api#ip")
+            ->constraint(array(
                 'ip' =>  function($value){
                     return \Respect\Validation\Validator::ip()->validate($value);
                 }
-            ))->to("api#ip");
+            ));
 
             $app->run();
 
