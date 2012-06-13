@@ -5,7 +5,7 @@ Pupcake --- a micro framework for PHP 5.3+
 Pupcake is a minimal but extensible microframework for PHP 5.3+. Unlike many other frameworks, it does not have built-in support for regular expressions in route matching, it only matches name-based route tokens.
 The regular expression part ( or route validation ) can be handled with 3rd party packages through the framework's event-based system and the service system.
 
-For developer who is interested also in Express framework in node.js, Pupcake also provide a service named "Express" so that you can use similar api calls like Express, the Express service is under active development,
+Starting Version 2.0, Pupcake also provide a service named "Express" so that you can use similar api calls like Express, the Express service is under active development,
 but you can see some simple demos.
 
 ##Installation:
@@ -21,7 +21,7 @@ but you can see some simple demos.
 
 ##Usage:
 
-###Simple get,post,put,delete requests
+###Simple requests
 ```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
@@ -46,25 +46,16 @@ $app->delete("/hello/:name", function($name){
   return "hello ".$name." in delete";
 });
 
-$app->run();
-```
-
-###Multiple request methods for one route
-```php
-<?php
-//Assuming this is public/index.php and the composer vendor directory is ../vendor
-
-require_once __DIR__.'/../vendor/autoload.php';
-
-$app = new Pupcake\Pupcake();
-
-$app->map("/hello/:name", function($name){
+/**
+ * Multiple request methods for one route
+ */
+$app->map("/api/hello/:action", function($action){
   return "hello ".$name." in get and post";
 })->via('GET','POST');
 
+
 $app->run();
 ```
-
 
 ###Request redirection
 ```php
@@ -119,6 +110,76 @@ $app->get("test_internal", function() use ($app) {
   $content .= $app->forward("GET", "test")."<br/>";
   $content .= $app->forward("POST", "date/2012/05/30")."<br/>";
   return $content;
+});
+
+$app->run();
+```
+
+
+####Use Pupcake like Express Node.js framework
+For all developers who are also a Express Node.js framework user, you will probably want to use something like the following:
+```php
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
+```
+Pupcake provide the service named "Express" to help with that
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->getService("Pupcake\Service\Express");
+
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
+
+$app->run();
+```
+
+Redirecting, Forwarding in express style
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->getService("Pupcake\Service\Express");
+
+$app->get("/hello/:name", function($req, $res){
+    $res->send($req->params('name'));
+});
+$app->post("/hello/:name", function($req, $res){
+    $res->send( "posting ".$req->params('name')." to hello");
+});
+
+$app->get("test", function($req, $res){
+    $res->redirect("test2");
+});
+
+$app->any("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year')."-".$req->params('month')."-".$req->params('day');
+    $res->send($output);
+});
+
+$app->get("/test2", function($req, $res){
+    $res->send("tesing 2");
+});
+
+$app->get("test_internal", function($req, $res){
+    $content = "";
+    $content .= $res->forward("POST", "hello/world")."<br/>";
+    $content .= $res->forward("GET", "hello/world2")."<br/>";
+    $content .= $res->forward("GET", "hello/world3")."<br/>";
+    $content .= $res->forward("GET", "test")."<br/>";
+    $content .= $res->forward("POST", "date/2012/05/30")."<br/>";
+    $res->send($content);
 });
 
 $app->run();
@@ -489,73 +550,6 @@ $app->get("api/validate/:token", function($token){
             ->validate($value);
     }
 ));
-
-$app->run();
-```
-####Advance Usage: use Pupcake like Express Node.js framework!
-For all developers who are also a Express Node.js framework user, you will probably want to use something like the following:
-```php
-$app->get("date/:year/:month/:day", function($req, $res){
-    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
-    $res->send($output);
-});
-```
-Pupcake provide the service named "Express" to help with that
-```php
-<?php
-//Assuming this is public/index.php and the composer vendor directory is ../vendor
-
-require_once __DIR__.'/../vendor/autoload.php';
-
-$app = new Pupcake\Pupcake();
-$app->getService("Pupcake\Service\Express");
-
-$app->get("date/:year/:month/:day", function($req, $res){
-    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
-    $res->send($output);
-});
-
-$app->run();
-```
-Redirecting, Forwarding in express style
-```php
-<?php
-//Assuming this is public/index.php and the composer vendor directory is ../vendor
-
-require_once __DIR__.'/../vendor/autoload.php';
-
-$app = new Pupcake\Pupcake();
-$app->getService("Pupcake\Service\Express");
-
-$app->get("/hello/:name", function($req, $res){
-    $res->send($req->params('name'));
-});
-$app->post("/hello/:name", function($req, $res){
-    $res->send( "posting ".$req->params('name')." to hello");
-});
-
-$app->get("test", function($req, $res){
-    $res->redirect("test2");
-});
-
-$app->any("date/:year/:month/:day", function($req, $res){
-    $output = $req->params('year')."-".$req->params('month')."-".$req->params('day');
-    $res->send($output);
-});
-
-$app->get("/test2", function($req, $res){
-    $res->send("tesing 2");
-});
-
-$app->get("test_internal", function($req, $res){
-    $content = "";
-    $content .= $res->forward("POST", "hello/world")."<br/>";
-    $content .= $res->forward("GET", "hello/world2")."<br/>";
-    $content .= $res->forward("GET", "hello/world3")."<br/>";
-    $content .= $res->forward("GET", "test")."<br/>";
-    $content .= $res->forward("POST", "date/2012/05/30")."<br/>";
-    $res->send($content);
-});
 
 $app->run();
 ```

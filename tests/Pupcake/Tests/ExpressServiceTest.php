@@ -15,12 +15,7 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
 
-        $services = array();
-        $services['Express'] = $app->getService("Pupcake\Service\Express"); //load service
-
-        //$app->on("system.request.found", function($event) use ($services) {
-            //return $event->register($services['Express'])->start();
-        //});
+        $app->getService("Pupcake\Service\Express"); //load service
 
         $app->get("date/:year/:month/:day", function($req, $res){
             $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
@@ -42,8 +37,7 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
 
-        $services = array();
-        $services['Express'] = $app->getService("Pupcake\Service\Express"); //load service
+        $app->getService("Pupcake\Service\Express"); //load service
 
         $app->on("system.request.found", function($event) use ($services) {
             return "custom output";
@@ -70,14 +64,7 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
 
-        $services = array();
-        $services['Express'] = $app->getService("Pupcake\Service\Express");
-
-        $app->startServices();
-
-        //$app->on("system.request.found", function($event) use ($services) {
-        //return $event->register($services['Express'])->start();
-        //});
+        $app->getService("Pupcake\Service\Express");
 
         $app->get("/hello/:name", function($req, $res){
             $res->send($req->params('name'));
