@@ -19,6 +19,7 @@ class Pupcake extends Object
     private $event_queue;
     private $event_execution_result;
     private $services; //holding an array of services
+    private $service_loading; //see if the service is loading or not
     private $services_started; //tell the system to see if the services are started or not
     private $events_services_map; //the event => services mapping
     private $events_services_map_processed;
@@ -29,6 +30,7 @@ class Pupcake extends Object
         $this->events_services_map = array();
         $this->events_services_map_processed = false;
         $this->services_started = false;
+        $this->service_loading = false;
         $this->query_path = $_SERVER['PATH_INFO'];
         
         set_error_handler(array($this, 'handleError'), E_ALL);
@@ -148,9 +150,11 @@ class Pupcake extends Object
             if(count($this->events_services_map) > 0){
                 foreach($this->events_services_map as $event_name => $services){
                     if(count($services) > 0){
+                        $this->service_loading = true;
                         $this->on($event_name, function($event) use ($services) {
                             return call_user_func_array(array($event, "register"), $services)->start();
                         });
+                        $this->service_loading = false;
                     }
                 }
                 $this->events_services_map_processed = true;
@@ -277,6 +281,14 @@ class Pupcake extends Object
      */
     public function on($event_name, $handler_callback)
     {
+        if(!$this->service_loading){
+            //start the services, only once
+            if(!$this->services_started){
+                $this->startServices();
+                $this->services_started = true;
+            }
+        }
+
         $event = null;
         if(!isset($this->event_queue[$event_name])){
             $event = new Event($event_name);
