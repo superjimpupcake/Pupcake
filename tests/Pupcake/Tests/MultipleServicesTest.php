@@ -17,11 +17,12 @@ class MultipleServiceTest extends Pupcake\TestCase
 
             $app = new Pupcake\Pupcake();
 
+            $app->getService("Pupcake\Service\Express"); //load Express service
             $app->getService("Pupcake\Service\RouteConstraint"); //load RouteConstraint service
             $app->getService("Pupcake\Service\RouteAction"); //load RouteAction service
 
-            $app->get("api/ip/:ip", function($ip) use ($app) {
-                return $app->getRouter()->getMatchedRoute()->getAction();
+            $app->get("api/ip/:ip", function($req, $res) use ($app) {
+                $res->send($app->getRouter()->getMatchedRoute()->getAction());
             })->constraint(array(
                 'ip' =>  function($value){
                     return \Respect\Validation\Validator::ip()->validate($value);
