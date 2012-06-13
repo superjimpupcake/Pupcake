@@ -5,6 +5,9 @@ Pupcake --- a micro framework for PHP 5.3+
 Pupcake is a minimal but extensible microframework for PHP 5.3+. Unlike many other frameworks, it does not have built-in support for regular expressions in route matching, it only matches name-based route tokens.
 The regular expression part ( or route validation ) can be handled with 3rd party packages through the framework's event-based system and the service system.
 
+For developer who is interested also in Express framework in node.js, Pupcake also provide a service named "Express" so that you can use similar api calls like Express, the Express service is under active development,
+but you can see some simple demos.
+
 ##Installation:
 
 ####install package "Pupcake/Pupcake" using composer (http://getcomposer.org/) (recommened)
@@ -168,6 +171,386 @@ $app->post('api/me/update', function() use ($app) {
 
 $app->get('test', function() use ($app) {
     return $app->getRequestType().":".$app->forward('POST','api/me/update');
+});
+
+$app->run();
+```
+
+###Custom Event handling --- detect request not found
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+/**
+ * This is the same as 
+ * $app->notFound(function(){
+ *   return "request not found handler";
+ * });
+ */
+
+$app->on('system.request.notfound', function(){
+    return "request not found handler";
+});
+
+$app->run();
+```
+
+###Custom Event Handling --- detect system error
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+/**
+ * By defining custom callback for system.error.detected event, 
+ * we can build a custom error handling system
+ */
+$app->on('system.error.detected', function($error){
+    $message = $error->getMessage();
+    $line = $error->getLine();
+    print $message." at ".$line."\n";
+});
+
+print $output; //undefined variable
+
+$app->run();
+```
+
+###Custom Event Handling --- custom response output
+####We can "intercept" the output generation process when request is found and a route is matched
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->get("/hello/:name", function($name){
+  return $name;
+});
+
+$app->on('system.request.found', function($route) use ($app) {
+    return "prepend outputs ".$app->executeRoute($route);
+});
+
+$app->run();
+```
+###Custom Event Handling --- system shutdown detection
+####We can hook into the system.shutdown event
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->on('system.shutdown', function(){
+    print "<br/>system is shutdown now<br/>";
+});
+
+$app->run();
+```
+###Custom Event Handling --- set up services to do validation on route parameters
+####We can create arbitary service events to hook up to Respect/Validation package (https://github.com/Respect/Validation)
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+/**
+ * First, we need to make sure Respect/Validation package is installed properly via composer
+ */
+$app = new Pupcake\Pupcake();
+
+$app->on('service.validation', function(){
+    $validator = array();
+    foreach(array('numeric','email','ip') as $type){
+        $validator[$type] = call_user_func("Respect\Validation\Validator::$type");
+    }
+    return $validator;
+});
+
+$app->get("hello/:string", function($string) use ($app){
+    $validator = $app->trigger('service.validation');
+    if($validator['numeric']->validate($string)){
+        return "number detected";
+    }
+    else if($validator['email']->validate($string)){
+        return "email detected";
+    }
+    else if($validator['ip']->validate($string)){
+        return "ip detected";
+    }
+
+});
+$app->run();
+```
+###Custom Event Handling --- set up services to render twig templates
+####We can create arbitary service events to hook up to twig/twig package (http://github.com/fabpot/Twig.git)
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+/**
+ * First, we need to make sure twig/twig package is installed properly via composer
+ * Also, the views folder and ../views/index.html file should be created and has proper write permissions for the server
+ */
+$app = new Pupcake\Pupcake();
+
+$app->on('service.twig.template', function(){
+    $loader = new Twig_Loader_Filesystem("../views");
+    $twig = new Twig_Environment($loader);
+    return $twig;
+});
+
+$app->get("hello/:string", function($string) use ($app){
+    $template = $app->trigger('service.twig.template');
+    return $template->loadTemplate('index.html')->render(array('string' => $string));
+});
+$app->run();
+```
+###Custom Event Handling --- set up services to render php templates using kaloa/view
+####We can create arbitary service events to hook up to kaloa/view package (https://github.com/mermshaus/kaloa-view)
+```php
+<?php
+
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+/**
+ * First, we need to make sure kaloa/view package is installed properly via composer
+ * Also, the ../views/index.phtml file should be created and has proper write permissions for the server
+ */
+$app = new Pupcake\Pupcake();
+
+$app->on('service.kaloa.view', function(){
+    $view = new Kaloa\View\View();
+    return $view;
+});
+
+$app->get("hello/:string", function($string) use ($app){
+    $view = $app->trigger('service.kaloa.view');
+    $view->string = $string;
+    return $view->render("../views/index.phtml");
+});
+$app->run();
+```
+###Advance Usage: dynamic method creation
+All Pupcake system objects (Object, EventManager, Route, Router, Pupcake) has a powerful method named "method", it allows you to dynamically define a  method that
+is not defined yet
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->method("hello", function($string){
+    return "hello $string";
+});
+print $app->hello("world");
+```
+###Advance Usage: use dynamic method creation on Pupcake\Ojbect to create a twig rendering service
+In The previous example on twig template rendering, we need to use 
+```php 
+$template->loadTemplate('index.html')->render(array('string' => $string));
+```
+to render the template, what if we want something like
+```php
+$view->render([template], array('[token1]' => '[value1]','[token2]' => '[value2]')) 
+```
+similar to what codeigniter does?
+We can achieve this with dynamic method creation without even defining our own class
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+/**
+ * Make sure ../views/index.html exists and twig/twig package is installed properly through composer
+ */
+$app = new Pupcake\Pupcake();
+
+$app->on('service.view.twig', function(){
+    $view = new Pupcake\Object();
+    //we add a dynamic method named render
+    $view->method("render", function($template_file,$data = array() ){
+        $loader = new Twig_Loader_Filesystem(dirname($template_file));
+        $twig = new Twig_Environment($loader);
+        return $twig->loadTemplate(basename($template_file))->render($data);
+    });
+    return $view;
+});
+
+$app->get("twigdemo", function() use ($app){
+    $view = $app->trigger('service.view.twig');
+    return $view->render("../views/index.html", array('string' => 'jim')); //now we can render the template similar to the codeigniter way!
+});
+
+$app->run();
+```
+###Advance Usage: adding constraints in route
+####We can create constraints in route by hooking into system.routing.route.create event and system.routing.route.matched event
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+/**
+ * First, we need to make sure Respect/Validation package is installed 
+ * properly via composer
+ */
+$app = new Pupcake\Pupcake();
+
+/**
+ * When a route object is being created, we add the constraint method 
+ * to it and store the constraint into this route object's storage
+ */
+$app->on("system.routing.route.create", function($route){
+    $route->method('constraint', function($constraint) use($route){
+        $route->storageSet('constraint', $constraint);
+    });
+    return $route; //return the route object reference for further enhancement
+});
+
+/**
+ * When a route object is initially matched, we add further checking logic 
+ * to make sure the constraint is applying toward the route matching process
+ */
+$app->on("system.routing.route.matched", function($route){
+    $matched = true;
+    $params = $route->getParams();
+    $constraint = $route->storageGet('constraint');
+    if(count($constraint) > 0){
+        foreach($constraint as $token => $validation_callback){
+            if(is_callable($validation_callback)){
+                if(!$validation_callback($params[$token])){
+                    $matched = false;
+                    break;
+                }
+            }
+        }
+    } 
+    return $matched;
+});
+
+$app->get("api/validate/:token", function($token){
+    return $token;
+})->constraint(array(
+    'token' => function($value){
+        return Respect\Validation\Validator::date('Y-m-d')
+        ->between('1980-02-02', '2015-12-25')
+        ->validate($value);
+    }
+));
+
+$app->run();
+```
+###Advance Usage: start using Pupcake services
+All of the code above on adding constraint to the route is great, but it might be tedious at some point, we can
+wrap most of them into a unit called "service", Pupcake by default comes with the service named "RouteConstraint"
+(for details, look into vendor/src/Pupcake/Pupcake/Service/RouteConstraint.php), we can simply use the getService
+method to start using the service
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->getService("Pupcake\Service\RouteConstraint");
+
+$app->get("api/validate/:token", function($token){
+    return $token;
+})->constraint(array(
+    'token' => function($value){
+        return Respect\Validation\Validator::date('Y-m-d')
+            ->between('1980-02-02', '2015-12-25')
+            ->validate($value);
+    }
+));
+
+$app->run();
+```
+####Advance Usage: use Pupcake like Express Node.js framework!
+For all developers who are also a Express Node.js framework user, you will probably want to use something like the following:
+```php
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
+```
+Pupcake provide the service named "Express" to help with that
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->getService("Pupcake\Service\Express");
+
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
+
+$app->run();
+```
+Redirecting, Forwarding in express style
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->getService("Pupcake\Service\Express");
+
+$app->get("/hello/:name", function($req, $res){
+    $res->send($req->params('name'));
+});
+$app->post("/hello/:name", function($req, $res){
+    $res->send( "posting ".$req->params('name')." to hello");
+});
+
+$app->get("test", function($req, $res){
+    $res->redirect("test2");
+});
+
+$app->any("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year')."-".$req->params('month')."-".$req->params('day');
+    $res->send($output);
+});
+
+$app->get("/test2", function($req, $res){
+    $res->send("tesing 2");
+});
+
+$app->get("test_internal", function($req, $res){
+    $content = "";
+    $content .= $res->forward("POST", "hello/world")."<br/>";
+    $content .= $res->forward("GET", "hello/world2")."<br/>";
+    $content .= $res->forward("GET", "hello/world3")."<br/>";
+    $content .= $res->forward("GET", "test")."<br/>";
+    $content .= $res->forward("POST", "date/2012/05/30")."<br/>";
+    $res->send($content);
 });
 
 $app->run();
