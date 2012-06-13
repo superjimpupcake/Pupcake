@@ -39,9 +39,13 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app->getService("Pupcake\Service\Express"); //load service
 
+        /**
+         * override system.request.found event handling, return custom output
+         */
         $app->on("system.request.found", function($event) use ($services) {
             return "custom output";
         });
+
 
         $app->get("date/:year/:month/:day", function($req, $res){
             $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
@@ -57,6 +61,39 @@ class ExpressServiceTest extends Pupcake\TestCase
         $this->assertEquals($this->getRequestOutput(), "custom output");
 
     }
+
+    public function testExpressServicCustomEventRegistration()
+    {
+        $this->simulateRequest("get", "/date/2012/12/25");
+
+        $app = new Pupcake\Pupcake();
+
+        $services = array();
+        $services['Express'] = $app->getService("Pupcake\Service\Express"); //load service
+
+        /**
+         * add back the express service to the event handling
+         */
+        $app->on("system.request.found", function($event) use ($services) {
+            return $event->register($services['Express'])
+                ->start(); 
+        });
+
+        $app->get("date/:year/:month/:day", function($req, $res){
+            $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+            $res->send($output);
+        });
+
+        $app->get("hello", function($req, $res){
+            $res->send("hello world");
+        });
+
+        $app->run();
+
+        $this->assertEquals($this->getRequestOutput(), "2012-12-25");
+
+    }
+
 
     public function testExpressRequestForwarding()
     {
