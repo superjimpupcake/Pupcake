@@ -212,7 +212,8 @@ $app = new Pupcake\Pupcake();
  * By defining custom callback for system.error.detected event, 
  * we can build a custom error handling system
  */
-$app->on('system.error.detected', function($error){
+$app->on('system.error.detected', function($event){
+    $error = $event->props('error'); # get the error object from the event object
     $message = $error->getMessage();
     $line = $error->getLine();
     print $message." at ".$line."\n";
@@ -237,7 +238,8 @@ $app->get("/hello/:name", function($name){
   return $name;
 });
 
-$app->on('system.request.found', function($route) use ($app) {
+$app->on('system.request.found', function($event) use ($app) {
+    $route = $event->props('route'); # get the route object from the event object
     return "prepend outputs ".$app->executeRoute($route);
 });
 
@@ -421,7 +423,8 @@ $app = new Pupcake\Pupcake();
  * When a route object is being created, we add the constraint method 
  * to it and store the constraint into this route object's storage
  */
-$app->on("system.routing.route.create", function($route){
+$app->on("system.routing.route.create", function($event){
+    $route = $event->props('route');
     $route->method('constraint', function($constraint) use($route){
         $route->storageSet('constraint', $constraint);
     });
@@ -432,7 +435,8 @@ $app->on("system.routing.route.create", function($route){
  * When a route object is initially matched, we add further checking logic 
  * to make sure the constraint is applying toward the route matching process
  */
-$app->on("system.routing.route.matched", function($route){
+$app->on("system.routing.route.matched", function($event){
+    $route = $event->props('route');
     $matched = true;
     $params = $route->getParams();
     $constraint = $route->storageGet('constraint');
