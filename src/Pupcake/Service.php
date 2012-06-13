@@ -13,6 +13,7 @@ abstract class Service
 
     private $event_handlers;
     private $context; //the service context
+    private $name; // the name of the service
 
     /**
      * the service constructor
@@ -23,11 +24,35 @@ abstract class Service
     }
 
     /**
+     * set the service name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * get the service name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * register an event callback in the service scope
      */
     public function on($event_name, $callback)
     {
         $this->event_handlers[$event_name] = $callback;
+    }
+
+    /**
+     * get all event handlers
+     */
+    public function getEventHandlers()
+    {
+        return $this->event_handlers;
     }
 
     /**

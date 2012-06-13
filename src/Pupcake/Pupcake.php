@@ -19,10 +19,16 @@ class Pupcake extends Object
     private $event_queue;
     private $event_execution_result;
     private $services; //holding an array of services
+    private $services_started; //tell the system to see if the services are started or not
+    private $events_services_map; //the event => services mapping
+    private $events_services_map_processed;
 
     public function __construct()
     {
         $this->services = array();
+        $this->events_services_map = array();
+        $this->events_services_map_processed = false;
+        $this->services_started = false;
         $this->query_path = $_SERVER['PATH_INFO'];
         
         set_error_handler(array($this, 'handleError'), E_ALL);
@@ -52,6 +58,12 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback)
     {
+        //start the services, only once
+        if(!$this->services_started){
+            $this->startServices();
+            $this->services_started = true;
+        }
+
         $route = new Route();
         $route->belongsTo($this->router); #route belongs to router
         $route->setRequestType("");
@@ -129,6 +141,23 @@ class Pupcake extends Object
         return $this->sendInternalRequest($request_type, $query_path);
     }
 
+    public function startServices()
+    {
+        //register all events in the event service map, only happen once
+        if(!$this->events_services_map_processed){
+            if(count($this->events_services_map) > 0){
+                foreach($this->events_services_map as $event_name => $services){
+                    if(count($services) > 0){
+                        $this->on($event_name, function($event) use ($services) {
+                            return call_user_func_array(array($event, "register"), $services)->start();
+                        });
+                    }
+                }
+                $this->events_services_map_processed = true;
+            }
+        }
+    }
+
     public function run()
     {
         $app = $this; //use the current app instance
@@ -159,7 +188,7 @@ class Pupcake extends Object
                     }
                 }
             }
-            
+
             return $request_matched;
         });
 
@@ -178,8 +207,8 @@ class Pupcake extends Object
                 function($event){
                     return $event->props('route')->execute();
                 },
-                array('route' => $this->router->getMatchedRoute())
-            );
+                    array('route' => $this->router->getMatchedRoute())
+                );
         }
 
         if($this->isReturnOutput()){
@@ -253,7 +282,7 @@ class Pupcake extends Object
             $event = new Event($event_name);
             $this->event_queue[$event_name] = $event;
         }
-        
+
         $event = $this->event_queue[$event_name];
         $event->setHandlerCallback($handler_callback);
     }
@@ -264,7 +293,7 @@ class Pupcake extends Object
         if(isset($this->event_queue[$event_name])){
             $event = $this->event_queue[$event_name];
             $event->setProperties($event_properties);
-            
+
             $handler_callback = $event->getHandlerCallback();
             if(is_callable($handler_callback)){
                 $result = call_user_func_array($handler_callback, array($event));
@@ -305,7 +334,20 @@ class Pupcake extends Object
         if(!isset($this->services[$service_name])){
             $this->services[$service_name] = new $service_name();
             $this->services[$service_name]->setContext(new ServiceContext($this));
+            $this->services[$service_name]->setName($service_name);
             $this->services[$service_name]->start($config); //start the service
+
+            //now preload all service handlers to the event queue
+
+            $event_handlers = $this->services[$service_name]->getEventHandlers();
+            if(count($event_handlers) > 0){
+                foreach($event_handlers as $event_name => $callback){
+                    if(!isset($this->events_services_map[$event_name])){
+                        $this->events_services_map[$event_name] = array();
+                    }
+                    $this->events_services_map[$event_name][] = $this->services[$service_name]; //add the service object to the map
+                }
+            }
         }
         return $this->services[$service_name];
     }
