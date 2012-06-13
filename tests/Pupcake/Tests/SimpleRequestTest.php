@@ -5,11 +5,20 @@ use Pupcake;
 
 class SimpleRequestTest extends Pupcake\TestCase
 {
+    public function testHolder()
+    {
+    }
+
     public function testSimpleGetRequest()
     {
         $this->simulateRequest("get", "/hello");
 
         $app = new Pupcake\Pupcake();
+
+        $app->get("api", function(){
+            return "api in get";
+        });
+
         $app->get("hello", function(){
             return "hello in get";
         });
@@ -46,7 +55,6 @@ class SimpleRequestTest extends Pupcake\TestCase
 
         $this->assertEquals($this->getRequestOutput(), "hello in post");
     }
-
 
     public function testRequestForwarding()
     {

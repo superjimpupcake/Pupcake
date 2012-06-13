@@ -32,7 +32,6 @@ class Router extends Object
     {
         $request_type = $route->getRequestType();
         $route_pattern = $route->getPattern();
-
         if(!isset($this->route_map[$request_type])){
             $this->route_map[$request_type] = array();
         }
@@ -56,14 +55,14 @@ class Router extends Object
 
     /**
      * process route matching
-     * @param string the request type
-     * @param string the uri
-     * @param the route pattern
+     * @param Event the event object
      * @return boolean whether the route matched the uri or not
      */
-    public function processRouteMatching($request_type, $uri, $route_pattern)
+    public function processRouteMatching($event)
     {
-
+        $request_type = $event->props('request_type');
+        $uri = $event->props('query_path');
+        $route_pattern= $event->props('route_pattern');
         $result = false;
         $params = array();
 
@@ -72,10 +71,7 @@ class Router extends Object
             $params = array('path' => $uri);
             $route->setParams($params);
             $this->setMatchedRoute($route); 
-            $result = $this->app->getEventManager()->trigger("system.routing.route.matched", function($route){
-                return true;
-            }, array($route));
-
+            $result = true;
         }
         else{
             $uri_comps = explode("/", $uri);
@@ -94,19 +90,35 @@ class Router extends Object
 
                 $uri_reformed = implode("/",$uri_comps);
                 $route_pattern_reformed = implode("/",$route_pattern_comps);
+                $route = $this->getRoute($request_type, $route_pattern);
+                $route->setParams($params);
 
                 if($uri_reformed == $route_pattern_reformed){
-                    $route = $this->getRoute($request_type, $route_pattern);
-                    $route->setParams($params);
-                    $result = $this->app->getEventManager()->trigger("system.routing.route.matched", function($route){
-                        return true;
-                    }, array($route));
+                    $results = $this->app->trigger("system.routing.route.matched", "", array('route' => $route));
+
+                    //the result can be either a boolean or an array 
+                    $result = true;
+                    if( is_array($results) && count($results) > 0 ){  //the result is an array
+                        foreach($results as $matched){
+                            if(!$matched){
+                                $result = false;
+                                break;
+                            }
+                        }
+                    }
+                    else if($results === FALSE){
+                        $result = false; 
+                    }
+
                     if($result){ 
                         $this->setMatchedRoute($route); 
                     }
+
                 }
             }
         }
+
+
 
         return $result;
     }
@@ -120,4 +132,3 @@ class Router extends Object
         return $route->execute($params);
     }
 }
-

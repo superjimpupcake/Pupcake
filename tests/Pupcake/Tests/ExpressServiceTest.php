@@ -5,16 +5,30 @@ use Pupcake;
 
 class ExpressServiceTest extends Pupcake\TestCase
 {
+    public function testHolder()
+    {
+    }
+
     public function testExpressSimpleRequest()
     {
         $this->simulateRequest("get", "/date/2012/12/25");
 
         $app = new Pupcake\Pupcake();
-        $app->getService("Pupcake\Service\Express");
+
+        $services = array();
+        $services['Express'] = $app->getService("Pupcake\Service\Express"); //load service
+
+        //$app->on("system.request.found", function($event) use ($services) {
+            //return $event->register($services['Express'])->start();
+        //});
 
         $app->get("date/:year/:month/:day", function($req, $res){
             $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
             $res->send($output);
+        });
+
+        $app->get("hello", function($req, $res){
+            $res->send("hello world");
         });
 
         $app->run();
@@ -22,12 +36,48 @@ class ExpressServiceTest extends Pupcake\TestCase
         $this->assertEquals($this->getRequestOutput(), "2012-12-25");
     }
 
+    public function testExpressServiceOverride()
+    {
+        $this->simulateRequest("get", "/date/2012/12/25");
+
+        $app = new Pupcake\Pupcake();
+
+        $services = array();
+        $services['Express'] = $app->getService("Pupcake\Service\Express"); //load service
+
+        $app->on("system.request.found", function($event) use ($services) {
+            return "custom output";
+        });
+
+        $app->get("date/:year/:month/:day", function($req, $res){
+            $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+            $res->send($output);
+        });
+
+        $app->get("hello", function($req, $res){
+            $res->send("hello world");
+        });
+
+        $app->run();
+
+        $this->assertEquals($this->getRequestOutput(), "custom output");
+
+    }
+
     public function testExpressRequestForwarding()
     {
         $this->simulateRequest("get", "/test_internal");
 
         $app = new Pupcake\Pupcake();
-        $app->getService("Pupcake\Service\Express");
+
+        $services = array();
+        $services['Express'] = $app->getService("Pupcake\Service\Express");
+
+        $app->startServices();
+
+        //$app->on("system.request.found", function($event) use ($services) {
+        //return $event->register($services['Express'])->start();
+        //});
 
         $app->get("/hello/:name", function($req, $res){
             $res->send($req->params('name'));

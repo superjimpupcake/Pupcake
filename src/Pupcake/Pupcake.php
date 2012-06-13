@@ -16,15 +16,22 @@ class Pupcake extends Object
     private $router;
     private $return_output;
     private $request_mode; 
-    private $event_manager;
+    private $event_queue;
+    private $event_execution_result;
     private $services; //holding an array of services
+    private $service_loading; //see if the service is loading or not
+    private $services_started; //tell the system to see if the services are started or not
+    private $events_services_map; //the event => services mapping
+    private $events_services_map_processed;
 
     public function __construct()
     {
         $this->services = array();
+        $this->events_services_map = array();
+        $this->events_services_map_processed = false;
+        $this->services_started = false;
+        $this->service_loading = false;
         $this->query_path = $_SERVER['PATH_INFO'];
-        $this->event_manager = new EventManager();
-        $this->event_manager->belongsTo($this);
         
         set_error_handler(array($this, 'handleError'), E_ALL);
         register_shutdown_function(array($this, 'handleShutdown'));
@@ -40,33 +47,31 @@ class Pupcake extends Object
         return $this->router;
     }
 
-    public function getEventManager()
-    {
-        return $this->event_manager;
-    }
-
     public function handleError($severity, $message, $file_path, $line)
     {
         $error = new Error($severity, $message, $file_path, $line);
-        $this->event_manager->trigger('system.error.detected', '', array($error));
+        $this->trigger('system.error.detected', '', array('error' => $error));
     }
 
     public function handleShutdown()
     {
-        $this->event_manager->trigger('system.shutdown');
+        $this->trigger('system.shutdown');
     }
 
     public function map($route_pattern, $callback)
     {
+        //start the services, only once
+        if(!$this->services_started){
+            $this->startServices();
+            $this->services_started = true;
+        }
+
         $route = new Route();
         $route->belongsTo($this->router); #route belongs to router
         $route->setRequestType("");
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
-
-        $this->event_manager->trigger('system.routing.route.create', function($route){
-        }, array($route));
-
+        $this->trigger('system.routing.route.create', '', array('route' => $route));
         return $route;
     }
 
@@ -107,7 +112,7 @@ class Pupcake extends Object
 
     public function notFound($callback)
     {
-        $this->event_manager->register('system.request.notfound', $callback);
+        $this->on('system.request.notfound', $callback);
     }
 
     public function sendInternalRequest($request_type, $query_path)
@@ -138,10 +143,30 @@ class Pupcake extends Object
         return $this->sendInternalRequest($request_type, $query_path);
     }
 
+    public function startServices()
+    {
+        //register all events in the event service map, only happen once
+        if(!$this->events_services_map_processed){
+            if(count($this->events_services_map) > 0){
+                foreach($this->events_services_map as $event_name => $services){
+                    if(count($services) > 0){
+                        $this->service_loading = true;
+                        $this->on($event_name, function($event) use ($services) {
+                            return call_user_func_array(array($event, "register"), $services)->start();
+                        });
+                        $this->service_loading = false;
+                    }
+                }
+                $this->events_services_map_processed = true;
+            }
+        }
+    }
+
     public function run()
     {
         $app = $this; //use the current app instance
-        $request_matched = $this->event_manager->trigger('system.request.routing', function() use($app){ #pass dependency, app
+        $route_map = $app->getRouter()->getRouteMap();
+        $request_matched = $this->trigger('system.request.routing', function() use($app){ #pass dependency, app
             $route_map = $app->getRouter()->getRouteMap();
             $request_matched = false;
             $output = "";
@@ -151,9 +176,14 @@ class Pupcake extends Object
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
                             //once we found there is a matching route, stop
-                            $request_matched = $app->getEventManager()->trigger('system.request.route.matching', 
-                                array($app->getRouter(), 'processRouteMatching'), 
-                                array($request_type,$app->getQueryPath(), $route_pattern)
+                            $request_matched = $app->trigger(
+                                'system.request.route.matching', 
+                                array($app->getRouter(), 'processRouteMatching'),
+                                array(
+                                    'request_type'=> $request_type, 
+                                    'query_path' => $app->getQueryPath(),
+                                    'route_pattern' => $route_pattern
+                                )
                             );
                             if($request_matched){
                                 break 2;
@@ -166,8 +196,10 @@ class Pupcake extends Object
             return $request_matched;
         });
 
+        $output = "";
+        $return_outputs = array();
         if(!$request_matched){
-            $output = $this->event_manager->trigger("system.request.notfound", function(){
+            $output = $this->trigger("system.request.notfound", function(){
                 //request not found
                 header("HTTP/1.1 404 Not Found");
                 return "Invalid Request";
@@ -175,9 +207,12 @@ class Pupcake extends Object
         }
         else{
             //request matched
-            $output = $this->event_manager->trigger("system.request.found", function($matched_route){
-                return $matched_route->execute();
-            }, array($this->router->getMatchedRoute()));
+            $output = $this->trigger("system.request.found", 
+                function($event){
+                    return $event->props('route')->execute();
+                },
+                    array('route' => $this->router->getMatchedRoute())
+                );
         }
 
         if($this->isReturnOutput()){
@@ -240,14 +275,62 @@ class Pupcake extends Object
         }
     }
 
-    public function on($event_name, $callback)
+    /**
+     * add a callback to the event, one event, one handler callback
+     * the handler callback is swappable, so later handler callback can override previous handler callback
+     */
+    public function on($event_name, $handler_callback)
     {
-        $this->event_manager->register($event_name, $callback);
+        if(!$this->service_loading){
+            //start the services, only once
+            if(!$this->services_started){
+                $this->startServices();
+                $this->services_started = true;
+            }
+        }
+
+        $event = null;
+        if(!isset($this->event_queue[$event_name])){
+            $event = new Event($event_name);
+            $this->event_queue[$event_name] = $event;
+        }
+
+        $event = $this->event_queue[$event_name];
+        $event->setHandlerCallback($handler_callback);
     }
 
-    public function trigger($event_name)
+    public function trigger($event_name, $handler_callback = "", $event_properties = array())
     {
-        return $this->event_manager->trigger($event_name);
+        $event = null;
+        if(isset($this->event_queue[$event_name])){
+            $event = $this->event_queue[$event_name];
+            $event->setProperties($event_properties);
+
+            $handler_callback = $event->getHandlerCallback();
+            if(is_callable($handler_callback)){
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+            }
+            else if( is_callable($handler_callback) ){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+            }
+        }
+        else{
+            $event = new Event($event_name);
+            $event->setProperties($event_properties);
+            if(is_callable($handler_callback)){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+                $this->event_queue[$event_name] = $event;
+            }
+        }
+
+        $result = $event->getHandlerCallbackReturnValue();
+
+        return $result;
     }
 
     public function executeRoute($route, $params = array())
@@ -262,7 +345,21 @@ class Pupcake extends Object
     {
         if(!isset($this->services[$service_name])){
             $this->services[$service_name] = new $service_name();
-            $this->services[$service_name]->start($this, $config); //start the service
+            $this->services[$service_name]->setContext(new ServiceContext($this));
+            $this->services[$service_name]->setName($service_name);
+            $this->services[$service_name]->start($config); //start the service
+
+            //now preload all service handlers to the event queue
+
+            $event_handlers = $this->services[$service_name]->getEventHandlers();
+            if(count($event_handlers) > 0){
+                foreach($event_handlers as $event_name => $callback){
+                    if(!isset($this->events_services_map[$event_name])){
+                        $this->events_services_map[$event_name] = array();
+                    }
+                    $this->events_services_map[$event_name][] = $this->services[$service_name]; //add the service object to the map
+                }
+            }
         }
         return $this->services[$service_name];
     }
