@@ -586,7 +586,7 @@ Starting version 2.0, Pupcake framework allows developer to write custom "servic
 is as follows:
 1. Each event in the system has one "event handler" only, so they are "swappable"
 2. Each event can register multiple "service handlers" to join the process of handling an event, very similar to Drupal's "hook" system
-   You can pass a service object or event a custom closure function as a service handler. 
+   You can pass a service object or even a custom closure function as a service handler. 
 ```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
