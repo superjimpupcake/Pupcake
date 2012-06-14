@@ -553,3 +553,30 @@ $app->get("api/validate/:token", function($token){
 
 $app->run();
 ```
+We can also use multiple services to achieve some powerful usage
+For example, we can load the Express Service, Route Constraint Service and RouteAction Service to start building
+a foundation for the MVC architecture
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->getService("Pupcake\Service\Express"); //load Express service
+$app->getService("Pupcake\Service\RouteConstraint"); //load RouteConstraint service
+$app->getService("Pupcake\Service\RouteAction"); //load RouteAction service
+
+$app->get("api/ip/:ip", function($req, $res) use ($app) {
+             $res->send($app->getRouter()->getMatchedRoute()->getAction());
+        })
+        ->to("api#ip")
+        ->constraint(array(
+             'ip' =>  function($value){
+             return \Respect\Validation\Validator::ip()->validate($value);
+          }
+        ));
+
+$app->run();
+```
