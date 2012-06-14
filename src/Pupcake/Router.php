@@ -5,12 +5,14 @@ class Router extends Object
 {
     private $app;
     private $route_map;
+    private $route_request_types;
     private $route_not_found_handler;
     private $matched_route;
 
     public function __construct()
     {
         $this->route_map = array(); //initialize the route map
+        $this->route_request_types = array();
     }
 
     public function belongsTo($app)
@@ -51,6 +53,10 @@ class Router extends Object
     public function getRouteMap()
     {
         return $this->route_map;
+    }
+
+    public function getRequestTypes()
+    {
     }
 
     /**
