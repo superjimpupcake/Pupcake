@@ -16,7 +16,6 @@ class Event
     {
         $this->name = $name;
         $this->properties = array();
-        $this->service_callbacks = array();
         $this->handler_callback = null;
         $this->handler_callback_return_value = null;
     }
@@ -76,6 +75,7 @@ class Event
      */
     public function register()
     {
+        $this->service_callbacks = array();
         $arguments= func_get_args();
         if(count($arguments) > 0){
             foreach($arguments as $argument){
