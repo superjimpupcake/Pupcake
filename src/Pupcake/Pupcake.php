@@ -174,8 +174,14 @@ class Pupcake extends Object
             $request_matched = false;
             $output = "";
             if(count($route_map) > 0){
-                $request_types = array($_SERVER['REQUEST_METHOD'], "*");
+                $request_types = array_keys($route_map);
+                $request_types_to_lookup = array();
                 foreach($request_types as $request_type){
+                    if($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == "*"){
+                        $request_types_to_lookup[] = $request_type;
+                    }
+                }
+                foreach($request_types_to_lookup as $request_type){
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
                             //once we found there is a matching route, stop

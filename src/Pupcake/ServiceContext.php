@@ -43,4 +43,8 @@ class ServiceContext
         return $this->app->getRouter()->executeRoute($route);
     }
 
+    public function getQueryPath()
+    {
+        return $this->app->getQueryPath();
+    }
 }
