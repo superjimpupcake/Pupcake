@@ -76,10 +76,15 @@ class Event
      */
     public function register()
     {
-        $services = func_get_args();
-        if(count($services) > 0){
-            foreach($services as $service){
-                $this->service_callbacks[] = $service->getEventHandler($this);
+        $arguments= func_get_args();
+        if(count($arguments) > 0){
+            foreach($arguments as $argument){
+                if($argument instanceof Service){ //this is a service object
+                    $this->service_callbacks[] = $argument->getEventHandler($this);
+                }
+                else if(is_callable($argument)){ //this is a closure
+                    $this->service_callbacks[] = $argument;
+                }
             }
         }
 
