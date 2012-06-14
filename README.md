@@ -3,10 +3,11 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ##About Pupcake Framework
 Pupcake is a minimal but extensible microframework for PHP 5.3+. Unlike many other frameworks, it does not have built-in support for regular expressions in route matching, it only matches name-based route tokens.
-The regular expression part ( or route validation ) can be handled with 3rd party packages through the framework's event-based system and the service system.
+The regular expression part ( or route validation ) can be handled through the framework's event-based system and the service system.
 
-Starting Version 2.0, Pupcake also provide a service named "Express" so that you can use similar api calls like Express, the Express service is under active development,
-but you can see some simple demos.
+Pupcake also provides a service named "Express" to allow developer to use the framework similar to Node.js's Express framework.
+
+Starting version 2.0, Pupcake support custom service handlers for each system event, very similar to the Drupal's hook system. So Pupcake's event system is both "swappable" and "extensible".
 
 ##Installation:
 
@@ -550,6 +551,81 @@ $app->get("api/validate/:token", function($token){
             ->validate($value);
     }
 ));
+
+$app->run();
+```
+We can also use multiple services to achieve some powerful usage
+For example, we can load the Express Service, Route Constraint Service and RouteAction Service to start building
+a foundation for the MVC architecture
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->getService("Pupcake\Service\Express"); //load Express service
+$app->getService("Pupcake\Service\RouteConstraint"); //load RouteConstraint service
+$app->getService("Pupcake\Service\RouteAction"); //load RouteAction service
+
+$app->get("api/ip/:ip", function($req, $res) use ($app) {
+             $res->send($app->getRouter()->getMatchedRoute()->getAction());
+        })
+        ->to("api#ip")
+        ->constraint(array(
+             'ip' =>  function($value){
+             return \Respect\Validation\Validator::ip()->validate($value);
+          }
+        ));
+
+$app->run();
+```
+###Very Advance Usage: writing custom service handlers for an event
+Starting version 2.0, Pupcake framework allows developer to write custom "service handlers" for an event. The philosophy
+is as follows:
+1. Each event in the system has one "event handler" only, so they are "swappable"
+2. Each event can register multiple "service handlers" to join the process of handling an event, very similar to Drupal's "hook" system
+   You can pass a service object or even a custom closure function as a service handler. 
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$services = array();
+$services['express'] = $app->getService("Pupcake\Service\Express"); //load Express service
+$services['constraint'] = $app->getService("Pupcake\Service\RouteConstraint"); //load RouteConstraint service
+$services['action'] = $app->getService("Pupcake\Service\RouteAction"); //load RouteAction service
+
+// custom event registration
+$app->on("system.routing.route.create", function($event) use ($services) {
+       return $event->register(
+           $services['express'],
+           $services['constraint'],
+           $services['action'],
+           function($event){ //a custom closure function
+               $event->props('route')->method('hello', function($word){
+                       return "hello $word";
+                   }); 
+               }
+           )->start();
+       });
+
+$app->get("api/ip/:ip", function($req, $res) use ($app) {
+        $route = $app->getRouter()->getMatchedRoute();
+        $action = $route->getAction();
+        $hello = $route->hello('world');
+        $res->send($action.$hello);
+      })
+      ->to("api#ip")
+      ->constraint(array(
+           'ip' =>  function($value){
+             return \Respect\Validation\Validator::ip()->validate($value);
+        }
+    ));
 
 $app->run();
 ```
