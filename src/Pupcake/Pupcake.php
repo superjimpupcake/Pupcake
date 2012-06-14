@@ -61,7 +61,7 @@ class Pupcake extends Object
         $this->trigger('system.shutdown');
     }
 
-    public function map($route_pattern, $callback)
+    public function map($route_pattern, $callback = "")
     {
         //start the services, only once
         if(!$this->services_started){
@@ -78,37 +78,37 @@ class Pupcake extends Object
         return $route;
     }
 
-    public function get($route_pattern, $callback)
+    public function get($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('GET');
     }
 
-    public function post($route_pattern, $callback)
+    public function post($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('POST');
     }
 
-    public function delete($route_pattern, $callback)
+    public function delete($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('DELETE');
     }
 
-    public function put($route_pattern, $callback)
+    public function put($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('PUT');
     }
 
-    public function options($route_pattern, $callback)
+    public function options($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('OPTIONS');
     }
 
-    public function patch($route_pattern, $callback)
+    public function patch($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('PATCH');
     }
 
-    public function any($route_pattern, $callback)
+    public function any($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('*');
     } 
