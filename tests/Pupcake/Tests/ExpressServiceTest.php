@@ -137,4 +137,34 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $this->assertEquals($this->getRequestOutput(), "posting world to helloworld2world3gettest22012-05-30");
     }
+
+    public function testNextRouteMatching()
+    {
+        $this->simulateRequest("get", "/api/12");
+        
+        $app = new Pupcake\Pupcake();
+
+        $app->getService("Pupcake\Service\Express"); //load service
+
+        $app->any("api/12", function($req, $res, $next){
+            $next();
+        });
+
+        $app->any("api/:number", function($req, $res, $next){
+            $next();
+        });
+
+        $app->get("api/12", function($req, $res, $next){
+            $next();
+        });
+
+        $app->get("api/:number", function($req, $res, $next){
+            $res->send("this is finally number ".$req->params('number'));
+        });
+
+
+        $app->run();
+
+        $this->assertEquals($this->getRequestOutput(), "this is finally number 12");
+    }
 }
