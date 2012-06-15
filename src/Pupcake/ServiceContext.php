@@ -47,4 +47,19 @@ class ServiceContext
     {
         return $this->app->getQueryPath();
     }
+
+    public function isRouteMatched($request_type, $route_pattern)
+    {
+        $request_matched = $this->app->trigger(
+            'system.request.route.matching', 
+            array($this->app->getRouter(), 'processRouteMatching'),
+            array(
+                'request_type'=> $request_type, 
+                'query_path' => $this->app->getQueryPath(),
+                'route_pattern' => $route_pattern
+            )
+        );
+
+        return $request_matched;
+    }
 }

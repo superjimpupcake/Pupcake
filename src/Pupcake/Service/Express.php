@@ -32,8 +32,6 @@ class Express extends Pupcake\Service
         $service = $this;
         $next = function() use ($route, $req, $res, $service) { //find the next matching route
 
-            $matched_route = null;
-
             $route_map = array();
 
             if($service->getRouteMapToLookup() === NULL){
@@ -61,41 +59,13 @@ class Express extends Pupcake\Service
                 }
             }
 
+
             foreach($request_types_to_lookup as $request_type){
                 if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                     foreach($route_map[$request_type] as $route_pattern => $route){
-                        if($matched_route === NULL){ // find the match route, only once
-                            if($route->getPattern() == "/*path"){
-                                $matched_route = $route;
-                                $params = array('path' => $_REQUEST['PATH_INFO']);
-                            }
-                            else{
-                                $current_route_pattern_comps = explode("/", $current_route_pattern);
-                                $current_route_pattern_comps_count = count($current_route_pattern_comps);
-                                $route_pattern_comps = explode("/", $route_pattern);
-                                $route_pattern_comps_count = count($route_pattern_comps);
-
-                                $matched = false;
-                                if($current_route_pattern_comps_count == $route_pattern_comps_count){
-                                    for($k=0;$k<$current_route_pattern_comps_count; $k++){
-                                        if($current_route_pattern_comps[$k][0] == ":"){
-                                            $current_route_pattern_comps[$k][0] = "";
-                                            unset($current_route_pattern_comps[$k]);
-                                            unset($route_pattern_comps[$k]);
-                                        }
-                                    }
-                                    $current_route_pattern_reformed = implode("/", $current_route_pattern);
-                                    $route_pattern_reformed = implode("/", $route_pattern);
-                                    if($current_route_pattern_reformed == $route_pattern_reformed){
-                                        $matched = true;
-                                    }
-                                }
-
-                                if($matched){
-                                    $matched_route = $route;
-                                    break 2;
-                                }
-                            }
+                        $matched = $service->getContext()->isRouteMatched($request_type, $route_pattern);
+                        if($matched){
+                            break 2;
                         }
                     }
                 }
@@ -105,6 +75,7 @@ class Express extends Pupcake\Service
 
             $output = ""; //return empty response by default
 
+            $matched_route = $service->getContext()->getMatchedRoute();
             if($matched_route !== NULL){ //we found the route
                 $params = array();
                 $route_pattern_comps = explode("/", $matched_route->getPattern());
