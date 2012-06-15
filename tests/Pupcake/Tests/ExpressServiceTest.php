@@ -145,6 +145,7 @@ class ExpressServiceTest extends Pupcake\TestCase
         $app = new Pupcake\Pupcake();
 
         $app->getService("Pupcake\Service\Express"); //load service
+        $app->getService("Pupcake\Service\RouteConstraint"); //load service
 
         $app->any("api/12", function($req, $res, $next){
             $next();
@@ -152,7 +153,15 @@ class ExpressServiceTest extends Pupcake\TestCase
 
         $app->any("api/:number", function($req, $res, $next){
             $next();
-        });
+        })->constraint(array(
+            'number' => function($value){
+                $result = true;
+                if($value < 15){
+                    $result = false;
+                }
+                return $result;
+            }
+        ));
 
         $app->get("api/12", function($req, $res, $next){
             $next();
