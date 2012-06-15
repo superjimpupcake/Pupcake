@@ -12,6 +12,11 @@ class Request extends Pupcake\Object
         $this->route = $route;
     }
 
+    public function setRoute($route)
+    {
+        $this->route = $route;
+    }
+
     public function params($param_name)
     {
         $params = $this->route->getParams();
