@@ -560,7 +560,7 @@ $app->get("api/validate/:token", function($token){
         ));
 
         $app->run();
-        ```
+```
 ###Advance Usage: start using Pupcake services
 All of the code above on adding constraint to the route is great, but it might be tedious at some point, we can
 wrap most of them into a unit called "service", Pupcake by default comes with the service named "RouteConstraint"
