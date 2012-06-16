@@ -77,17 +77,17 @@ class Express extends Pupcake\Service
 
             $matched_route = $service->getContext()->getMatchedRoute();
             if($matched_route !== NULL){ //we found the route
-                $params = array();
-                $route_pattern_comps = explode("/", $matched_route->getPattern());
-                $route_pattern_comps_count = count($route_pattern_comps);
-                for($k=0;$k<$route_pattern_comps_count;$k++){
-                    if($route_pattern_comps[$k][0] == ":"){
-                        $route_pattern_comps[$k][0] = "";
-                        $token = trim($route_pattern_comps[$k]);
-                        $params[$token] = $service->getUrlComponent($k);
-                    }
-                }
-                $matched_route->setParams($params);
+                ////$params = array();
+                //$route_pattern_comps = explode("/", $matched_route->getPattern());
+                //$route_pattern_comps_count = count($route_pattern_comps);
+                //for($k=0;$k<$route_pattern_comps_count;$k++){
+                    //if($route_pattern_comps[$k][0] == ":"){
+                        //$route_pattern_comps[$k][0] = "";
+                        //$token = trim($route_pattern_comps[$k]);
+                        //$params[$token] = $service->getUrlComponent($k);
+                    //}
+                //}
+                //$matched_route->setParams($params);
                 $req->setRoute($matched_route);
                 $next = $service->getNextRouteFinder($matched_route, $req, $res);
                 if(is_callable($next)){
