@@ -487,11 +487,11 @@ $app->on('service.view.twig', function(){
         $view = new Pupcake\Object();
         //we add a dynamic method named render
         $view->method("render", function($template_file,$data = array() ){
-            $loader = new Twig_Loader_Filesystem(dirname($template_file));
-            $twig = new Twig_Environment($loader);
-            return $twig->loadTemplate(basename($template_file))->render($data);
+                $loader = new Twig_Loader_Filesystem(dirname($template_file));
+                $twig = new Twig_Environment($loader);
+                return $twig->loadTemplate(basename($template_file))->render($data);
             });
-        return $view;
+            return $view;
         });
 
 $app->get("twigdemo", function() use ($app){
