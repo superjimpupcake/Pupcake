@@ -48,8 +48,8 @@ class ServiceContext
         return $this->app->getQueryPath();
     }
 
-    public function findMatchedRoute($request_type, $route_pattern, $query_path = "")
+    public function findMatchedRoute($request_method = "", $query_path = "", $route_map)
     {
-        return $this->app->getRouter()->findMatchedRoute($request_type, $route_pattern, $query_path);
+        return $this->app->getRouter()->findMatchedRoute($request_method, $query_path, $route_map);
     }
 }
