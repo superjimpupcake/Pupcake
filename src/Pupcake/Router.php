@@ -56,14 +56,10 @@ class Router extends Object
     }
 
     /**
-     * Find a route
+     * check if route exists
      */
-    public function findMatchedRoute($request_type, $route_pattern, $query_path = "")
+    public function routeExists($request_type, $route_pattern, $query_path = "")
     {
-        if($query_path == ""){
-            $query_path = $this->app->getQueryPath();
-        }
-
         $matched = $this->app->trigger(
             'system.request.route.matching', 
             array($this, 'processRouteMatching'),
@@ -76,6 +72,38 @@ class Router extends Object
 
         return $matched;
     } 
+
+    /**
+     * find a route
+     */
+    public function findMatchedRoute($request_method = "", $query_path = "", $route_map)
+    {
+        $request_matched = false;
+        $output = "";
+        if(count($route_map) > 0){
+            $request_types = array_keys($route_map);
+            $request_types_to_lookup = array();
+            foreach($request_types as $request_type){
+                if($request_type == $request_method || $request_type == "*"){
+                    $request_types_to_lookup[] = $request_type;
+                }
+            }
+            foreach($request_types_to_lookup as $request_type){
+                if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
+                    foreach($route_map[$request_type] as $route_pattern => $route){
+                        //once we found there is a matched route, stop
+                        $matched = $this->routeExists($request_type, $route_pattern);
+                        if($matched){
+                            $request_matched = true;
+                            break 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $request_matched;
+    }
 
     /**
      * process route matching

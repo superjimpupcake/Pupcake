@@ -167,37 +167,7 @@ class Pupcake extends Object
 
     public function run()
     {
-        $app = $this; //use the current app instance
-        $route_map = $app->getRouter()->getRouteMap();
-        $request_matched = $this->trigger('system.request.routing', function() use($app){ #pass dependency, app
-            $route_map = $app->getRouter()->getRouteMap();
-            $request_matched = false;
-            $output = "";
-            if(count($route_map) > 0){
-                $request_types = array_keys($route_map);
-                $request_types_to_lookup = array();
-                foreach($request_types as $request_type){
-                    if($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == "*"){
-                        $request_types_to_lookup[] = $request_type;
-                    }
-                }
-                foreach($request_types_to_lookup as $request_type){
-                    if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
-                        foreach($route_map[$request_type] as $route_pattern => $route){
-                            //once we found there is a matched route, stop
-                            $matched = $app->getRouter()->findMatchedRoute($request_type, $route_pattern);
-                            if($matched){
-                                $request_matched = true;
-                                break 2;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return $request_matched;
-        });
-
+        $request_matched = $this->router->findMatchedRoute($_SERVER['REQUEST_METHOD'], $this->getQueryPath(), $this->getRouter()->getRouteMap());
         $output = "";
         $return_outputs = array();
         if(!$request_matched){

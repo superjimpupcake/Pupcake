@@ -48,46 +48,14 @@ class Express extends Pupcake\Service
             //unset the current route 
             unset($route_map[$current_route_request_type][$current_route_pattern]);
 
-            $request_types = array_keys($route_map);
-            $request_types_to_lookup = array();
-            foreach($request_types as $request_type){
-                if($request_type == $_SERVER['REQUEST_METHOD'] || $request_type == "*"){
-                    $request_types_to_lookup[] = $request_type;
-                }
-                else{
-                    unset($route_map[$request_type]); //remove other uneccessary routes
-                }
-            }
-
-
-            foreach($request_types_to_lookup as $request_type){
-                if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
-                    foreach($route_map[$request_type] as $route_pattern => $route){
-                        $matched = $service->getContext()->findMatchedRoute($request_type, $route_pattern);
-                        if($matched){
-                            break 2;
-                        }
-                    }
-                }
-            }
-
             $service->setRouteMapToLookup($route_map);
 
             $output = ""; //return empty response by default
 
+            $request_matched = $this->getContext()->findMatchedRoute($_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
+
             $matched_route = $service->getContext()->getMatchedRoute();
             if($matched_route !== NULL){ //we found the route
-                ////$params = array();
-                //$route_pattern_comps = explode("/", $matched_route->getPattern());
-                //$route_pattern_comps_count = count($route_pattern_comps);
-                //for($k=0;$k<$route_pattern_comps_count;$k++){
-                    //if($route_pattern_comps[$k][0] == ":"){
-                        //$route_pattern_comps[$k][0] = "";
-                        //$token = trim($route_pattern_comps[$k]);
-                        //$params[$token] = $service->getUrlComponent($k);
-                    //}
-                //}
-                //$matched_route->setParams($params);
                 $req->setRoute($matched_route);
                 $next = $service->getNextRouteFinder($matched_route, $req, $res);
                 if(is_callable($next)){
