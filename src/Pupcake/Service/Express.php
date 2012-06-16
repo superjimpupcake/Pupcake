@@ -70,23 +70,12 @@ class Express extends Pupcake\Service
         return $next;
     }
 
-    public function setUrlComponent($url_component)
-    {
-        $this->url_component = $url_component;
-    }
-
-    public function getUrlComponent($index)
-    {
-        return $this->url_component[$index];
-    }
-
     public function start($config = array())
     {
         $service = $this;
         $this->on("system.request.found", function($event) use ($service) {
             $route = $event->props('route');
             $query_path = $_SERVER['PATH_INFO'];
-            $service->setUrlComponent(explode("/", $query_path));
             $req = new Express\Request($route);
             $res = new Express\Response($service, $route);
             $next = $service->getNextRouteFinder($route, $req, $res);
