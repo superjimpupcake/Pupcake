@@ -54,8 +54,8 @@ class Express extends Pupcake\Service
 
             $request_matched = $this->getContext()->findMatchedRoute($_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
 
-            $matched_route = $service->getContext()->getMatchedRoute();
-            if($matched_route !== NULL){ //we found the route
+            if($request_matched){ //we found the route
+                $matched_route = $service->getContext()->getMatchedRoute();
                 $req->setRoute($matched_route);
                 $next = $service->getNextRouteFinder($matched_route, $req, $res);
                 if(is_callable($next)){
