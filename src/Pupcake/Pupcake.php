@@ -184,17 +184,10 @@ class Pupcake extends Object
                 foreach($request_types_to_lookup as $request_type){
                     if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                         foreach($route_map[$request_type] as $route_pattern => $route){
-                            //once we found there is a matching route, stop
-                            $request_matched = $app->trigger(
-                                'system.request.route.matching', 
-                                array($app->getRouter(), 'processRouteMatching'),
-                                array(
-                                    'request_type'=> $request_type, 
-                                    'query_path' => $app->getQueryPath(),
-                                    'route_pattern' => $route_pattern
-                                )
-                            );
-                            if($request_matched){
+                            //once we found there is a matched route, stop
+                            $matched = $app->getRouter()->findMatchedRoute($request_type, $route_pattern);
+                            if($matched){
+                                $request_matched = true;
                                 break 2;
                             }
                         }
