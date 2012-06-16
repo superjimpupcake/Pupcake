@@ -55,9 +55,27 @@ class Router extends Object
         return $this->route_map;
     }
 
-    public function getRequestTypes()
+    /**
+     * Find a route
+     */
+    public function findMatchedRoute($request_type, $route_pattern, $query_path = "")
     {
-    }
+        if($query_path == ""){
+            $query_path = $this->app->getQueryPath();
+        }
+
+        $matched = $this->app->trigger(
+            'system.request.route.matching', 
+            array($this, 'processRouteMatching'),
+            array(
+                'request_type'=> $request_type, 
+                'query_path' => $this->app->getQueryPath(),
+                'route_pattern' => $route_pattern
+            )
+        );
+
+        return $matched;
+    } 
 
     /**
      * process route matching
@@ -137,4 +155,5 @@ class Router extends Object
     {
         return $route->execute($params);
     }
+
 }

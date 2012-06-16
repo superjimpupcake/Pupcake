@@ -63,7 +63,7 @@ class Express extends Pupcake\Service
             foreach($request_types_to_lookup as $request_type){
                 if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                     foreach($route_map[$request_type] as $route_pattern => $route){
-                        $matched = $service->getContext()->isRouteMatched($request_type, $route_pattern);
+                        $matched = $service->getContext()->findMatchedRoute($request_type, $route_pattern);
                         if($matched){
                             break 2;
                         }
