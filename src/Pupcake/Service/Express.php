@@ -75,7 +75,6 @@ class Express extends Pupcake\Service
         $service = $this;
         $this->on("system.request.found", function($event) use ($service) {
             $route = $event->props('route');
-            $query_path = $_SERVER['PATH_INFO'];
             $req = new Express\Request($route);
             $res = new Express\Response($service, $route);
             $next = $service->getNextRouteFinder($route, $req, $res);
