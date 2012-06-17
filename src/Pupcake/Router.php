@@ -60,6 +60,9 @@ class Router extends Object
         if(strlen($query_path) > 0 && $query_path[0] != '/'){
             $query_path = "/".$query_path;
         }
+        else if($query_path == ""){
+            $query_path = "/";
+        }
 
         return $query_path;
     }

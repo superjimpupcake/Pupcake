@@ -28,10 +28,7 @@ class Pupcake extends Object
         $this->events_services_map_processed = false;
         $this->services_started = false;
         $this->service_loading = false;
-        if(!isset($_SERVER['PATH_INFO'])){
-            $_SERVER['PATH_INFO'] = "/";
-        }
-        
+       
         set_error_handler(array($this, 'handleError'), E_ALL);
         register_shutdown_function(array($this, 'handleShutdown'));
 
