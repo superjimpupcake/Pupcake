@@ -36,7 +36,6 @@ class Pupcake extends Object
         set_error_handler(array($this, 'handleError'), E_ALL);
         register_shutdown_function(array($this, 'handleShutdown'));
 
-        $this->request_mode = "external"; //default request mode is external
         $this->router = new Router(); #initiate one router for this app instance
         $this->router->belongsTo($this);
     }
@@ -114,57 +113,10 @@ class Pupcake extends Object
         $this->on('system.request.notfound', $callback);
     }
 
-    public function sendInternalRequest($request_type, $query_path)
+    public function sendRequest($request_mode, $request_type, $query_path, $route_map)
     {
-        $this->request_mode = "internal"; //default request mode is external
-
-        $request_matched = $this->router->findMatchedRoute($request_type, $query_path, $this->router->getRouteMap());
-
-        $output = "";
-        $return_outputs = array();
-        if(!$request_matched){
-            $output = $this->trigger("system.request.notfound");
-        }
-        else{
-            //request matched
-            $output = $this->trigger("system.request.found", 
-                function($event){
-                    return $event->props('route')->execute();
-                },
-                    array('route' => $this->router->getMatchedRoute())
-                );
-        }
-
-        return $output;
-    }
-
-    public function forward($request_type, $query_path)
-    {
-        return $this->sendInternalRequest($request_type, $query_path);
-    }
-
-    public function startServices()
-    {
-        //register all events in the event service map, only happen once
-        if(!$this->events_services_map_processed){
-            if(count($this->events_services_map) > 0){
-                foreach($this->events_services_map as $event_name => $services){
-                    if(count($services) > 0){
-                        $this->service_loading = true;
-                        $this->on($event_name, function($event) use ($services) {
-                            return call_user_func_array(array($event, "register"), $services)->start();
-                        });
-                        $this->service_loading = false;
-                    }
-                }
-                $this->events_services_map_processed = true;
-            }
-        }
-    }
-
-    public function run()
-    {
-        $request_matched = $this->router->findMatchedRoute($_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
+        $this->request_mode = $request_mode;
+        $request_matched = $this->router->findMatchedRoute($request_type, $query_path, $route_map);
         $output = "";
         $return_outputs = array();
         if(!$request_matched){
@@ -184,6 +136,18 @@ class Pupcake extends Object
                 );
         }
 
+        return $output;
+    }
+
+    public function forward($request_type, $query_path)
+    {
+        return $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
+    }
+
+
+    public function run()
+    {
+        $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
         ob_start();
         print $output;
         $output = ob_get_contents();
@@ -294,4 +258,24 @@ class Pupcake extends Object
         }
         return $this->services[$service_name];
     }
+
+    public function startServices()
+    {
+        //register all events in the event service map, only happen once
+        if(!$this->events_services_map_processed){
+            if(count($this->events_services_map) > 0){
+                foreach($this->events_services_map as $event_name => $services){
+                    if(count($services) > 0){
+                        $this->service_loading = true;
+                        $this->on($event_name, function($event) use ($services) {
+                            return call_user_func_array(array($event, "register"), $services)->start();
+                        });
+                        $this->service_loading = false;
+                    }
+                }
+                $this->events_services_map_processed = true;
+            }
+        }
+    }
+
 }
