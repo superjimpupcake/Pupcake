@@ -12,9 +12,7 @@ namespace Pupcake;
 class Pupcake extends Object
 {
     private $request_type;
-    private $query_path;
     private $router;
-    private $request_mode; 
     private $event_queue;
     private $event_execution_result;
     private $services; //holding an array of services
@@ -22,6 +20,7 @@ class Pupcake extends Object
     private $services_started; //tell the system to see if the services are started or not
     private $events_services_map; //the event => services mapping
     private $events_services_map_processed;
+    private $request_mode;
 
     public function __construct()
     {
@@ -33,13 +32,11 @@ class Pupcake extends Object
         if(!isset($_SERVER['PATH_INFO'])){
             $_SERVER['PATH_INFO'] = "/";
         }
-        $this->query_path = $_SERVER['PATH_INFO'];
         
         set_error_handler(array($this, 'handleError'), E_ALL);
         register_shutdown_function(array($this, 'handleShutdown'));
 
         $this->request_mode = "external"; //default request mode is external
-        $this->return_output = false;
         $this->router = new Router(); #initiate one router for this app instance
         $this->router->belongsTo($this);
     }
@@ -119,15 +116,9 @@ class Pupcake extends Object
 
     public function sendInternalRequest($request_type, $query_path)
     {
-        $is_nested_internal_request = false;
-        if($this->getRequestMode() == 'internal'){ //this is a nested internal request
-            $is_nested_internal_request = true;
-        }
+        $this->request_mode = "internal"; //default request mode is external
 
-        $this->setRequestMode("internal");
-        $this->setQueryPath($query_path);
         $request_matched = $this->router->findMatchedRoute($request_type, $query_path, $this->router->getRouteMap());
-
 
         $output = "";
         $return_outputs = array();
@@ -142,10 +133,6 @@ class Pupcake extends Object
                 },
                     array('route' => $this->router->getMatchedRoute())
                 );
-        }
-
-        if(!$is_nested_internal_request){
-            $this->setRequestMode("external");
         }
 
         return $output;
@@ -177,7 +164,7 @@ class Pupcake extends Object
 
     public function run()
     {
-        $request_matched = $this->router->findMatchedRoute($_SERVER['REQUEST_METHOD'], $this->getQueryPath(), $this->router->getRouteMap());
+        $request_matched = $this->router->findMatchedRoute($_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
         $output = "";
         $return_outputs = array();
         if(!$request_matched){
@@ -204,29 +191,6 @@ class Pupcake extends Object
         print $output;
     }
 
-    public function setQueryPath($query_path)
-    {
-        if(strlen($query_path) > 0 && $query_path[0] != '/'){
-            $query_path = "/".$query_path;
-        }
-        $this->query_path = $query_path;
-    }
-
-    public function getQueryPath()
-    {
-        return $this->query_path;
-    }
-
-    public function setRequestMode($request_mode)
-    {
-        $this->request_mode = $request_mode; 
-    }
-
-    public function getRequestMode()
-    {
-        return $this->request_mode;
-    }
-
     public function getRequestType()
     {
         return $_SERVER['REQUEST_METHOD'];
@@ -234,10 +198,10 @@ class Pupcake extends Object
 
     public function redirect($uri)
     {
-        if($this->getRequestMode() == 'external'){
+        if($this->request_mode == 'external'){
             header("Location: ".$uri);
         }
-        else if($this->getRequestMode() == 'internal'){
+        else if($this->request_mode == 'internal'){
             return $this->forward('GET', $uri);
         }
     }
