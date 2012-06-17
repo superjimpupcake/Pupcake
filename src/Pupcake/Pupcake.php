@@ -14,7 +14,6 @@ class Pupcake extends Object
     private $request_type;
     private $query_path;
     private $router;
-    private $return_output;
     private $request_mode; 
     private $event_queue;
     private $event_execution_result;
@@ -126,15 +125,26 @@ class Pupcake extends Object
         }
 
         $this->setRequestMode("internal");
-        $current_request_type = $_SERVER['REQUEST_METHOD'];
-        $_SERVER['REQUEST_METHOD'] = $request_type; 
         $this->setQueryPath($query_path);
-        $this->setReturnOutput(true);
-        $output = $this->run();
-        $_SERVER['REQUEST_METHOD'] = $current_request_type;
+        $request_matched = $this->router->findMatchedRoute($request_type, $query_path, $this->router->getRouteMap());
+
+
+        $output = "";
+        $return_outputs = array();
+        if(!$request_matched){
+            $output = $this->trigger("system.request.notfound");
+        }
+        else{
+            //request matched
+            $output = $this->trigger("system.request.found", 
+                function($event){
+                    return $event->props('route')->execute();
+                },
+                    array('route' => $this->router->getMatchedRoute())
+                );
+        }
 
         if(!$is_nested_internal_request){
-            $this->setReturnOutput(false);
             $this->setRequestMode("external");
         }
 
@@ -187,16 +197,11 @@ class Pupcake extends Object
                 );
         }
 
-        if($this->isReturnOutput()){
-            return $output;
-        }
-        else{
-            ob_start();
-            print $output;
-            $output = ob_get_contents();
-            ob_end_clean();
-            print $output;
-        }
+        ob_start();
+        print $output;
+        $output = ob_get_contents();
+        ob_end_clean();
+        print $output;
     }
 
     public function setQueryPath($query_path)
@@ -210,16 +215,6 @@ class Pupcake extends Object
     public function getQueryPath()
     {
         return $this->query_path;
-    }
-
-    public function setReturnOutput($return_output)
-    {
-        $this->return_output = $return_output;
-    }
-
-    public function isReturnOutput()
-    {
-        return $this->return_output;
     }
 
     public function setRequestMode($request_mode)
