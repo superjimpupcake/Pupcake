@@ -14,7 +14,6 @@ class Pupcake extends Object
     private $request_type;
     private $router;
     private $event_queue;
-    private $event_execution_result;
     private $services; //holding an array of services
     private $service_loading; //see if the service is loading or not
     private $services_started; //tell the system to see if the services are started or not
