@@ -167,7 +167,7 @@ class Pupcake extends Object
 
     public function run()
     {
-        $request_matched = $this->router->findMatchedRoute($_SERVER['REQUEST_METHOD'], $this->getQueryPath(), $this->getRouter()->getRouteMap());
+        $request_matched = $this->router->findMatchedRoute($_SERVER['REQUEST_METHOD'], $this->getQueryPath(), $this->router->getRouteMap());
         $output = "";
         $return_outputs = array();
         if(!$request_matched){
