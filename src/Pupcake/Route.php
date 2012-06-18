@@ -75,7 +75,6 @@ class Route extends Object
         if($request_types_count > 0){
             for($k=0;$k<$request_types_count;$k++){
                 $this->request_type = $request_types[$k];
-                $this->router->getAppInstance()->trigger('system.routing.route.create', '', array('route' => $this));
                 $this->router->addRoute($this);
             } 
         }
