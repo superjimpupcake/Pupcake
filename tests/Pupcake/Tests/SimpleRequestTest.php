@@ -96,4 +96,18 @@ class SimpleRequestTest extends Pupcake\TestCase
 
         $this->assertEquals($this->getRequestOutput(), "post 1get 2get 3testing 22012-05-30");
     }
+
+    public function testAnyPathMatching()
+    {
+        $this->simulateRequest("get", "/api/view/ip/3");
+
+        $app = new Pupcake\Pupcake();
+        $app->get("api/*path", function($path){
+            return $path;
+        });
+
+        $app->run();
+
+        $this->assertEquals($this->getRequestOutput(), "view/ip/3");
+    }
 }
