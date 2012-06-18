@@ -134,7 +134,6 @@ class Router extends Object
 
         $route_pattern_length = strlen($route_pattern);
         $path_pos = strpos($route_pattern, "*path"); //see if there is *path exists
-        $first_part_of_path = "";
         if($path_pos !== FALSE){
             $first_part_of_path = substr($route_pattern, 0, $path_pos);
             if(substr($uri, 0, $path_pos) == $first_part_of_path){
