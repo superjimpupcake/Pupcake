@@ -55,6 +55,11 @@ class Router extends Object
         return $this->route_map[$request_type][$route_pattern];
     }
 
+    public function setRouteMap($route_map)
+    {
+        $this->route_map = $route_map;
+    }
+
     public function getRouteMap()
     {
         return $this->route_map;
