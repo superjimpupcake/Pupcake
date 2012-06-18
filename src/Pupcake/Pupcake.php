@@ -65,6 +65,7 @@ class Pupcake extends Object
         $route->setRequestType("");
         $route->setPattern($route_pattern);
         $route->setCallback($callback);
+        $this->trigger('system.routing.route.create', '', array('route' => $route));
         return $route;
     }
 
