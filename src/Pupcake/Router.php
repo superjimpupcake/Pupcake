@@ -20,6 +20,11 @@ class Router extends Object
         $this->app = $app;
     }
 
+    public function getAppInstance()
+    {
+        return $this->app;
+    }
+
     public function setMatchedRoute(Route $matched_route)
     {
         $this->matched_route = $matched_route;
