@@ -79,9 +79,9 @@ class Router extends Object
     }
 
     /**
-     * check if route exists
+     * check if a route is matched given a query path
      */
-    public function routeExists($request_type, $route_pattern, $query_path)
+    public function routeMatched($request_type, $route_pattern, $query_path)
     {
         $matched = $this->app->trigger(
             'system.request.route.matching', 
@@ -117,7 +117,7 @@ class Router extends Object
                 if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
                     foreach($route_map[$request_type] as $route_pattern => $route){
                         //once we found there is a matched route, stop
-                        $matched = $this->routeExists($request_type, $route_pattern, $query_path);
+                        $matched = $this->routeMatched($request_type, $route_pattern, $query_path);
                         if($matched){
                             $request_matched = true;
                             break 2;
