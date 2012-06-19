@@ -87,10 +87,9 @@ class Route extends Object
      */
     public function execute($params = array())
     {
-        if(count($params) == 0){
+        if($params != NULL && count($params) == 0){
             $params = $this->getParams();
         }
         return call_user_func_array($this->getCallback(), $params);
-
     }
 }
