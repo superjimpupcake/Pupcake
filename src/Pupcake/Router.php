@@ -39,6 +39,7 @@ class Router extends Object
     {
         $request_type = $route->getRequestType();
         $route_pattern = $route->getPattern();
+        $this->app->trigger('system.routing.route.create', '', array('route' => $route));
         if(!isset($this->route_map[$request_type])){
             $this->route_map[$request_type] = array();
         }
