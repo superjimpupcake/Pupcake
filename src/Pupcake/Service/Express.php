@@ -10,7 +10,6 @@ class Express extends Pupcake\Service
 {
 
     private $route_map;
-    private $url_component;
 
     public function __construct()
     {
