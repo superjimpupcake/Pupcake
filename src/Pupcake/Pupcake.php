@@ -224,6 +224,7 @@ class Pupcake extends Object
             //allow plugin name to use . sign
             $plugin_class_name = $plugin_name."\Main";
             $this->plugins[$plugin_name]['obj'] = new $plugin_class_name();
+            $this->plugins[$plugin_name]['obj']->setAppInstance($this);
             $this->plugins[$plugin_name]['config'] = $config;
         }
     }
