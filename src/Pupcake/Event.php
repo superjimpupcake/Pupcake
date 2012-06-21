@@ -9,7 +9,7 @@ class Event
     private $name; //name of the event
     private $properties; //properties of the event
     private $handler_callback; //the main handler callback for this event, one event => one handler callback
-    private $service_callbacks; //the service callbacks for this event, one event => many service callbacks
+    private $helper_callbacks; //the plugin helper callbacks for this event, one event => many helper callbacks
     private $handler_callback_return_value; //store handler callback's return value
 
     public function __construct($name = "")
@@ -71,19 +71,19 @@ class Event
     }
 
     /**
-     * register an array of service objects and allow this service object to joint the process of handling this event
+     * register an array of plugins objects and allow the plugins to join the process of handling this event
      */
     public function register()
     {
-        $this->service_callbacks = array();
+        $this->helper_callbacks = array();
         $arguments= func_get_args();
         if(count($arguments) > 0){
             foreach($arguments as $argument){
-                if($argument instanceof Service){ //this is a service object
-                    $this->service_callbacks[] = $argument->getEventHandler($this);
+                if($argument instanceof Plugin){ //this is a plugin object
+                    $this->helper_callbacks[] = $argument->getEventHelperCallback($this->getName());
                 }
                 else if(is_callable($argument)){ //this is a closure
-                    $this->service_callbacks[] = $argument;
+                    $this->helper_callbacks[] = $argument;
                 }
             }
         }
@@ -102,11 +102,11 @@ class Event
     }
 
     /**
-     * get all service callbacks
+     * get all helper callbacks
      */
-    public function getServiceCallbacks()
+    public function getHelperCallbacks()
     {
-        return $this->service_callbacks;
+        return $this->helper_callbacks;
     }
 
     /**
@@ -115,8 +115,8 @@ class Event
     public function start()
     {
         $result = array();
-        if(count($this->service_callbacks) > 0){
-            foreach($this->service_callbacks as $callback){
+        if(count($this->helper_callbacks) > 0){
+            foreach($this->helper_callbacks as $callback){
                 $return_value = call_user_func_array($callback, array($this));
                 $result[] = $return_value;
             }

@@ -44,6 +44,16 @@ abstract class Plugin
     }
 
     /**
+     * get the event helper callback
+     */
+    public function getEventHelperCallback($event_name)
+    {
+        if(isset($this->event_helpers[$event_name])){
+            return $this->event_helpers[$event_name];
+        }
+    }
+
+    /**
      * start loading a plugin
      */
     abstract public function load($config = array());
