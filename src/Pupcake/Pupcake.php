@@ -54,12 +54,6 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback = "")
     {
-        //start the services, only once
-        if(!$this->services_started){
-            $this->startServices();
-            $this->services_started = true;
-        }
-
         $route = new Route();
         $route->belongsTo($this->router); #route belongs to router
         $route->setRequestType("");
@@ -172,14 +166,6 @@ class Pupcake extends Object
      */
     public function on($event_name, $handler_callback)
     {
-        if(!$this->service_loading){
-            //start the services, only once
-            if(!$this->services_started){
-                $this->startServices();
-                $this->services_started = true;
-            }
-        }
-
         $event = null;
         if(!isset($this->event_queue[$event_name])){
             $event = new Event($event_name);
@@ -228,6 +214,10 @@ class Pupcake extends Object
     {
         return $this->router->executeRoute($route, $params);
     }
+
+    /**
+     * load 
+     */
 
     /**
      * get a pupcake service

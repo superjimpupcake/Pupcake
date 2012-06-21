@@ -4,10 +4,15 @@ namespace Pupcake;
 /**
  * The pupcake plugin 
  */
-class Plugin
+abstract class Plugin
 {
     private $app; //the app instance
     private $event_helpers;
+
+    public function __construct()
+    {
+        $this->event_helpers = array();
+    }
 
     public function setAppInstance($app)
     {
@@ -32,6 +37,14 @@ class Plugin
      */
     public function help($event_name, $callback)
     {
-
+        if(!isset($this->event_helpers[$event_name]))
+        {
+            $this->event_helpers[$event_name] = $callback;
+        }
     }
+
+    /**
+     * start loading a plugin
+     */
+    abstract public function load($config = array());
 }
