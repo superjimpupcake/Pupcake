@@ -215,9 +215,9 @@ class Pupcake extends Object
     }
 
     /**
-     * load a plugin
+     * tell the sytem to use a plugin
      */
-    public function loadPlugin($plugin_name, $config = array())
+    public function usePlugin($plugin_name, $config = array())
     {
         if(!isset($this->plugins[$plugin_name])){
             $plugin_name = str_replace(".", "\\", $plugin_name);
