@@ -14,12 +14,8 @@ class Pupcake extends Object
     private $request_type;
     private $router;
     private $event_queue;
-    private $services; //holding an array of services
-    private $service_loading; //see if the service is loading or not
-    private $services_started; //tell the system to see if the services are started or not
-    private $events_services_map; //the event => services mapping
-    private $events_services_map_processed;
     private $request_mode;
+    private $plugins; //all plugins in the application
 
     public function __construct()
     {
@@ -137,6 +133,9 @@ class Pupcake extends Object
 
     public function run()
     {
+        //load all plugins
+        $this->loadAllPlugins(); 
+
         $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
         ob_start();
         print $output;
@@ -216,52 +215,38 @@ class Pupcake extends Object
     }
 
     /**
-     * load 
+     * load a plugin
      */
+    public function loadPlugin($plugin_name, $config = array())
+    {
+        if(!isset($this->plugins[$plugin_name])){
+            $plugin_name = str_replace(".", "\\", $plugin_name);
+            //allow plugin name to use . sign
+            $plugin_class_name = $plugin_name."\Main";
+            $this->plugins[$plugin_name]['obj'] = new $plugin_class_name();
+            $this->plugins[$plugin_name]['config'] = $config;
+        }
+    }
 
     /**
-     * get a pupcake service
+     * get a plugin object
      */
-    public function getService($service_name, $config = array())
+    public function getPlugin($plugin_name)
     {
-        if(!isset($this->services[$service_name])){
-            $this->services[$service_name] = new $service_name();
-            $this->services[$service_name]->setContext(new ServiceContext($this));
-            $this->services[$service_name]->setName($service_name);
-            $this->services[$service_name]->start($config); //start the service
-
-            //now preload all service handlers to the event queue
-
-            $event_handlers = $this->services[$service_name]->getEventHandlers();
-            if(count($event_handlers) > 0){
-                foreach($event_handlers as $event_name => $callback){
-                    if(!isset($this->events_services_map[$event_name])){
-                        $this->events_services_map[$event_name] = array();
-                    }
-                    $this->events_services_map[$event_name][] = $this->services[$service_name]; //add the service object to the map
-                }
-            }
-        }
-        return $this->services[$service_name];
-    }
-
-    public function startServices()
-    {
-        //register all events in the event service map, only happen once
-        if(!$this->events_services_map_processed){
-            if(count($this->events_services_map) > 0){
-                foreach($this->events_services_map as $event_name => $services){
-                    if(count($services) > 0){
-                        $this->service_loading = true;
-                        $this->on($event_name, function($event) use ($services) {
-                            return call_user_func_array(array($event, "register"), $services)->start();
-                        });
-                        $this->service_loading = false;
-                    }
-                }
-                $this->events_services_map_processed = true;
-            }
+        if(isset($this->plugins[$plugin_name])){
+            return $this->plugins[$plugin_name]['obj'];
         }
     }
 
+    /**
+     * load all plugins
+     */
+    public function loadAllPlugins()
+    {
+        if(count($this->plugins) > 0){
+            foreach($this->plugins as $plugin_name => $plugin){
+               $plugin['obj']->load($plugin['config']); 
+            }
+        }
+    }
 }
