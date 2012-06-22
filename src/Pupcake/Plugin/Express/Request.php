@@ -6,9 +6,11 @@ use Pupcake;
 class Request extends Pupcake\Object
 {
     private $route;
+    private $plugin;
 
-    public function __construct($route)
+    public function __construct($plugin, $route)
     {
+        $this->plugin = $plugin;
         $this->route = $route;
     }
 
@@ -25,7 +27,11 @@ class Request extends Pupcake\Object
             $result = $params[$param_name];
         }
         return $result;
+    }
 
+    public function url()
+    {
+        return $this->plugin->getAppInstance()->getQueryPath();
     }
 }
 

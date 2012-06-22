@@ -15,6 +15,7 @@ class Pupcake extends Object
     private $router;
     private $event_queue;
     private $request_mode;
+    private $query_path;
     private $plugins; //all plugins in the application
     private $plugin_loading;
     private $plugins_loaded;
@@ -236,6 +237,7 @@ class Pupcake extends Object
 
     public function sendRequest($request_mode, $request_type, $query_path, $route_map)
     {
+        $this->query_path = $query_path;
         $this->request_mode = $request_mode;
         $request_matched = $this->router->findMatchedRoute($request_type, $query_path, $route_map);
         $output = "";
@@ -258,6 +260,11 @@ class Pupcake extends Object
         }
 
         return $output;
+    }
+
+    public function getQueryPath()
+    {
+        return $this->query_path;
     }
 
     public function forward($request_type, $query_path)

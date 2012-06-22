@@ -70,7 +70,7 @@ class Main extends Pupcake\plugin
         $plugin = $this;
         $this->on("system.request.found", function($event) use ($plugin) {
             $route = $event->props('route');
-            $req = new Request($route);
+            $req = new Request($plugin, $route);
             $res = new Response($plugin, $route, $req);
             $next = $plugin->getNextRouteFinder($route, $req, $res);
             if(is_callable($next)){
