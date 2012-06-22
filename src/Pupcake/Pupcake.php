@@ -33,6 +33,135 @@ class Pupcake extends Object
         $this->router->belongsTo($this);
     }
 
+
+    /**
+     * add a callback to the event, one event, one handler callback
+     * the handler callback is swappable, so later handler callback can override previous handler callback
+     */
+    public function on($event_name, $handler_callback)
+    {
+        if(!$this->plugin_loading){
+            //load all plugins, only once
+            if(!$this->plugins_loaded){
+                $this->loadAllPlugins();
+                $this->plugins_loaded = true;
+            }
+        }
+
+        $event = null;
+        if(!isset($this->event_queue[$event_name])){
+            $event = new Event($event_name);
+            $this->event_queue[$event_name] = $event;
+        }
+
+        $event = $this->event_queue[$event_name];
+        $event->setHandlerCallback($handler_callback);
+    }
+
+    public function trigger($event_name, $handler_callback = "", $event_properties = array())
+    {
+        $event = null;
+        if(isset($this->event_queue[$event_name])){
+            $event = $this->event_queue[$event_name];
+            $event->setProperties($event_properties);
+
+            $handler_callback = $event->getHandlerCallback();
+            if(is_callable($handler_callback)){
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+            }
+            else if( is_callable($handler_callback) ){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+            }
+        }
+        else{
+            $event = new Event($event_name);
+            $event->setProperties($event_properties);
+            if(is_callable($handler_callback)){
+                $event->setHandlerCallback($handler_callback);
+                $result = call_user_func_array($handler_callback, array($event));
+                $event->setHandlerCallbackReturnValue($result);
+                $this->event_queue[$event_name] = $event;
+            }
+        }
+
+        $result = $event->getHandlerCallbackReturnValue();
+
+        return $result;
+    }
+
+    /**
+     * tell the sytem to use a plugin
+     */
+    public function usePlugin($plugin_name, $config = array())
+    {
+        if(!isset($this->plugins[$plugin_name])){
+            $plugin_name = str_replace(".", "\\", $plugin_name);
+            //allow plugin name to use . sign
+            $plugin_class_name = $plugin_name."\Main";
+            $this->plugins[$plugin_name] = new $plugin_class_name();
+            $this->plugins[$plugin_name]->setAppInstance($this);
+            $this->plugin_loading = true;
+            $this->plugins[$plugin_name]->load($config);
+            $this->plugin_loading = false;
+        }
+    }
+
+    /**
+     * get a plugin object
+     */
+    public function getPlugin($plugin_name)
+    {
+        if(isset($this->plugins[$plugin_name])){
+            return $this->plugins[$plugin_name]['obj'];
+        }
+    }
+
+    /**
+     * load all plugins
+     */
+    public function loadAllPlugins()
+    {
+        if(count($this->plugins) > 0){
+            foreach($this->plugins as $plugin_name => $plugin){
+                $event_helpers = $plugin->getEventHelperCallbacks();
+                if(count($event_helpers) > 0){
+                    foreach($event_helpers as $event_name => $callback){
+                        if(!isset($this->events_helpers[$event_name])){
+                            $this->events_helpers[$event_name] = array();
+                        }
+                        $this->events_helpers[$event_name][] = $plugin; //add the plugin object to the map
+                    }
+                }
+            }
+
+            //register all event helpers
+            if(count($this->events_helpers) > 0){
+                foreach($this->events_helpers as $event_name => $plugin_objs){
+                    if(count($plugin_objs) > 0){
+                        $this->plugin_loading = true;
+                        $this->on($event_name, function($event) use ($plugin_objs) {
+                            return call_user_func_array(array($event, "register"), $plugin_objs)->start();
+                        });
+                        $this->plugin_loading = false;
+                    }
+                }
+            }
+        }
+    }
+
+    public function run()
+    {
+        $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
+        ob_start();
+        print $output;
+        $output = ob_get_contents();
+        ob_end_clean();
+        print $output;
+    }
+
     public function getRouter()
     {
         return $this->router;
@@ -137,15 +266,9 @@ class Pupcake extends Object
         return $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
     }
 
-
-    public function run()
+    public function executeRoute($route, $params = array())
     {
-        $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
-        ob_start();
-        print $output;
-        $output = ob_get_contents();
-        ob_end_clean();
-        print $output;
+        return $this->router->executeRoute($route, $params);
     }
 
     public function getRequestType()
@@ -163,126 +286,4 @@ class Pupcake extends Object
         }
     }
 
-    /**
-     * add a callback to the event, one event, one handler callback
-     * the handler callback is swappable, so later handler callback can override previous handler callback
-     */
-    public function on($event_name, $handler_callback)
-    {
-        if(!$this->plugin_loading){
-            //load all plugins, only once
-            if(!$this->plugins_loaded){
-                $this->loadAllPlugins();
-                $this->plugins_loaded = true;
-            }
-        }
-
-        $event = null;
-        if(!isset($this->event_queue[$event_name])){
-            $event = new Event($event_name);
-            $this->event_queue[$event_name] = $event;
-        }
-
-        $event = $this->event_queue[$event_name];
-        $event->setHandlerCallback($handler_callback);
-    }
-
-    public function trigger($event_name, $handler_callback = "", $event_properties = array())
-    {
-        $event = null;
-        if(isset($this->event_queue[$event_name])){
-            $event = $this->event_queue[$event_name];
-            $event->setProperties($event_properties);
-
-            $handler_callback = $event->getHandlerCallback();
-            if(is_callable($handler_callback)){
-                $result = call_user_func_array($handler_callback, array($event));
-                $event->setHandlerCallbackReturnValue($result);
-            }
-            else if( is_callable($handler_callback) ){
-                $event->setHandlerCallback($handler_callback);
-                $result = call_user_func_array($handler_callback, array($event));
-                $event->setHandlerCallbackReturnValue($result);
-            }
-        }
-        else{
-            $event = new Event($event_name);
-            $event->setProperties($event_properties);
-            if(is_callable($handler_callback)){
-                $event->setHandlerCallback($handler_callback);
-                $result = call_user_func_array($handler_callback, array($event));
-                $event->setHandlerCallbackReturnValue($result);
-                $this->event_queue[$event_name] = $event;
-            }
-        }
-
-        $result = $event->getHandlerCallbackReturnValue();
-
-        return $result;
-    }
-
-    public function executeRoute($route, $params = array())
-    {
-        return $this->router->executeRoute($route, $params);
-    }
-
-    /**
-     * tell the sytem to use a plugin
-     */
-    public function usePlugin($plugin_name, $config = array())
-    {
-        if(!isset($this->plugins[$plugin_name])){
-            $plugin_name = str_replace(".", "\\", $plugin_name);
-            //allow plugin name to use . sign
-            $plugin_class_name = $plugin_name."\Main";
-            $this->plugins[$plugin_name] = new $plugin_class_name();
-            $this->plugins[$plugin_name]->setAppInstance($this);
-            $this->plugin_loading = true;
-            $this->plugins[$plugin_name]->load($config);
-            $this->plugin_loading = false;
-        }
-    }
-
-    /**
-     * get a plugin object
-     */
-    public function getPlugin($plugin_name)
-    {
-        if(isset($this->plugins[$plugin_name])){
-            return $this->plugins[$plugin_name]['obj'];
-        }
-    }
-
-    /**
-     * load all plugins
-     */
-    public function loadAllPlugins()
-    {
-        if(count($this->plugins) > 0){
-            foreach($this->plugins as $plugin_name => $plugin){
-                $event_helpers = $plugin->getEventHelperCallbacks();
-                if(count($event_helpers) > 0){
-                    foreach($event_helpers as $event_name => $callback){
-                        if(!isset($this->events_helpers[$event_name])){
-                            $this->events_helpers[$event_name] = array();
-                        }
-                        $this->events_helpers[$event_name][] = $plugin; //add the plugin object to the map
-                    }
-                }
-            }
-
-            //register all event helpers
-            if(count($this->events_helpers) > 0){
-                foreach($this->events_helpers as $event_name => $plugin_objs){
-                    if(count($plugin_objs) > 0){
-                        $this->plugin_loading = true;
-                        $this->on($event_name, function($event) use ($plugin_objs) {
-                            return call_user_func_array(array($event, "register"), $plugin_objs)->start();
-                        });
-                        $this->plugin_loading = false;
-                    }
-                }
-            }
-        }
-    }
 }
