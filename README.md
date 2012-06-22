@@ -114,3 +114,44 @@ $app->get("api/:number", function($req, $res, $next){
 
 $app->run();
 ```
+
+###Register event helpers
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
+
+$app->on("system.request.found", function($event){
+    /**
+     * We register 3 helper callbacks for the sytem.request.found event
+     */
+    $results = $event->register(
+        function(){
+            return "output 1";
+        },
+        function(){
+            return "output 2";
+        },
+        function(){
+            return "output 3"; 
+        }
+    )->start();
+
+    $output = "";
+    if(count($results) > 0){
+        foreach($results as $result){
+            $output .= $result;
+        } 
+    }
+
+    return $output;
+});
+
+$app->any("*path", function($req, $res){
+});
+
+$app->run();
