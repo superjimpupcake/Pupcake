@@ -78,6 +78,10 @@ $app->run();
 ###Using constraint in route and using $next function to find the next route like Express framework
 ```php
 <?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
 $app = new Pupcake\Pupcake();
 
 $app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
