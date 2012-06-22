@@ -161,3 +161,34 @@ $app->any("*path", function($req, $res){
 
 $app->run();
 ```
+
+### Custom Event Triggering and Handling
+```
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
+
+/**
+ * We define a custom event handler for the node.view event
+ */
+$app->on("node.view", function($event){
+    return "viewing node id ".$event->props('id');
+});
+
+$app->any("node/:id", function($req, $res) use ($app) {
+    /**
+     * We trigger the node.view event when we have node/1, node/2... in the request path
+     * The second parameter in the trigger method is empty string since we don't have 
+     * a default event handler callback for the node.view event
+     */
+    $output = $app->trigger("node.view", "", array('id' => $req->params('id')));
+    $res->send($output);
+});
+
+$app->run();
+```
