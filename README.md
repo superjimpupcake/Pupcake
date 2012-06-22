@@ -3,6 +3,7 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ##About Pupcake Framework
 Pupcake is a minimal but extensible microframework for PHP 5.3+. It has a powerful plugin and event handling system, which makes it "simple at the beginning, powerful at the end".
+Starting version 3.0.4, Pupcake enable the Express plugin by default, so it can use similar api syntax like the Express Framework in Node.js.
 
 ##Installation:
 
@@ -22,27 +23,27 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
-$app->get("/hello/:name", function($name){
-  return "hello ".$name." in get";
+$app->get("/hello/:name", function($req, $res){
+  $res->send("hello ".$req->params('name')." in get");
 });
 
-$app->post("/hello/:name", function($name){
-  return "hello ".$name." in post";
+$app->post("/hello/:name", function($req, $res){
+  $res->send("hello ".$req->params('name')." in post");
 });
 
-$app->put("/hello/:name", function($name){
-  return "hello ".$name." in put";
+$app->put("/hello/:name", function($req, $res){
+  $res->send("hello ".$req->params('name')." in put");
 });
 
-$app->delete("/hello/:name", function($name){
-  return "hello ".$name." in delete";
+$app->delete("/hello/:name", function($req, $res){
+  $res->send("hello ".$req->params('name')." in delete");
 });
 
 /**
  * Multiple request methods for one route
  */
-$app->map("/api/hello/:action", function($action){
-  return "hello ".$name." in get and post";
+$app->map("/api/hello/:action", function($req, $res){
+  $res->send("hello ".$req->params('action')." in get and post");
 })->via('GET','POST');
 
 
@@ -65,7 +66,6 @@ Pupcake provide the plugin named "Express" to help with that
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
-$app->usePlugin("Pupcake.Plugin.Express");
 
 $app->get("date/:year/:month/:day", function($req, $res){
     $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
@@ -84,7 +84,6 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
-$app->usePlugin("Pupcake\Plugin\Express"); //note that we can use both \ and . in the plugin name
 $app->usePlugin("Pupcake\Plugin\RouteConstraint"); 
 
 $app->any("api/12", function($req, $res, $next){
@@ -124,8 +123,6 @@ In Pupcake framework, each event can have only one event handler, it is swappabl
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
-
-$app->usePlugin("Pupcake\Plugin\Express"); //note that we can use both \ and . in the plugin name
 
 /**
  * we override the system.request.found event's handler
@@ -171,8 +168,6 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
-$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
-
 /**
  * We define a custom event handler for the node.view event
  */
@@ -201,8 +196,6 @@ $app->run();
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
-
-$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
 
 $app->on("node.view", function($event){
     return "viewing node id ".$event->props('id');

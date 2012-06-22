@@ -15,8 +15,6 @@ class ExpressPluginTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
 
-        $app->usePlugin("Pupcake\Plugin\Express"); //use plugin
-
         $app->get("date/:year/:month/:day", function($req, $res){
             $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
             $res->send($output);
@@ -36,8 +34,6 @@ class ExpressPluginTest extends Pupcake\TestCase
         $this->simulateRequest("get", "/date/2012/12/25");
 
         $app = new Pupcake\Pupcake();
-
-        $app->usePlugin("Pupcake\Plugin\Express"); //use plugin
 
         /**
          * override system.request.found event handling, return custom output
@@ -68,8 +64,6 @@ class ExpressPluginTest extends Pupcake\TestCase
         $this->simulateRequest("get", "/test_internal");
 
         $app = new Pupcake\Pupcake();
-
-        $app->usePlugin("Pupcake\Plugin\Express");
 
         $app->get("/hello/:name", function($req, $res){
             $res->send($req->params('name'));
@@ -112,7 +106,6 @@ class ExpressPluginTest extends Pupcake\TestCase
         
         $app = new Pupcake\Pupcake();
 
-        $app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
         $app->usePlugin("Pupcake\Plugin\RouteConstraint"); //load Plugin
 
         $app->any("api/12", function($req, $res, $next){

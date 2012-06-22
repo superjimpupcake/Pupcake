@@ -17,7 +17,6 @@ class MultiplePluginsTest extends Pupcake\TestCase
 
             $app = new Pupcake\Pupcake();
 
-            $app->usePlugin("Pupcake\Plugin\Express"); //load Express Plugin
             $app->usePlugin("Pupcake\Plugin\RouteConstraint"); //load RouteConstraint Plugin
             $app->usePlugin("Pupcake\Plugin\RouteAction"); //load RouteAction Plugin
 

@@ -23,6 +23,11 @@ class Pupcake extends Object
 
     public function __construct()
     {
+        $this->event_queue = array();
+        $this->trigger("system.initialize", array($this, 'initialize'));
+    }
+
+    public function initialize(){
         $this->events_helpers = array();
         $this->plugin_loading = false;
         $this->plugins_loaded = false;
@@ -32,8 +37,10 @@ class Pupcake extends Object
 
         $this->router = new Router(); #initiate one router for this app instance
         $this->router->belongsTo($this);
-    }
 
+        //use express plugin by default
+        $this->usePlugin("Pupcake\Plugin\Express"); //load Express Plugin by default
+    }
 
     /**
      * add a callback to the event, one event, one handler callback
