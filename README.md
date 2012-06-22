@@ -115,7 +115,8 @@ $app->get("api/:number", function($req, $res, $next){
 $app->run();
 ```
 
-###Register event helpers
+###Event Helper and Event Handler
+In Pupcake framework, each event can have only one event handler, it is swappable. Each event can register one or many event helpers to join the process of the event handling.
 ```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
@@ -126,9 +127,12 @@ $app = new Pupcake\Pupcake();
 
 $app->usePlugin("Pupcake\Plugin\Express"); //note that we can use both \ and . in the plugin name
 
+/**
+ * we override the system.request.found event's handler
+ */
 $app->on("system.request.found", function($event){
     /**
-     * We register 3 helper callbacks for the sytem.request.found event
+     * We register 3 event helper callbacks for the sytem.request.found event
      */
     $results = $event->register(
         function(){
