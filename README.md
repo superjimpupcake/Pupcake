@@ -84,8 +84,8 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
-$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
-$app->usePlugin("Pupcake\Plugin\RouteConstraint"); //load Plugin
+$app->usePlugin("Pupcake\Plugin\Express"); //note that we can use both \ and . in the plugin name
+$app->usePlugin("Pupcake\Plugin\RouteConstraint"); 
 
 $app->any("api/12", function($req, $res, $next){
     $next();
@@ -124,7 +124,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
-$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
+$app->usePlugin("Pupcake\Plugin\Express"); //note that we can use both \ and . in the plugin name
 
 $app->on("system.request.found", function($event){
     /**
