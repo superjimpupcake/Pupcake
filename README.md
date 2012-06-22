@@ -193,7 +193,7 @@ $app->any("node/:id", function($req, $res) use ($app) {
 $app->run();
 ```
 
-### Url Alias effect using request forwarding, custom event trigging and handling
+### URL Alias effect using request forwarding, custom event trigging and handling
 ```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
