@@ -71,7 +71,7 @@ class Main extends Pupcake\plugin
         $this->on("system.request.found", function($event) use ($plugin) {
             $route = $event->props('route');
             $req = new Request($route);
-            $res = new Response($plugin, $route);
+            $res = new Response($plugin, $route, $req);
             $next = $plugin->getNextRouteFinder($route, $req, $res);
             if(is_callable($next)){
                 $route->execute(array($req, $res, $next)); //execuite route and override params

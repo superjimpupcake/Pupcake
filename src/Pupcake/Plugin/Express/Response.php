@@ -7,11 +7,13 @@ class Response extends Pupcake\Object
 {
     private $plugin;
     private $route;
+    private $req;
 
-    public function __construct($plugin, $route)
+    public function __construct($plugin, $route, $req)
     {
         $this->plugin = $plugin;
         $this->route = $route;
+        $this->req = $req;
     }
 
     public function send($output)
@@ -30,5 +32,16 @@ class Response extends Pupcake\Object
         $route = $this->plugin->getAppInstance()->getRouter()->getMatchedRoute();
         return $route->storageGet('output');
     }
+
+    public function toRoute($request_type, $route_pattern, $params)
+    {
+        $router = $this->plugin->getAppInstance()->getRouter();
+        $route = $router->getRoute($request_type, $route_pattern);
+        $route->setParams($params);
+        $this->req->setRoute($route);
+        $route->execute(array($this->req, $this));
+        $output = $this->route->storageGet('output');
+        return $output;
+    } 
 }
 
