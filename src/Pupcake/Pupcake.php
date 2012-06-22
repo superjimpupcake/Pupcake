@@ -235,9 +235,11 @@ class Pupcake extends Object
             $plugin_name = str_replace(".", "\\", $plugin_name);
             //allow plugin name to use . sign
             $plugin_class_name = $plugin_name."\Main";
-            $this->plugins[$plugin_name]['obj'] = new $plugin_class_name();
-            $this->plugins[$plugin_name]['obj']->setAppInstance($this);
-            $this->plugins[$plugin_name]['config'] = $config;
+            $this->plugins[$plugin_name] = new $plugin_class_name();
+            $this->plugins[$plugin_name]->setAppInstance($this);
+            $this->plugin_loading = true;
+            $this->plugins[$plugin_name]->load($config);
+            $this->plugin_loading = false;
         }
     }
 
@@ -258,17 +260,13 @@ class Pupcake extends Object
     {
         if(count($this->plugins) > 0){
             foreach($this->plugins as $plugin_name => $plugin){
-                $this->plugin_loading = true;
-                $plugin['obj']->load($plugin['config']); 
-                $this->plugin_loading = false;
-
-                $event_helpers = $plugin['obj']->getEventHelperCallbacks();
+                $event_helpers = $plugin->getEventHelperCallbacks();
                 if(count($event_helpers) > 0){
                     foreach($event_helpers as $event_name => $callback){
                         if(!isset($this->events_helpers[$event_name])){
                             $this->events_helpers[$event_name] = array();
                         }
-                        $this->events_helpers[$event_name][] = $plugin['obj']; //add the plugin object to the map
+                        $this->events_helpers[$event_name][] = $plugin; //add the plugin object to the map
                     }
                 }
             }
