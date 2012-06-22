@@ -192,3 +192,43 @@ $app->any("node/:id", function($req, $res) use ($app) {
 
 $app->run();
 ```
+
+### Url Alias effect using request forwarding, custom event trigging and handling
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
+
+$app->on("node.view", function($event){
+    return "viewing node id ".$event->props('id');
+});
+
+$app->get("article/*path", function($req, $res){
+    $map = array(
+        "stock-exchange" => 1,
+        "world/market/preview" => 2,
+        "wine/list" => 3
+    );
+    $path = $req->params("path");
+    if(isset($map[$path])){
+        $res->send($res->forward("get", "node/".$map[$path])); //we forward the request to node
+    }
+});
+
+$app->get("node/:id", function($req, $res) use ($app) {
+    /**
+     * We trigger the node.view event when we have node/1, node/2... in the request path
+     * The second parameter in the trigger method is empty string since we don't have 
+     * a default event handler callback for the node.view event
+     */
+    $output = $app->trigger("node.view", "", array('id' => $req->params('id')));
+    $res->send($output);
+});
+
+$app->run();
+```
