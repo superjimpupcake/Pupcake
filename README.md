@@ -77,6 +77,7 @@ $app->run();
 
 ###Using constraint in route and using $next function to find the next route like Express framework
 ```php
+<?php
 $app = new Pupcake\Pupcake();
 
 $app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
