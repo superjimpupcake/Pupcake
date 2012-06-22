@@ -116,6 +116,7 @@ $app->run();
 ```
 
 ###Register event helpers
+```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
 
@@ -155,3 +156,4 @@ $app->any("*path", function($req, $res){
 });
 
 $app->run();
+```
