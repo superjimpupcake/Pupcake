@@ -16,15 +16,16 @@ class Pupcake extends Object
     private $event_queue;
     private $request_mode;
     private $plugins; //all plugins in the application
+    private $plugin_loading;
+    private $plugins_loaded;
+    private $events_helpers;
 
     public function __construct()
     {
-        $this->services = array();
-        $this->events_services_map = array();
-        $this->events_services_map_processed = false;
-        $this->services_started = false;
-        $this->service_loading = false;
-       
+        $this->events_helpers = array();
+        $this->plugin_loading = false;
+        $this->plugins_loaded = false;
+
         set_error_handler(array($this, 'handleError'), E_ALL);
         register_shutdown_function(array($this, 'handleShutdown'));
 
@@ -50,6 +51,12 @@ class Pupcake extends Object
 
     public function map($route_pattern, $callback = "")
     {
+        //load all plugins, only once
+        if(!$this->plugins_loaded){
+            $this->loadAllPlugins();
+            $this->plugins_loaded = true;
+        }
+
         $route = new Route();
         $route->belongsTo($this->router); #route belongs to router
         $route->setRequestType("");
@@ -133,9 +140,6 @@ class Pupcake extends Object
 
     public function run()
     {
-        //load all plugins
-        $this->loadAllPlugins(); 
-
         $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
         ob_start();
         print $output;
@@ -165,6 +169,14 @@ class Pupcake extends Object
      */
     public function on($event_name, $handler_callback)
     {
+        if(!$this->plugin_loading){
+            //load all plugins, only once
+            if(!$this->plugins_loaded){
+                $this->loadAllPlugins();
+                $this->plugins_loaded = true;
+            }
+        }
+
         $event = null;
         if(!isset($this->event_queue[$event_name])){
             $event = new Event($event_name);
@@ -246,7 +258,32 @@ class Pupcake extends Object
     {
         if(count($this->plugins) > 0){
             foreach($this->plugins as $plugin_name => $plugin){
-               $plugin['obj']->load($plugin['config']); 
+                $this->plugin_loading = true;
+                $plugin['obj']->load($plugin['config']); 
+                $this->plugin_loading = false;
+
+                $event_helpers = $plugin['obj']->getEventHelperCallbacks();
+                if(count($event_helpers) > 0){
+                    foreach($event_helpers as $event_name => $callback){
+                        if(!isset($this->events_helpers[$event_name])){
+                            $this->events_helpers[$event_name] = array();
+                        }
+                        $this->events_helpers[$event_name][] = $plugin['obj']; //add the plugin object to the map
+                    }
+                }
+            }
+
+            //register all event helpers
+            if(count($this->events_helpers) > 0){
+                foreach($this->events_helpers as $event_name => $plugin_objs){
+                    if(count($plugin_objs) > 0){
+                        $this->plugin_loading = true;
+                        $this->on($event_name, function($event) use ($plugin_objs) {
+                            return call_user_func_array(array($event, "register"), $plugin_objs)->start();
+                        });
+                        $this->plugin_loading = false;
+                    }
+                }
             }
         }
     }

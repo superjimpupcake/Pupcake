@@ -44,13 +44,21 @@ abstract class Plugin
     }
 
     /**
-     * get the event helper callback
+     * get the helper callback of a specifc event
      */
     public function getEventHelperCallback($event_name)
     {
         if(isset($this->event_helpers[$event_name])){
             return $this->event_helpers[$event_name];
         }
+    }
+
+    /**
+     * get all event helper callbacks
+     */
+    public function getEventHelperCallbacks()
+    {
+        return $this->event_helpers;
     }
 
     /**
