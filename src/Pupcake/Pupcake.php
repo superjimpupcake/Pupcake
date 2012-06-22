@@ -280,11 +280,6 @@ class Pupcake extends Object
         return $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
     }
 
-    public function executeRoute($route, $params = array())
-    {
-        return $this->router->executeRoute($route, $params);
-    }
-
     public function getRequestType()
     {
         return $_SERVER['REQUEST_METHOD'];
