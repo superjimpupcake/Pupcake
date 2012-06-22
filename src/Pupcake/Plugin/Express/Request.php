@@ -7,6 +7,7 @@ class Request extends Pupcake\Object
 {
     private $route;
     private $plugin;
+    private $args;
 
     public function __construct($plugin, $route)
     {
@@ -32,6 +33,28 @@ class Request extends Pupcake\Object
     public function url()
     {
         return $this->plugin->getAppInstance()->getQueryPath();
+    }
+
+    public function type()
+    {
+        return $_SERVER['REQUEST_METHOD'];
+    }
+
+    public function mode()
+    {
+        return $this->plugin->getAppInstance()->getRequestMode();
+    }
+
+    public function arg($index)
+    {
+        if(!isset($this->args)){
+            $url = $this->url();
+            $url_comps = explode("/", $url);
+            array_shift($url_comps);
+            $this->args = $url_comps;  
+        }
+
+        return $this->args[$index];
     }
 }
 

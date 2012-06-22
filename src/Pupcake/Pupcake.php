@@ -285,6 +285,11 @@ class Pupcake extends Object
         return $_SERVER['REQUEST_METHOD'];
     }
 
+    public function getRequestMode()
+    {
+        return $this->request_mode;
+    }
+
     public function redirect($uri)
     {
         if($this->request_mode == 'external'){
