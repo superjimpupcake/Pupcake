@@ -3,7 +3,7 @@ namespace Pupcake\Tests;
 
 use Pupcake;
 
-class MultipleServiceTest extends Pupcake\TestCase
+class MultiplePluginsTest extends Pupcake\TestCase
 {
     public function testRouteActionAndRouteConstraint()
     {
@@ -17,9 +17,9 @@ class MultipleServiceTest extends Pupcake\TestCase
 
             $app = new Pupcake\Pupcake();
 
-            $app->getService("Pupcake\Service\Express"); //load Express service
-            $app->getService("Pupcake\Service\RouteConstraint"); //load RouteConstraint service
-            $app->getService("Pupcake\Service\RouteAction"); //load RouteAction service
+            $app->usePlugin("Pupcake\Plugin\Express"); //load Express Plugin
+            $app->usePlugin("Pupcake\Plugin\RouteConstraint"); //load RouteConstraint Plugin
+            $app->usePlugin("Pupcake\Plugin\RouteAction"); //load RouteAction Plugin
 
             $app->get("api/ip/:ip", function($req, $res) use ($app) {
                 $res->send($app->getRouter()->getMatchedRoute()->getAction());
@@ -27,7 +27,13 @@ class MultipleServiceTest extends Pupcake\TestCase
             ->to("api#ip")
             ->constraint(array(
                 'ip' =>  function($value){
-                    return \Respect\Validation\Validator::ip()->validate($value);
+                    $value_comps = explode(".", $value);
+                    if(count($value_comps) == 4){
+                        return true;
+                    }
+                    else{
+                        return false;
+                    }
                 }
             ));
 

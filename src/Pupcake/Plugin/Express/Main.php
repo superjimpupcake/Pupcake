@@ -41,7 +41,6 @@ class Main extends Pupcake\plugin
 
             //unset the current route 
             unset($route_map[$current_route_request_type][$current_route_pattern]);
-
             $plugin->setRouteMapToLookup($route_map);
 
             $output = ""; //return empty response by default
@@ -66,7 +65,8 @@ class Main extends Pupcake\plugin
 
     public function load($config = array())
     {
-        $this->route_map = array();
+        $this->route_map = null; //initially, set route map to null
+
         $plugin = $this;
         $this->on("system.request.found", function($event) use ($plugin) {
             $route = $event->props('route');

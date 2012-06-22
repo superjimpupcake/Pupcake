@@ -5,12 +5,12 @@ use Pupcake;
 
 class Response extends Pupcake\Object
 {
-    private $service;
+    private $plugin;
     private $route;
 
-    public function __construct($service, $route)
+    public function __construct($plugin, $route)
     {
-        $this->service = $service;
+        $this->plugin = $plugin;
         $this->route = $route;
     }
 
@@ -21,13 +21,13 @@ class Response extends Pupcake\Object
 
     public function redirect($uri)
     {
-        $this->service->getContext()->redirect($uri);
+        $this->plugin->getAppInstance()->redirect($uri);
     }
 
     public function forward($request_type, $uri)
     {
-        $this->service->getContext()->forward($request_type, $uri);
-        $route = $this->service->getContext()->getMatchedRoute();
+        $this->plugin->getAppInstance()->forward($request_type, $uri);
+        $route = $this->plugin->getAppInstance()->getRouter()->getMatchedRoute();
         return $route->storageGet('output');
     }
 }
