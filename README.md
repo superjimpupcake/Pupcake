@@ -74,3 +74,38 @@ $app->get("date/:year/:month/:day", function($req, $res){
 
 $app->run();
 ```
+
+###Using constraint in route and using $next function to find the next route like Express framework
+```php
+$app = new Pupcake\Pupcake();
+
+$app->usePlugin("Pupcake\Plugin\Express"); //load Plugin
+$app->usePlugin("Pupcake\Plugin\RouteConstraint"); //load Plugin
+
+$app->any("api/12", function($req, $res, $next){
+    $next();
+});
+
+$app->any("api/:number", function($req, $res, $next){
+    $next();
+})->constraint(array(
+    'number' => function($value){
+        $result = true;
+        if($value < 15){
+            $result = false;
+        }
+        return $result;
+    }
+));
+
+$app->get("api/12", function($req, $res, $next){
+    $next();
+});
+
+$app->get("api/:number", function($req, $res, $next){
+    $res->send("this is finally number ".$req->params('number'));
+});
+
+
+$app->run();
+```
