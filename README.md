@@ -65,7 +65,7 @@ Pupcake provide the plugin named "Express" to help with that
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
-$app->usePlugin("Pupcake.Service.Express");
+$app->usePlugin("Pupcake.Plugin.Express");
 
 $app->get("date/:year/:month/:day", function($req, $res){
     $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
