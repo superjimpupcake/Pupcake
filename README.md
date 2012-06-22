@@ -23,6 +23,11 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
 
+$app->get("date/:year/:month/:day", function($req, $res){
+    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
+    $res->send($output);
+});
+
 $app->get("/hello/:name", function($req, $res){
   $res->send("hello ".$req->params('name')." in get");
 });
@@ -46,31 +51,6 @@ $app->map("/api/hello/:action", function($req, $res){
   $res->send("hello ".$req->params('action')." in get and post");
 })->via('GET','POST');
 
-
-$app->run();
-```
-
-####Use Pupcake like Express Node.js framework
-For all developers who are also a Express Node.js framework user, you will probably want to use something like the following:
-```php
-$app->get("date/:year/:month/:day", function($req, $res){
-    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
-    $res->send($output);
-});
-```
-Pupcake provide the plugin named "Express" to help with that
-```php
-<?php
-//Assuming this is public/index.php and the composer vendor directory is ../vendor
-
-require_once __DIR__.'/../vendor/autoload.php';
-
-$app = new Pupcake\Pupcake();
-
-$app->get("date/:year/:month/:day", function($req, $res){
-    $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
-    $res->send($output);
-});
 
 $app->run();
 ```
