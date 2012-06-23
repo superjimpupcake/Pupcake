@@ -29,7 +29,15 @@ abstract class Plugin
      */
     public function on($event_name, $callback)
     {
-        return $this->app->on($event_name, $callback);
+        $this->app->on($event_name, $callback);
+    }
+
+    /**
+     * handle an event, same as on
+     */
+    public function handle($event_name, $callback)
+    {
+        $this->on($event_name, $callback);
     }
 
     /**

@@ -66,6 +66,14 @@ class Pupcake extends Object
         $event->setHandlerCallback($handler_callback);
     }
 
+    /**
+     * add alias to the on method, handle
+     */
+    public function handle($event_name, $handler_callback)
+    {
+        $this->on($event_name, $handler_callback);
+    }
+
     public function trigger($event_name, $handler_callback = "", $event_properties = array())
     {
         $event = null;
