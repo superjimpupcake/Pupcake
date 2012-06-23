@@ -121,9 +121,6 @@ class Event
                 $result[] = $return_value;
             }
         }
-        if(count($result) == 1){ //if the array has only 1 elment, return it
-            $result = $result[0];
-        }
         return $result;
     }
 }
