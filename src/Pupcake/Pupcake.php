@@ -123,7 +123,7 @@ class Pupcake extends Object
     public function getPlugin($plugin_name)
     {
         if(isset($this->plugins[$plugin_name])){
-            return $this->plugins[$plugin_name]['obj'];
+            return $this->plugins[$plugin_name];
         }
     }
 
