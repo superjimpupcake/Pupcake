@@ -148,7 +148,8 @@ class Router extends Object
         if($path_pos !== FALSE){
             $first_part_of_path = substr($route_pattern, 0, $path_pos);
             if(substr($uri, 0, $path_pos) == $first_part_of_path){
-                $params[":path"] = str_replace($first_part_of_path, "", $uri);
+                $uri_length = strlen($uri);
+                $params[":path"] = substr($uri, $path_pos, $uri_length - $path_pos);
                 $route = $this->getRoute($request_type, $route_pattern);
                 $route->setParams($params);
                 $this->setMatchedRoute($route); 
