@@ -6,7 +6,7 @@ namespace Pupcake\Plugin\Express;
 
 use Pupcake;
 
-class Main extends Pupcake\plugin
+class Main extends Pupcake\Plugin
 {
 
     private $route_map;
