@@ -4,7 +4,7 @@ namespace Pupcake;
 /**
  * The pupcake plugin 
  */
-abstract class Plugin
+abstract class Plugin extends Object
 {
     private $app; //the app instance
     private $event_helpers;
