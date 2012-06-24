@@ -80,7 +80,10 @@ class Event
         if(count($arguments) > 0){
             foreach($arguments as $argument){
                 if($argument instanceof Plugin){ //this is a plugin object
-                    $this->helper_callbacks[] = $argument->getEventHelperCallback($this->getName());
+                    $callback = $argument->getEventHelperCallback($this->getName());
+                    if(is_callable($callback)){
+                        $this->helper_callbacks[] = $callback;
+                    }                 
                 }
                 else if(is_callable($argument)){ //this is a closure
                     $this->helper_callbacks[] = $argument;

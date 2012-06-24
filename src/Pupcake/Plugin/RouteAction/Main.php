@@ -23,6 +23,7 @@ class Main extends Pupcake\Plugin
             $route->method("getAction", function() use ($route, $time) {
                 return $route->storageGet($time."_route_action");
             });
+            return $route;
         });
     }
 }
