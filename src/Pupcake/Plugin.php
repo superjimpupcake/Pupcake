@@ -52,6 +52,23 @@ abstract class Plugin
     }
 
     /**
+     * get event context
+     */
+    public function getEventContext()
+    {
+        $class = strtolower(get_class($this));
+        print $class;
+    }
+
+    /**
+     * trigger an event
+     */
+    public function trigger($event_name, $handler_callback = "", $event_properties = array())
+    {
+       return $this->app->trigger($event_name, $handler_callback = "", $event_properties);
+    }
+      
+    /**
      * get the helper callback of a specifc event
      */
     public function getEventHelperCallback($event_name)

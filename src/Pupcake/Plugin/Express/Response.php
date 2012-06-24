@@ -14,6 +14,7 @@ class Response extends Pupcake\Object
         $this->plugin = $plugin;
         $this->route = $route;
         $this->req = $req;
+        $plugin->trigger("pupcake.plugin.express.response.create", "", array("response" => $this));
     }
 
     public function send($output)

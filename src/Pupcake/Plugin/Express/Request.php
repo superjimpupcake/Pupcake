@@ -13,6 +13,7 @@ class Request extends Pupcake\Object
     {
         $this->plugin = $plugin;
         $this->route = $route;
+        $plugin->trigger("pupcake.plugin.express.request.create", "", array("request" => $this));
     }
 
     public function setRoute($route)
@@ -57,4 +58,3 @@ class Request extends Pupcake\Object
         return $this->args[$index];
     }
 }
-
