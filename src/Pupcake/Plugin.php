@@ -65,7 +65,7 @@ abstract class Plugin extends Object
      */
     public function trigger($event_name, $handler_callback = "", $event_properties = array())
     {
-       return $this->app->trigger($event_name, $handler_callback = "", $event_properties);
+       return $this->app->trigger($event_name, $handler_callback, $event_properties);
     }
       
     /**
