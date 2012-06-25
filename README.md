@@ -3,7 +3,7 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ##About Pupcake Framework
 Pupcake is a minimal but extensible microframework for PHP 5.3+. It has a powerful plugin and event handling system, which makes it "simple at the beginning, powerful at the end".
-Starting from version 3.0.4, Pupcake enable the Express plugin by default, so it can use similar api syntax like the Express Framework in Node.js.
+Pupcake mimic some of the api syntax in Express Node.js Framework, so developers in Express will feel at home.
 For more detail usages, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 
 ##Installation:
