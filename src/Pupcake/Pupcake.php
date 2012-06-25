@@ -74,30 +74,28 @@ class Pupcake extends Object
         $this->on($event_name, $handler_callback);
     }
 
-    public function trigger($event_name, $handler_callback = "", $event_properties = array())
+    /**
+     * trigger an event with a default handler callback
+     */
+    public function trigger($event_name, $default_handler_callback = "", $event_properties = array())
     {
         $event = null;
-        if(isset($this->event_queue[$event_name])){
+        if(isset($this->event_queue[$event_name])){ //if the event already exists, use the handler callback for the event instead of the default handler callback
             $event = $this->event_queue[$event_name];
             $event->setProperties($event_properties);
 
             $handler_callback = $event->getHandlerCallback();
-            if(is_callable($handler_callback)){
-                $result = call_user_func_array($handler_callback, array($event));
-                $event->setHandlerCallbackReturnValue($result);
-            }
-            else if( is_callable($handler_callback) ){
-                $event->setHandlerCallback($handler_callback);
+            if(is_callable($handler_callback)){ 
                 $result = call_user_func_array($handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
             }
         }
-        else{
+        else{ //event does not exist yet, use the default handler callback
             $event = new Event($event_name);
             $event->setProperties($event_properties);
-            if(is_callable($handler_callback)){
-                $event->setHandlerCallback($handler_callback);
-                $result = call_user_func_array($handler_callback, array($event));
+            if(is_callable($default_handler_callback)){
+                $event->setHandlerCallback($default_handler_callback);
+                $result = call_user_func_array($default_handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
                 $this->event_queue[$event_name] = $event;
             }
