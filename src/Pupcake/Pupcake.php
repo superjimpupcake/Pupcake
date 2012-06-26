@@ -24,10 +24,6 @@ class Pupcake extends Object
     public function __construct()
     {
         $this->event_queue = array();
-        $this->trigger("system.initialize", array($this, 'initialize'));
-    }
-
-    public function initialize(){
         $this->events_helpers = array();
         $this->plugin_loading = false;
         $this->plugins_loaded = false;
