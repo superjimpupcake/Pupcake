@@ -124,6 +124,7 @@ class Pupcake extends Object
      */
     public function getPlugin($plugin_name)
     {
+        $plugin_name = str_replace(".", "\\", $plugin_name);
         if(isset($this->plugins[$plugin_name])){
             return $this->plugins[$plugin_name];
         }
