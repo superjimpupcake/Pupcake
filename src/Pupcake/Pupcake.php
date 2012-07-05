@@ -280,7 +280,9 @@ class Pupcake extends Object
     public function forward($request_type, $query_path)
     {
         $request_type = strtoupper($request_type);
-        return $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
+        $output = $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
+        $this->request_mode = "external"; # set the request mode back to external
+        return $output;
     }
 
     public function getRequestType()
