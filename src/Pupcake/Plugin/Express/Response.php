@@ -49,6 +49,7 @@ class Response extends Pupcake\Object
     $route->setParams($params);
     $this->req->setRoute($route);
     $route->execute(array($this->req, $this));
+    $this->req->setRoute($this->route); //set back the request route
     $this->in_inner_route = false;
     return $this->route->storageGet('inner_route_output');
   }
