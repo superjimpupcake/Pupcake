@@ -40,8 +40,10 @@ class Response extends Pupcake\Object
         $route = $router->getRoute($request_type, $route_pattern);
         $route->setParams($params);
         $this->req->setRoute($route);
+        ob_start();
         $route->execute(array($this->req, $this));
-        $output = $this->route->storageGet('output');
+        $output = ob_get_contents();
+        ob_end_clean();
         return $output;
     } 
 }
