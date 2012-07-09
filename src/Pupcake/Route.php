@@ -87,18 +87,25 @@ class Route extends Object
      */
     public function execute($params = array())
     {
-        if(count($params) == 0){
-            $params = $this->getParams();
-        }
-        //enhancement, detect the type of the callback
-        $callback = $this->getCallback();
-        if(is_string($callback)){
-          $callback_comps = explode("#", $callback);
-          $callback_object_class = "\\".$callback_comps[0]; //starting from root namespace
-          $callback_object = new $callback_object_class($this->router->getAppInstance());
-          $callback_object_method = $callback_comps[1];
-          $callback = array($callback_object, $callback_object_method);
-        }
-        return call_user_func_array($callback, $params);
+        $app = $this->router->getAppInstance();
+        return $app->trigger("system.routing.route.execute", function($event){
+          $app = $event->props('app');
+          $route = $event->props('route');
+          $params = $event->props('params');
+          if(count($params) == 0){
+            $params = $route->getParams();
+          }
+          //enhancement, detect the type of the callback
+          $callback = $route->getCallback();
+          if(is_string($callback)){
+            $callback_comps = explode("#", $callback);
+            $callback_object_class = $callback_comps[0]; //starting from root namespace
+            $callback_object_class = str_replace(".", "\\", $callback_object_class); 
+            $callback_object = new $callback_object_class($app);
+            $callback_object_method = $callback_comps[1];
+            $callback = array($callback_object, $callback_object_method);
+          }
+          return call_user_func_array($callback, $params);
+        }, array('app' => $app, 'route' => $this, 'params' => $params));
     }
 }
