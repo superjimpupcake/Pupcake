@@ -56,6 +56,31 @@ $app->map("/api/hello/:action", function($req, $res){
 $app->run();
 ```
 
+###Handling request with [action_class]#[action_method] string
+Pupcake also support handling route with [action_class]#[action_method] string. 
+In the example below, we use Page class's home action to handle the get request to the homepage.
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+class Page
+{
+  public function home($req, $res)
+  {
+    $res->send("this is the homepage"); 
+  }
+}
+
+$app = new Pupcake\Pupcake();
+
+$app->get("/", "Page#home");
+
+$app->run();
+
+```
+
 ###Using constraint in route and using $next function to find the next route like Express framework
 ```php
 <?php
