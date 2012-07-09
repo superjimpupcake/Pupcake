@@ -90,6 +90,15 @@ class Route extends Object
         if(count($params) == 0){
             $params = $this->getParams();
         }
-        return call_user_func_array($this->getCallback(), $params);
+        //enhancement, detect the type of the callback
+        $callback = $this->getCallback();
+        if(is_string($callback)){
+          $callback_comps = explode("#", $callback);
+          $callback_object_class = "\\".$callback_comps[0]; //starting from root namespace
+          $callback_object = new $callback_object_class($this->router->getAppInstance());
+          $callback_object_method = $callback_comps[1];
+          $callback = array($callback_object, $callback_object_method);
+        }
+        return call_user_func_array($callback, $params);
     }
 }
