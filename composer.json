@@ -1,5 +1,5 @@
 {
-    "name": "Pupcake/Pupcake",
+    "name": "Pupcake",
     "description": "A PHP Microframework for PHP 5.3+",
     "keywords": ["microframework", "micro", "framework", "lightweight", "extensible"],
     "homepage": "https://github.com/superjimpupcake/Pupcake",
@@ -22,7 +22,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.1.4-dev"
+            "dev-master": "3.1.5-dev"
         }
     }
 }
