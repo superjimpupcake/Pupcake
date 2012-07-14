@@ -29,15 +29,25 @@ class Response extends Pupcake\Object
     }
   }
 
+  public function contentType($content_type)
+  {
+    header("Content-type: $content_type");
+    return $this;
+  }
+
   public function redirect($uri)
   {
     $this->plugin->getAppInstance()->redirect($uri);
   }
 
-  public function forward($request_type, $uri)
+  public function forward($request_type, $uri, $request_params = array())
   {
+    $request_type = strtoupper($request_type);
+    $tmp = $GLOBALS["_$request_type"]; //store current request variables in tmp
+    $GLOBALS["_$request_type"] = $request_params;
     $this->plugin->getAppInstance()->forward($request_type, $uri);
     $route = $this->plugin->getAppInstance()->getRouter()->getMatchedRoute();
+    $GLOBALS["_$request_type"] = $tmp; //restore current request variables
     return $route->storageGet('output');
   }
 
