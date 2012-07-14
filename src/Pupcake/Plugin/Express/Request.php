@@ -57,4 +57,17 @@ class Request extends Pupcake\Object
 
         return $this->args[$index];
     }
+
+    public function body($key = "")
+    {
+      $request_method = $_SERVER['REQUEST_METHOD'];
+      if($key == ""){
+        return $GLOBALS["_$request_method"];
+      }
+      else{
+        if(isset($GLOBALS["_$request_method"][$key])){
+          return $GLOBALS["_$request_method"][$key];
+        }
+      }
+    }
 }
