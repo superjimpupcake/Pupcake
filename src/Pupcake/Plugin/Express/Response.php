@@ -6,6 +6,7 @@ use Pupcake;
 class Response extends Pupcake\Object
 {
   private $plugin;
+  private $app_instance;
   private $route;
   private $req;
   private $in_inner_route;
@@ -13,10 +14,16 @@ class Response extends Pupcake\Object
   public function __construct($plugin, $route, $req)
   {
     $this->plugin = $plugin;
+    $this->app_instance = $plugin->getAppInstance();
     $this->route = $route;
     $this->req = $req;
     $this->in_inner_route = false;
     $plugin->trigger("pupcake.plugin.express.response.create", "", array("response" => $this));
+  }
+
+  public function getAppInstance()
+  {
+    return $this->app_instance;
   }
 
   public function send($output)
