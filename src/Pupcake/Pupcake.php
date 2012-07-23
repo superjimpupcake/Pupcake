@@ -368,7 +368,7 @@ class Pupcake extends Object
     $crlf = "\r\n";
     $req = $verb .' '. $uri . $getdata_str .' HTTP/1.1' . $crlf;
     $req .= 'Host: '. $ip . $crlf;
-    $req .= $user_agent . $crlf;
+    $req .= 'User-Agent: '.$user_agent . $crlf;
     $req .= 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . $crlf;
     $req .= 'Accept-Language: en-us,en;q=0.5' . $crlf;
     $req .= 'Accept-Encoding: deflate' . $crlf;
