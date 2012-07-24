@@ -3,7 +3,10 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ##About Pupcake Framework
 Pupcake is a minimal but extensible microframework for PHP 5.3+. It has a powerful plugin and event handling system, which makes it "simple at the beginning, powerful at the end".
-Pupcake mimic some of the api syntax in Express Node.js Framework, so developers in Express will feel at home.
+Pupcake mimic some of the api syntax in Express Node.js Framework, so developers in Express will feel at home. 
+
+New Feature: Pupcake now supports asynchronous internal request.
+
 For more detail usages, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 
 ##Installation:
@@ -227,6 +230,33 @@ $app->get("node/:id", function($req, $res) use ($app) {
      */
     $output = $app->trigger("node.view", "", array('id' => $req->params('id')));
     $res->send($output);
+});
+
+$app->run();
+```
+
+### Sending asynchronous internal request
+```php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+/**
+ * Pupcake now support asynchronous internal request, the request is non-blocking
+ */
+$app->get("file_create_call", function($req, $res) use ($app) {
+  session_start();
+  $_SESSION['session_jim'] = 1;
+  $_SESSION['session_tom'] = 2;
+  $_SESSION['session_huang'] = 5;
+  $_SESSION['more_data'] = 300;
+  $result = $app->sendAsyncRequest("post", "file_create");   
+});
+
+$app->post("file_create", function($req, $res){
+  session_start();
+  file_put_contents("tmp", print_r($_SESSION,true));
 });
 
 $app->run();
