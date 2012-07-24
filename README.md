@@ -237,6 +237,7 @@ $app->run();
 
 ### Sending asynchronous internal request
 ```php
+<?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
 require_once __DIR__.'/../vendor/autoload.php';
 
