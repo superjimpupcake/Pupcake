@@ -12,6 +12,17 @@ class Main extends Pupcake\Plugin
   {
     $app = $this->getAppInstance();
     $app->method("sendAsyncRequest", array($this, "sendAsyncRequest"));  
+
+    $plugin = $this;
+
+    $this->help("pupcake.plugin.express.response.create", function($event) use ($plugin, $app) {
+      $response = $event->props("response");
+      /**
+       * add forwardAsync method
+       */
+      $response->method("forwardAsync", array($plugin, "sendAsyncRequest"));
+    });
+
   }
 
   /**
