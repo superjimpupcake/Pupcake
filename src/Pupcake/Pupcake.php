@@ -270,13 +270,16 @@ class Pupcake extends Object
     return $this->query_path;
   }
 
-  public function forward($request_type, $query_path)
+  public function forward($request_type, $query_path, $request_params = array())
   {
     $request_type = strtoupper($request_type);
-    $tmp = $_SERVER['REQUEST_METHOD']; //store server request method to tmp
+    $tmp_request_method = $_SERVER['REQUEST_METHOD']; //store server request method in temporary storage
+    $tmp_request_params = $GLOBALS["_$request_type"]; //store current request variables in temporary storage
+    $GLOBALS["_$request_type"] = $request_params;
     $_SERVER['REQUEST_METHOD'] = $request_type; //override request method
     $output = $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
-    $_SERVER['REQUEST_METHOD'] = $tmp; //set back the request method
+    $_SERVER['REQUEST_METHOD'] = $tmp_request_method; //set back the request method
+    $GLOBALS["_$request_type"] = $tmp; //restore current request variables
     $this->request_mode = "external"; # set the request mode back to external
     return $output;
   }

@@ -49,13 +49,7 @@ class Response extends Pupcake\Object
 
   public function forward($request_type, $uri, $request_params = array())
   {
-    $request_type = strtoupper($request_type);
-    $tmp = $GLOBALS["_$request_type"]; //store current request variables in tmp
-    $GLOBALS["_$request_type"] = $request_params;
-    $this->plugin->getAppInstance()->forward($request_type, $uri);
-    $route = $this->plugin->getAppInstance()->getRouter()->getMatchedRoute();
-    $GLOBALS["_$request_type"] = $tmp; //restore current request variables
-    return $route->storageGet('output');
+    return $this->app_instance->forward($request_type, $uri, $request_params);
   }
 
   public function toRoute($request_type, $route_pattern, $params)
