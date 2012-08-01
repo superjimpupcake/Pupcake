@@ -279,7 +279,7 @@ class Pupcake extends Object
     $_SERVER['REQUEST_METHOD'] = $request_type; //override request method
     $output = $this->sendRequest("internal", $request_type, $query_path, $this->router->getRouteMap());
     $_SERVER['REQUEST_METHOD'] = $tmp_request_method; //set back the request method
-    $GLOBALS["_$request_type"] = $tmp; //restore current request variables
+    $GLOBALS["_$request_type"] = $tmp_request_params; //restore current request variables
     $this->request_mode = "external"; # set the request mode back to external
     return $output;
   }
