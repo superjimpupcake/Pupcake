@@ -26,6 +26,10 @@ class Main extends Pupcake\Plugin
         $client = uv_tcp_init();
         uv_accept($server, $client);
         uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin){
+          $client_info = uv_tcp_getpeername($client);
+          if(is_array($client_info)){
+            $_SERVER['REMOTE_ADDR'] = $client_info['address'];
+          }
           $result = $plugin->httpParseExecute($buffer);
           if(is_array($result)){
             $_SERVER['REQUEST_METHOD'] = $result['REQUEST_METHOD'];
