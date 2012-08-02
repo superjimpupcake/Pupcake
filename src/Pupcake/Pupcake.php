@@ -158,15 +158,15 @@ class Pupcake extends Object
 
   public function run()
   {
-    $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
-    $this->trigger('system.request.output.return', function($event){
-      $output = $event->props('output');
+    $this->trigger('system.run', function($event){
+      $app = $event->props('app');
+      $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $app->getRouter()->getRouteMap());
       ob_start();
       print $output;
       $output = ob_get_contents();
       ob_end_clean();
       print $output;
-    }, array('output' => $output));
+    }, array('app' => $this));
   }
 
   public function getRouter()
