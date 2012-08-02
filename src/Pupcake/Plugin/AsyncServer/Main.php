@@ -11,6 +11,7 @@ class Main extends Pupcake\Plugin
 {
   private $tcp;
   private $header;
+  private $request_count;
 
   public function load($config = array())
   {
@@ -19,10 +20,13 @@ class Main extends Pupcake\Plugin
     $app->method("listen", array($this, "listen")); //add listen method
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
 
+    $this->request_count = 0;
+
     $plugin = $this;
 
     $app->handle("system.run", function($event) use ($plugin){
       uv_listen($plugin->getTCP(),200, function($server) use ($event, $plugin){
+        $plugin->incrementRequestCount();
         $client = uv_tcp_init();
         uv_accept($server, $client);
         uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin){
@@ -32,14 +36,23 @@ class Main extends Pupcake\Plugin
           }
           $result = $plugin->httpParseExecute($buffer);
           if(is_array($result)){
+            $request_method = $result['REQUEST_METHOD'];
+
+            //constructing server variables
             $_SERVER['REQUEST_METHOD'] = $result['REQUEST_METHOD'];
             $_SERVER['PATH_INFO'] = $result['path'];
             $_SERVER['HTTP_HOST'] = $result['headers']['Host'];
             $_SERVER['HTTP_USER_AGENT'] = $result['headers']['User-Agent'];
 
+            //constructing global variables
+            if($request_method == 'GET'){
+              $result['headers']['body'] = $result['query']; //bind body to query if it is a get request
+            }
+
+            $GLOBALS["_$request_method"] = explode("&", $result['headers']['body']); 
+
             $app = $event->props('app');
             $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $app->getRouter()->getRouteMap());
-
             $header = $plugin->getHeader();
 
             if(strlen($header) > 0){
@@ -90,5 +103,15 @@ class Main extends Pupcake\Plugin
   public function getHeader()
   {
     return $this->header;
+  }
+
+  public function incrementRequestCount()
+  {
+    $this->request_count ++;
+  }
+
+  public function getRequestCount()
+  {
+    return $this->request_count;
   }
 }
