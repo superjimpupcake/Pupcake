@@ -36,6 +36,11 @@ class Response extends Pupcake\Object
     }
   }
 
+  public function sendJSON($data = array())
+  {
+    $this->contentType("application/json")->send(json_encode($data));
+  }
+
   public function contentType($content_type)
   {
     $this->app_instance->setHeader("Content-type: $content_type");
