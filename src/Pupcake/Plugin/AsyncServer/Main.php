@@ -74,7 +74,7 @@ class Main extends Pupcake\Plugin
             $status_message = $plugin->getStatusMessage();
 
             $buffer = "$protocol $status_code $status_message\r\n$header\r\n$output";
-            uv_write($client, $buffer, function($c, $client) use ($client){
+            uv_write($client, $buffer, function($client, $stat){
               uv_close($client,function(){
                 //    echo "connection closed\n";
               });
