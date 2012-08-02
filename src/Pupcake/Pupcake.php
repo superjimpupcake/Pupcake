@@ -26,7 +26,8 @@ class Pupcake extends Object
     register_shutdown_function(array($this, 'handleShutdown'));
 
     //define methods that can be reopened
-    $this->method("setHeader", array($this, "setHeader"));
+    $this->method("setHeader", array($this, "setHeaderNative"));
+    $this->method("redirect", array($this, "redirectNative"));
 
     $this->event_queue = array();
     $this->events_helpers = array();
@@ -301,10 +302,15 @@ class Pupcake extends Object
     return $this->request_mode;
   }
 
-  public function redirect($uri)
+  public function setHeaderNative($header)
+  {
+    header($header);
+  }
+
+  public function redirectNative($uri)
   {
     if($this->request_mode == 'external'){
-      $this->setHeader("Location: ".$uri);
+      header("Location: $uri");
     }
     else if($this->request_mode == 'internal'){
       return $this->forward('GET', $uri);

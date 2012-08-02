@@ -11,16 +11,25 @@ class Main extends Pupcake\Plugin
 {
   private $tcp;
   private $header;
+  private $protocol;
+  private $status_code;
+  private $status_message;
   private $request_count;
 
   public function load($config = array())
   {
     $app = $this->getAppInstance();
 
+    $this->app = $app;
+
     $app->method("listen", array($this, "listen")); //add listen method
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
+    $app->method("redirect", array($this, "redirect")); //reopen redirect method
 
     $this->request_count = 0;
+    $this->protocol = "HTTP/1.1"; // default protocol
+    $this->status_code = 200; //default status code
+    $this->status_message = "OK"; //default status message
 
     $plugin = $this;
 
@@ -62,7 +71,12 @@ class Main extends Pupcake\Plugin
               $header = "";
             }
 
-            $buffer = "HTTP/1.1 200 OK\r\n$header\r\n$output";
+            $protocol = $plugin->getProtocol();
+            $status_code = $plugin->getStatusCode();
+            $status_message = $plugin->getStatusMessage();
+
+            $buffer = "$protocol $status_code $status_message\r\n$header\r\n$output";
+            print $buffer;
             uv_write($client, $buffer, function($c, $client) use ($client){
               uv_close($client,function(){
                 //    echo "connection closed\n";
@@ -95,6 +109,36 @@ class Main extends Pupcake\Plugin
     return $this->tcp;
   }
 
+  public function setProtocol($protocol)
+  {
+    $this->protocol = $protocol;
+  }
+
+  public function getProtocol()
+  {
+    return $this->protocol;
+  }
+
+  public function setStatusCode($status_code)
+  {
+    $this->status_code = $status_code;
+  }
+
+  public function getStatusCode()
+  {
+    return $this->status_code;
+  }
+
+  public function setStatusMessage($status_message)
+  {
+    $this->status_message = $status_message;
+  }
+
+  public function getStatusMessage()
+  {
+    return $this->status_message;
+  }
+
   public function setHeader($header)
   {
     $this->header = $header;
@@ -113,5 +157,18 @@ class Main extends Pupcake\Plugin
   public function getRequestCount()
   {
     return $this->request_count;
+  }
+
+  public function redirect($uri)
+  {
+    $app = $this->app;
+    $request_mode = $app->getRequestMode();
+    if($request_mode == 'external'){
+      $this->setStatusCode(302);
+      $this->setHeader("Location: $uri");
+    }
+    else if($request_mode == 'internal'){
+      return $app->forward('GET', $uri);
+    }
   }
 }
