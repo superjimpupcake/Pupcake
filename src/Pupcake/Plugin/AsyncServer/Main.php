@@ -10,20 +10,22 @@ use Pupcake;
 class Main extends Pupcake\Plugin
 {
   private $tcp;
+  private $header;
 
   public function load($config = array())
   {
     $app = $this->getAppInstance();
 
-    $app->method("listen", array($this, "listen"));
+    $app->method("listen", array($this, "listen")); //add listen method
+    $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
 
     $plugin = $this;
 
     $app->handle("system.run", function($event) use ($plugin){
-      uv_listen($plugin->getTCP(),200, function($server) use ($event){
+      uv_listen($plugin->getTCP(),200, function($server) use ($event, $plugin){
         $client = uv_tcp_init();
         uv_accept($server, $client);
-        uv_read_start($client, function($client, $nread, $buffer) use ($event){
+        uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin){
           $parser = http_parser_init();
           $result = array();
           if (http_parser_execute($parser, $buffer, $result)){
@@ -33,7 +35,16 @@ class Main extends Pupcake\Plugin
             $app = $event->props('app');
             $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $app->getRouter()->getRouteMap());
 
-            $buffer = "HTTP/1.1 200 OK\n\n".$output;
+            $header = $plugin->getHeader();
+
+            if(strlen($header) > 0){
+              $header = $header."\r\n";
+            }
+            else{
+              $header = "";
+            }
+
+            $buffer = "HTTP/1.1 200 OK\r\n$header\r\n$output";
             uv_write($client, $buffer, function($c, $client) use ($client){
               uv_close($client,function(){
                 //    echo "connection closed\n";
@@ -57,5 +68,15 @@ class Main extends Pupcake\Plugin
   public function getTCP()
   {
     return $this->tcp;
+  }
+
+  public function setHeader($header)
+  {
+    $this->header = $header;
+  }
+
+  public function getHeader()
+  {
+    return $this->header;
   }
 }
