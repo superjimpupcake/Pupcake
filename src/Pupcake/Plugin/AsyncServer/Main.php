@@ -26,11 +26,12 @@ class Main extends Pupcake\Plugin
         $client = uv_tcp_init();
         uv_accept($server, $client);
         uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin){
-          $parser = http_parser_init();
-          $result = array();
-          if (http_parser_execute($parser, $buffer, $result)){
+          $result = $plugin->httpParseExecute($buffer);
+          if(is_array($result)){
             $_SERVER['REQUEST_METHOD'] = $result['REQUEST_METHOD'];
             $_SERVER['PATH_INFO'] = $result['path'];
+            $_SERVER['HTTP_HOST'] = $result['headers']['Host'];
+            $_SERVER['HTTP_USER_AGENT'] = $result['headers']['User-Agent'];
 
             $app = $event->props('app');
             $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $app->getRouter()->getRouteMap());
@@ -50,13 +51,20 @@ class Main extends Pupcake\Plugin
                 //    echo "connection closed\n";
               });
             });
-
           }
         });
       });
 
       uv_run();
     });
+  }
+
+  public function httpParseExecute($buffer)
+  {
+    $result = array();
+    $parser = http_parser_init();
+    http_parser_execute($parser, $buffer, $result);
+    return $result;
   }
 
   public function listen($ip, $port = 8080)
