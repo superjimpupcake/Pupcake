@@ -14,7 +14,6 @@ class Main extends Pupcake\Plugin
   private $protocol;
   private $status_code;
   private $status_message;
-  private $request_count;
 
   public function load($config = array())
   {
@@ -26,7 +25,6 @@ class Main extends Pupcake\Plugin
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
     $app->method("redirect", array($this, "redirect")); //reopen redirect method
 
-    $this->request_count = 0;
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
     $this->status_message = "OK"; //default status message
@@ -34,11 +32,12 @@ class Main extends Pupcake\Plugin
     $plugin = $this;
 
     $app->handle("system.run", function($event) use ($plugin){
-      uv_listen($plugin->getTCP(),200, function($server) use ($event, $plugin){
-        $plugin->incrementRequestCount();
+      $app = $event->props('app');
+      $route_map = $app->getRouter()->getRouteMap(); //load route map only once 
+      uv_listen($plugin->getTCP(),100, function($server) use ($event, $plugin, $app, $route_map){
         $client = uv_tcp_init();
         uv_accept($server, $client);
-        uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin){
+        uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin, $app, $route_map){
           $client_info = uv_tcp_getpeername($client);
           if(is_array($client_info)){
             $_SERVER['REMOTE_ADDR'] = $client_info['address'];
@@ -60,8 +59,7 @@ class Main extends Pupcake\Plugin
 
             $GLOBALS["_$request_method"] = explode("&", $result['headers']['body']); 
 
-            $app = $event->props('app');
-            $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $app->getRouter()->getRouteMap());
+            $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
             $header = $plugin->getHeader();
 
             if(strlen($header) > 0){
@@ -146,16 +144,6 @@ class Main extends Pupcake\Plugin
   public function getHeader()
   {
     return $this->header;
-  }
-
-  public function incrementRequestCount()
-  {
-    $this->request_count ++;
-  }
-
-  public function getRequestCount()
-  {
-    return $this->request_count;
   }
 
   public function redirect($uri)
