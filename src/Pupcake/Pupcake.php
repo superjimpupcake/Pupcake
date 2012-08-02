@@ -25,9 +25,8 @@ class Pupcake extends Object
     set_error_handler(array($this, 'handleError'), E_ALL);
     register_shutdown_function(array($this, 'handleShutdown'));
 
-    $this->method("setHeader", function($header){
-      header($header);
-    });
+    //define methods that can be reopened
+    $this->method("setHeader", array($this, "setHeader"));
 
     $this->event_queue = array();
     $this->events_helpers = array();
