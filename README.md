@@ -18,23 +18,23 @@ For more detail usages, please see https://github.com/superjimpupcake/Pupcake/wi
 ##If you plan to use it as a standalone async server
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
 #### install php-uv and php-httpparser
-  git clone https://github.com/chobie/php-uv.git --recursive
-  cd php-uv/libuv
-  make && cp uv.a libuv.a
-  cd ..
-  phpize
-  ./configure
-  make && make install
+    git clone https://github.com/chobie/php-uv.git --recursive
+    cd php-uv/libuv
+    make && cp uv.a libuv.a
+    cd ..
+    phpize
+    ./configure
+    make && make install
 
-  git clone https://github.com/chobie/php-httpparser.git --recursive
-  cd php-httpparser
-  phpize
-  ./configure
-  make && make install
+    git clone https://github.com/chobie/php-httpparser.git --recursive
+    cd php-httpparser
+    phpize
+    ./configure
+    make && make install
 
-  add following extensions to your php.ini
-  extension=uv.so
-  extension=httpparser.so
+    add following extensions to your php.ini
+    extension=uv.so
+    extension=httpparser.so
 
 
 ###Simple requests
