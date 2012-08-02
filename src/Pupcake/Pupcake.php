@@ -253,9 +253,10 @@ class Pupcake extends Object
     $output = "";
     $return_outputs = array();
     if(!$request_matched){
-      $output = $this->trigger("system.request.notfound", function(){
+      $app = $this;
+      $output = $this->trigger("system.request.notfound", function() use ($app) {
         //request not found
-        header("HTTP/1.1 404 Not Found");
+        $app->setHeader("HTTP/1.1 404 Not Found");
         return "Invalid Request";
       });
     }

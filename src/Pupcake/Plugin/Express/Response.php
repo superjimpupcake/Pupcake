@@ -29,10 +29,10 @@ class Response extends Pupcake\Object
   public function send($output)
   {
     if($this->in_inner_route){
-      $this->route->storageSet('inner_route_output', $output); 
+      $this->plugin->storageSet('inner_route_output', $output); 
     }
     else{
-      $this->route->storageSet('output', $output); 
+      $this->plugin->storageSet('output', $output); 
     }
   }
 
@@ -67,7 +67,7 @@ class Response extends Pupcake\Object
     $route->execute(array($this->req, $this));
     $this->req->setRoute($this->route); //set back the request route
     $this->in_inner_route = false;
-    return $this->route->storageGet('inner_route_output');
+    return $this->plugin->storageGet('inner_route_output');
   }
 
   public function inInnerRoute()

@@ -76,7 +76,7 @@ class Main extends Pupcake\Plugin
       if(is_callable($next)){
         $route->execute(array($req, $res, $next)); //execute route and override params
       }
-      return $route->storageGet('output');
+      return $plugin->storageGet('output');
     });
   }
 }
