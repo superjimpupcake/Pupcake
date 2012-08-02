@@ -8,14 +8,14 @@ For more detail usages, please see https://github.com/superjimpupcake/Pupcake/wi
 
 ##Installation:
 
-##If you plan to use it on Apache
+###If you plan to use it on Apache
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
 ####.htaccess File for Apache
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php/$1 [L]
 
-##If you plan to use it as a standalone async server
+###If you plan to use it as a standalone async server
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
 #### install php-uv and php-httpparser
     git clone https://github.com/chobie/php-uv.git --recursive
