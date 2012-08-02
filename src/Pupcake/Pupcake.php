@@ -304,7 +304,7 @@ class Pupcake extends Object
   public function redirect($uri)
   {
     if($this->request_mode == 'external'){
-      header("Location: ".$uri);
+      $this->setHeader("Location: ".$uri);
     }
     else if($this->request_mode == 'internal'){
       return $this->forward('GET', $uri);
