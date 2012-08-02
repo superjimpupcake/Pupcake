@@ -251,7 +251,6 @@ class Pupcake extends Object
     $this->request_mode = $request_mode;
     $request_matched = $this->router->findMatchedRoute($request_type, $query_path, $route_map);
     $output = "";
-    $return_outputs = array();
     if(!$request_matched){
       $app = $this;
       $output = $this->trigger("system.request.notfound", function() use ($app) {
