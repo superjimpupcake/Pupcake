@@ -20,15 +20,15 @@ class Pupcake extends Object
   private $plugins_loaded;
   private $events_helpers;
 
-  public function __construct()
+  public function __construct($configuration = array())
   {
+    set_error_handler(array($this, 'handleError'), E_ALL);
+    register_shutdown_function(array($this, 'handleShutdown'));
+
     $this->event_queue = array();
     $this->events_helpers = array();
     $this->plugin_loading = false;
     $this->plugins_loaded = false;
-
-    set_error_handler(array($this, 'handleError'), E_ALL);
-    register_shutdown_function(array($this, 'handleShutdown'));
 
     $this->router = new Router(); #initiate one router for this app instance
     $this->router->belongsTo($this);
@@ -159,11 +159,14 @@ class Pupcake extends Object
   public function run()
   {
     $output = $this->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $this->router->getRouteMap());
-    ob_start();
-    print $output;
-    $output = ob_get_contents();
-    ob_end_clean();
-    print $output;
+    $this->trigger('system.request.output.return', function($event){
+      $output = $event->props('output');
+      ob_start();
+      print $output;
+      $output = ob_get_contents();
+      ob_end_clean();
+      print $output;
+    }, array('output' => $output));
   }
 
   public function getRouter()
