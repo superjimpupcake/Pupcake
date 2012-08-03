@@ -117,7 +117,7 @@ class Router extends Object
             }
             foreach($request_types_to_lookup as $request_type){
                 if(isset($route_map[$request_type]) && count($route_map[$request_type]) > 0){
-                    foreach($route_map[$request_type] as $route_pattern => $route){
+                  foreach($route_map[$request_type] as $route_pattern => $route){
                         //once we found there is a matched route, stop
                         $matched = $this->routeMatched($request_type, $route_pattern, $query_path);
                         if($matched){
