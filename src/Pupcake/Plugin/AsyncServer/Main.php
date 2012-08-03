@@ -26,9 +26,6 @@ class Main extends Pupcake\Plugin
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
     $app->method("redirect", array($this, "redirect")); //reopen redirect method
 
-    $this->router = $app->getRouter();
-    $this->router->method("processRouteMatching", array($this, "processRouteMatching")); //reopen processRouteMatching
-
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
     $this->status_message = "OK"; //default status message
@@ -63,7 +60,10 @@ class Main extends Pupcake\Plugin
 
             $GLOBALS["_$request_method"] = explode("&", $result['headers']['body']); 
 
-            $output = $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
+            $output = $app->trigger("system.client.response.body", function($event) use ($route_map){
+              return $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
+            });
+
             $header = $plugin->getHeader();
 
             if(strlen($header) > 0){
@@ -163,72 +163,4 @@ class Main extends Pupcake\Plugin
     }
   }
 
-  public function processRouteMatching($event)
-  {
-    $request_type = $event->props('request_type');
-    $uri = $event->props('query_path');
-    $route_pattern= $event->props('route_pattern');
-    $result = false;
-    $params = array();
-
-    $route_pattern_length = strlen($route_pattern);
-    $path_pos = strpos($route_pattern, "*path"); //see if there is *path exists
-    if($path_pos !== FALSE){
-      $first_part_of_path = substr($route_pattern, 0, $path_pos);
-      if(substr($uri, 0, $path_pos) == $first_part_of_path){
-        $uri_length = strlen($uri);
-        $params[":path"] = substr($uri, $path_pos, $uri_length - $path_pos);
-        $route = $this->router->getRoute($request_type, $route_pattern);
-        $route->setParams($params);
-        $this->router->setMatchedRoute($route); 
-        $result = true;
-        return $result;
-      }
-    }
-
-    $uri_comps = explode("/", $uri);
-    $uri_comps_count = count($uri_comps);
-    $route_pattern_comps = explode("/", $route_pattern);
-    $route_pattern_comps_count = count($route_pattern_comps);
-    if($uri_comps_count == $route_pattern_comps_count){
-      for($k=1;$k<$route_pattern_comps_count;$k++){ //we should start from index 1 since index 0 is the /
-        if($route_pattern_comps[$k][0] == ":"){
-          $token = $route_pattern_comps[$k];
-          $params[$token] = $uri_comps[$k];
-          $route_pattern_comps[$k] = "";
-          $uri_comps[$k] = "";
-        }
-      }
-
-      $uri_reformed = implode("/",$uri_comps);
-      $route_pattern_reformed = implode("/",$route_pattern_comps);
-      $route = $this->router->getRoute($request_type, $route_pattern);
-      $route->setParams($params);
-
-      if($uri_reformed == $route_pattern_reformed){
-        $results = $this->app->trigger("system.routing.route.matched", "", array('route' => $route));
-
-        //the result can be either a boolean or an array 
-        $result = true;
-        if( is_array($results) && count($results) > 0 ){  //the result is an array
-          foreach($results as $matched){
-            if(!$matched){
-              $result = false;
-              break;
-            }
-          }
-        }
-        else if($results === FALSE){
-          $result = false; 
-        }
-
-        if($result){ 
-          $this->router->setMatchedRoute($route); 
-        }
-
-      }
-    }
-
-    return $result;
-  }
 }
