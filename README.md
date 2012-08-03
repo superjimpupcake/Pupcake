@@ -20,11 +20,11 @@ Pupcake --- a micro framework for PHP 5.3+
 #### install php-uv and php-httpparser
     git clone https://github.com/chobie/php-uv.git --recursive
     cd php-uv/libuv
-    make && cp uv.a libuv.a
+    make && cp uv.a libuv.a (my experience on both centos and ubuntu server is, we need to add -fPIC flag to cc)
     cd ..
     phpize
     ./configure
-    make && make install
+    make && make install (my experience on both centos and ubuntu server is, we need to add -fPIC flag to cc)
 
     git clone https://github.com/chobie/php-httpparser.git --recursive
     cd php-httpparser
