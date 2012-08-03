@@ -103,7 +103,7 @@ $app->run();
 ```
 Now run php server/server.php and go to http://127.0.0.1:9000 to see the result
 
-### A simple standalone server returning "Hello Word"
+### A simple standalone server returning "Hello Word", benchmarked with node.js
 We can return any custom output by skipping the whole routing process by hooking up to system.server.response.body event
 ```php
 <?php
@@ -134,44 +134,30 @@ http.createServer(function (req, res) {
 console.log('Server running at http://127.0.0.1:1337/');
 ```
 Below are the data return by apache ab:
-ab -n 1000 -c 20 http://127.0.0.1:9000/ (our php server)
+ab -n 100000 -c 200 http://127.0.0.1:9000/ (our php server)
 
-    Server Software:        
-    Server Hostname:        127.0.0.1
-    Server Port:            9000
-
-    Document Path:          /
-    Document Length:        11 bytes
-
-    Concurrency Level:      20
-    Time taken for tests:   0.194 seconds
-    Complete requests:      1000
+    Concurrency Level:      200
+    Time taken for tests:   22.771 seconds
+    Complete requests:      100000
     Failed requests:        0
     Write errors:           0
-    Total transferred:      30000 bytes
-    HTML transferred:       11000 bytes
-    Requests per second:    5148.35 [#/sec] (mean)
-    Time per request:       3.885 [ms] (mean)
-    Time per request:       0.194 [ms] (mean, across all concurrent requests)
-    Transfer rate:          150.83 [Kbytes/sec] received
+    Total transferred:      3000000 bytes
+    HTML transferred:       1100000 bytes
+    Requests per second:    4391.53 [#/sec] (mean)
+    Time per request:       45.542 [ms] (mean)
+    Time per request:       0.228 [ms] (mean, across all concurrent requests)
+    Transfer rate:          128.66 [Kbytes/sec] received
 
-ab -n 1000 -c 20 http://127.0.0.1:1337/ (the node.js hello world script)
+ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script)
 
-    Server Software:        
-    Server Hostname:        127.0.0.1
-    Server Port:            1337
-
-    Document Path:          /
-    Document Length:        12 bytes
-
-    Concurrency Level:      20
-    Time taken for tests:   0.257 seconds
-    Complete requests:      1000
+    Concurrency Level:      200
+    Time taken for tests:   25.660 seconds
+    Complete requests:      100000
     Failed requests:        0
     Write errors:           0
-    Total transferred:      113000 bytes
-    HTML transferred:       12000 bytes
-    Requests per second:    3884.73 [#/sec] (mean)
-    Time per request:       5.148 [ms] (mean)
+    Total transferred:      11300000 bytes
+    HTML transferred:       1200000 bytes
+    Requests per second:    3897.19 [#/sec] (mean)
+    Time per request:       51.319 [ms] (mean)
     Time per request:       0.257 [ms] (mean, across all concurrent requests)
-    Transfer rate:          428.69 [Kbytes/sec] received
+    Transfer rate:          430.06 [Kbytes/sec] received
