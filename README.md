@@ -102,3 +102,78 @@ $app->get("/hello", function($req, $res){
 $app->run();
 ```
 Now run php server/server.php and go to http://127.0.0.1:9000 to see the result
+
+### A simple standalone server returning "Hello Word"
+We can return any custom output by skipping the whole routing process by hooking up to system.server.response.body event
+```php
+<?php
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+
+$app->usePlugin("Pupcake\Plugin\AsyncServer");
+
+$app->listen("127.0.0.1", 9000);
+
+$app->setHeader("application/json");
+$app->on("system.server.response.body", function($event){
+  return json_encode(array('path' => $_SERVER['PATH_INFO']));
+});
+
+$app->run();
+```
+
+This might need more investigation, but the script above seems to be able handle more requests per seconds than Node.js
+
+Benchmarking compared with the following node.js script
+```javascript
+var http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello World\n');
+    }).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+```
+Below are the data return by apache ab:
+ab -n 1000 -c 20 http://127.0.0.1:9000/ (our php server)
+
+    Server Software:        
+    Server Hostname:        127.0.0.1
+    Server Port:            9000
+
+    Document Path:          /
+    Document Length:        13 bytes
+
+    Concurrency Level:      20
+    Time taken for tests:   0.185 seconds
+    Complete requests:      1000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      50000 bytes
+    HTML transferred:       13000 bytes
+    Requests per second:    5414.01 [#/sec] (mean)
+    Time per request:       3.694 [ms] (mean)
+    Time per request:       0.185 [ms] (mean, across all concurrent requests)
+    Transfer rate:          264.36 [Kbytes/sec] received
+
+ab -n 1000 -c 20 http://127.0.0.1:1337/ (the node.js hello world script)
+
+    Server Software:        
+    Server Hostname:        127.0.0.1
+    Server Port:            1337
+
+    Document Path:          /
+    Document Length:        12 bytes
+
+    Concurrency Level:      20
+    Time taken for tests:   0.257 seconds
+    Complete requests:      1000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      113000 bytes
+    HTML transferred:       12000 bytes
+    Requests per second:    3884.73 [#/sec] (mean)
+    Time per request:       5.148 [ms] (mean)
+    Time per request:       0.257 [ms] (mean, across all concurrent requests)
+    Transfer rate:          428.69 [Kbytes/sec] received
+
