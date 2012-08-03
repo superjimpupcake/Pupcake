@@ -13,6 +13,8 @@ class Router extends Object
     {
         $this->route_map = array(); //initialize the route map
         $this->route_request_types = array();
+
+        $this->method("processRouteMatching", array($this, "processRouteMatchingNative")); //open processRouteMatching
     }
 
     public function belongsTo($app)
@@ -135,7 +137,7 @@ class Router extends Object
      * @param Event the event object
      * @return boolean whether the route matched the uri or not
      */
-    public function processRouteMatching($event)
+    public function processRouteMatchingNative($event)
     {
         $request_type = $event->props('request_type');
         $uri = $event->props('query_path');
