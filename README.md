@@ -115,9 +115,8 @@ $app->usePlugin("Pupcake\Plugin\AsyncServer");
 
 $app->listen("127.0.0.1", 9000);
 
-$app->setHeader("application/json");
 $app->on("system.server.response.body", function($event){
-  return json_encode(array('path' => $_SERVER['PATH_INFO']));
+  return "hello world";
 });
 
 $app->run();
@@ -142,19 +141,19 @@ ab -n 1000 -c 20 http://127.0.0.1:9000/ (our php server)
     Server Port:            9000
 
     Document Path:          /
-    Document Length:        13 bytes
+    Document Length:        11 bytes
 
     Concurrency Level:      20
-    Time taken for tests:   0.185 seconds
+    Time taken for tests:   0.194 seconds
     Complete requests:      1000
     Failed requests:        0
     Write errors:           0
-    Total transferred:      50000 bytes
-    HTML transferred:       13000 bytes
-    Requests per second:    5414.01 [#/sec] (mean)
-    Time per request:       3.694 [ms] (mean)
-    Time per request:       0.185 [ms] (mean, across all concurrent requests)
-    Transfer rate:          264.36 [Kbytes/sec] received
+    Total transferred:      30000 bytes
+    HTML transferred:       11000 bytes
+    Requests per second:    5148.35 [#/sec] (mean)
+    Time per request:       3.885 [ms] (mean)
+    Time per request:       0.194 [ms] (mean, across all concurrent requests)
+    Transfer rate:          150.83 [Kbytes/sec] received
 
 ab -n 1000 -c 20 http://127.0.0.1:1337/ (the node.js hello world script)
 
@@ -176,4 +175,3 @@ ab -n 1000 -c 20 http://127.0.0.1:1337/ (the node.js hello world script)
     Time per request:       5.148 [ms] (mean)
     Time per request:       0.257 [ms] (mean, across all concurrent requests)
     Transfer rate:          428.69 [Kbytes/sec] received
-
