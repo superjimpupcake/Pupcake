@@ -116,7 +116,7 @@ $app->usePlugin("Pupcake\Plugin\AsyncServer");
 $app->listen("127.0.0.1", 9000);
 
 $app->on("system.server.response.body", function($event){
-  return "hello world";
+  return "hello world\n";
 });
 
 $app->run();
@@ -137,18 +137,18 @@ Below are the data return by apache ab:
 ab -n 100000 -c 200 http://127.0.0.1:9000/ (our php server)
 
     Concurrency Level:      200
-    Time taken for tests:   22.771 seconds
+    Time taken for tests:   22.338 seconds
     Complete requests:      100000
     Failed requests:        0
     Write errors:           0
-    Total transferred:      3000000 bytes
-    HTML transferred:       1100000 bytes
-    Requests per second:    4391.53 [#/sec] (mean)
-    Time per request:       45.542 [ms] (mean)
-    Time per request:       0.228 [ms] (mean, across all concurrent requests)
-    Transfer rate:          128.66 [Kbytes/sec] received
+    Total transferred:      3100000 bytes
+    HTML transferred:       1200000 bytes
+    Requests per second:    4476.65 [#/sec] (mean)
+    Time per request:       44.676 [ms] (mean)
+    Time per request:       0.223 [ms] (mean, across all concurrent requests)
+    Transfer rate:          135.52 [Kbytes/sec] received
 
-ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script)
+ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script run with node version 0.8.5)
 
     Concurrency Level:      200
     Time taken for tests:   25.660 seconds
