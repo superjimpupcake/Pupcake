@@ -60,7 +60,7 @@ class Main extends Pupcake\Plugin
 
             $GLOBALS["_$request_method"] = explode("&", $result['headers']['body']); 
 
-            $output = $app->trigger("system.client.response.body", function($event) use ($route_map){
+            $output = $app->trigger("system.server.response.body", function($event) use ($route_map){
               return $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
             });
 
