@@ -4,7 +4,7 @@ Pupcake --- a micro framework for PHP 5.3+
 ##About Pupcake Framework
 + Pupcake is a minimal but extensible microframework for PHP 5.3+
 + Pupcake can be run in traditional web server such as Apache and can also run as a standalone async server using the AsyncServer plugin together with php-uv and php-httpparser
-  (The standalone async server at this phrase is at its very early stage and is under active development)
+  (The standalone async server is at its very early stage and is under active development)
 + For more detail usages, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 
 ##Installation:
