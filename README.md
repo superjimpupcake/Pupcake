@@ -123,7 +123,7 @@ $app->on("system.server.response.body", function($event){
 $app->run();
 ```
 
-This might need more investigation, but the script above seems to be able handle more requests per seconds than Node.js
+This might need more investigation, but the script above seems to be able to handle more requests per seconds than Node.js
 
 Benchmarking compared with the following node.js script
 ```javascript
