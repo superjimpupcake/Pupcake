@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Pupcake by superjimpupcake</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/superjimpupcake/Pupcake">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/superjimpupcake/Pupcake/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/superjimpupcake/Pupcake/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Pupcake</h1>
+          <p>Pupcake, a PHP 5.3+ application framework</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/superjimpupcake">superjimpupcake</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Pupcake --- a micro framework for PHP 5.3+</h1>
+
+<h2>About Pupcake Framework</h2>
+
+<ul>
+<li>Pupcake is a minimal but extensible microframework for PHP 5.3+</li>
+<li>Pupcake can be run in traditional web server such as Apache and can also run as a standalone async server using the AsyncServer plugin together with php-uv and php-httpparser
+(The standalone async server is at its very early stage and is under active development)</li>
+<li>For more detail usages, please see <a href="https://github.com/superjimpupcake/Pupcake/wiki/_pages">https://github.com/superjimpupcake/Pupcake/wiki/_pages</a>
+</li>
+</ul><h2>Installation:</h2>
+
+<h3>If you plan to use it on Apache</h3>
+
+<h4>install package "Pupcake/Pupcake" using composer (<a href="http://getcomposer.org/">http://getcomposer.org/</a>)</h4>
+
+<h4>.htaccess File for Apache</h4>
+
+<pre><code>RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php/$1 [L]
+</code></pre>
+
+<h3>If you plan to use it as a standalone async server</h3>
+
+<h4>install package "Pupcake/Pupcake" using composer (<a href="http://getcomposer.org/">http://getcomposer.org/</a>)</h4>
+
+<h4>install php-uv and php-httpparser</h4>
+
+<pre><code>git clone https://github.com/chobie/php-uv.git --recursive
+cd php-uv/libuv
+make &amp;&amp; cp uv.a libuv.a (my experience on both centos and ubuntu server is, we need to add -fPIC flag to cc)
+cd ..
+phpize
+./configure
+make &amp;&amp; make install (my experience on both centos and ubuntu server is, we need to add -fPIC flag to cc)
+
+git clone https://github.com/chobie/php-httpparser.git --recursive
+cd php-httpparser
+phpize
+./configure
+make &amp;&amp; make install
+
+add following extensions to your php.ini
+extension=uv.so
+extension=httpparser.so
+</code></pre>
+
+<h3>Simple requests when running on Apache</h3>
+
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">//Assuming this is public/index.php and the composer vendor directory is ../vendor</span>
+
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s2">"date/:year/:month/:day"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+    <span class="nv">$output</span> <span class="o">=</span> <span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'year'</span><span class="p">)</span><span class="o">.</span><span class="s1">'-'</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'month'</span><span class="p">)</span><span class="o">.</span><span class="s1">'-'</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'day'</span><span class="p">);</span>
+    <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="nv">$output</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s2">"/hello/:name"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"hello "</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span><span class="o">.</span><span class="s2">" in get"</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">post</span><span class="p">(</span><span class="s2">"/hello/:name"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"hello "</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span><span class="o">.</span><span class="s2">" in post"</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">put</span><span class="p">(</span><span class="s2">"/hello/:name"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"hello "</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span><span class="o">.</span><span class="s2">" in put"</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="s2">"/hello/:name"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"hello "</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span><span class="o">.</span><span class="s2">" in delete"</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Multiple request methods for one route</span>
+<span class="sd"> */</span>
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">map</span><span class="p">(</span><span class="s2">"/api/hello/:action"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"hello "</span><span class="o">.</span><span class="nv">$req</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">(</span><span class="s1">'action'</span><span class="p">)</span><span class="o">.</span><span class="s2">" in get and post"</span><span class="p">);</span>
+<span class="p">})</span><span class="o">-&gt;</span><span class="na">via</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="s1">'POST'</span><span class="p">);</span>
+
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+</pre></div>
+
+<h3>A simple standalone server to listen to port 9000 in local</h3>
+
+<p>Write a php script named server.php in the server folder</p>
+
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">sendJSON</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'ok'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">));</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s2">"/hello"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">sendJSON</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'word'</span> <span class="o">=&gt;</span> <span class="s1">'hello'</span><span class="p">));</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+</pre></div>
+
+<p>Now run php server/server.php and go to <a href="http://127.0.0.1:9000">http://127.0.0.1:9000</a> to see the result</p>
+
+<h3>A simple standalone server returning "Hello Word", benchmarked with node.js</h3>
+
+<p>We can return any custom output by skipping the whole routing process by hooking up to system.server.response.body event</p>
+
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">){</span>
+  <span class="k">return</span> <span class="s2">"hello world</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+</pre></div>
+
+<p>This might need more investigation, but the script above seems to be able to handle more requests per seconds than Node.js</p>
+
+<p>Benchmarking compared with the following node.js script</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">);</span>
+<span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">{</span><span class="s1">'Content-Type'</span><span class="o">:</span> <span class="s1">'text/plain'</span><span class="p">});</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">'Hello World\n'</span><span class="p">);</span>
+    <span class="p">}).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">1337</span><span class="p">,</span> <span class="s1">'127.0.0.1'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:1337/'</span><span class="p">);</span>
+</pre></div>
+
+<p>Below are the data return by apache ab:
+ab -n 100000 -c 200 <a href="http://127.0.0.1:9000/">http://127.0.0.1:9000/</a> (our php server)</p>
+
+<pre><code>Concurrency Level:      200
+Time taken for tests:   22.338 seconds
+Complete requests:      100000
+Failed requests:        0
+Write errors:           0
+Total transferred:      3100000 bytes
+HTML transferred:       1200000 bytes
+Requests per second:    4476.65 [#/sec] (mean)
+Time per request:       44.676 [ms] (mean)
+Time per request:       0.223 [ms] (mean, across all concurrent requests)
+Transfer rate:          135.52 [Kbytes/sec] received
+</code></pre>
+
+<p>ab -n 100000 -c 200 <a href="http://127.0.0.1:1337/">http://127.0.0.1:1337/</a> (the node.js hello world script run with node version 0.8.5)</p>
+
+<pre><code>Concurrency Level:      200
+Time taken for tests:   25.660 seconds
+Complete requests:      100000
+Failed requests:        0
+Write errors:           0
+Total transferred:      11300000 bytes
+HTML transferred:       1200000 bytes
+Requests per second:    3897.19 [#/sec] (mean)
+Time per request:       51.319 [ms] (mean)
+Time per request:       0.257 [ms] (mean, across all concurrent requests)
+Transfer rate:          430.06 [Kbytes/sec] received
+</code></pre>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
