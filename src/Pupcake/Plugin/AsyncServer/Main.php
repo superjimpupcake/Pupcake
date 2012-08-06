@@ -35,10 +35,11 @@ class Main extends Pupcake\Plugin
     $app->handle("system.run", function($event) use ($plugin){
       $app = $event->props('app');
       $route_map = $app->getRouter()->getRouteMap(); //load route map only once 
-      uv_listen($plugin->getTCP(),100, function($server) use ($event, $plugin, $app, $route_map){
+      $request = new Request($app);
+      uv_listen($plugin->getTCP(),100, function($server) use ($event, $plugin, $app, $route_map, $request){
         $client = uv_tcp_init();
         uv_accept($server, $client);
-        uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin, $app, $route_map){
+        uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin, $app, $route_map, $request){
           $client_info = uv_tcp_getpeername($client);
           if(is_array($client_info)){
             $_SERVER['REMOTE_ADDR'] = $client_info['address'];
@@ -62,7 +63,7 @@ class Main extends Pupcake\Plugin
 
             $output = $app->trigger("system.server.response.body", function($event) use ($route_map, $app){
               return $app->sendRequest("external", $_SERVER['REQUEST_METHOD'], $_SERVER['PATH_INFO'], $route_map);
-            });
+            }, array('request' => $request));
 
             $header = $plugin->getHeader();
 
