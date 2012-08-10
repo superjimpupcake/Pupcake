@@ -199,5 +199,5 @@ $app->on("system.server.response.body", function($event) use ($app, $pm){
 
 $app->run();
 ```
-Now go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
+Now run php server/server.php and go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
 After 10 seconds, go to 127.0.0.1:9000, we should see "test 1,hello test2" since now process test1 return "test1". 
