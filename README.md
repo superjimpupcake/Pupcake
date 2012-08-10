@@ -5,7 +5,8 @@ Pupcake --- a micro framework for PHP 5.3+
 + Pupcake is a minimal but extensible microframework for PHP 5.3+
 + Pupcake can be run in traditional web server such as Apache and can also run as a standalone async server using the AsyncServer plugin together with php-uv and php-httpparser
   (The standalone async server is at its very early stage and is under active development)
-+ For more detail usages, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
++ For more detail usages on using pupcake in general and on traditional web servers, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
++ For see what pupcake can do as a standalone async server, see this readme page, a lot of the async server features are experimental now but it will demonstrate what Pupcake can do.
 
 ##Installation:
 
@@ -162,3 +163,41 @@ ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script run w
     Time per request:       51.319 [ms] (mean)
     Time per request:       0.257 [ms] (mean, across all concurrent requests)
     Transfer rate:          430.06 [Kbytes/sec] received
+
+### (Experimental and Demo only) Process forking in an async fashion
+In the example below, we will create 2 processes, test1 and test2, test1 will sleep for 10 seconds and return a string "test 1", test2
+will return a string "test 2" immediately, what we want is, run test1 and test2 as 2 separate process and return their outputs together 
+on each request, and we do not want to block all the incoming requests. The process test1 and test2 are called process closures, since it 
+take a closure function as the main code body and run as a separate process.
+```php
+<?php
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->usePlugin("Pupcake\Plugin\AsyncServer");
+
+$app->listen("127.0.0.1", 9000);
+
+$pm = $app->getProcessClosureManager();
+$pm->setMaxNumberOfProcess(10);
+$pm->setProcessDirectory(__DIR__."/processes"); //tell the system where to store all the process related files
+$pm->addProcess("test1", function(){
+  sleep(10);
+  return "test 1";
+});
+
+$pm->addProcess("test2", function(){
+  return "hello test2";
+});
+
+$app->on("system.server.response.body", function($event) use ($app, $pm){
+  $test1_output = $pm->getProcessOutput("test1");
+  $test2_output = $pm->getProcessOutput("test2");
+  return $test1_output.",".$test2_output;
+});
+
+$app->run();
+```
+Now go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
+After 10 seconds, go to 127.0.0.1:9000, we should see "test 1,hello test2" since now process test1 return "test1". 
