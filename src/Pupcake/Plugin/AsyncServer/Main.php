@@ -25,6 +25,7 @@ class Main extends Pupcake\Plugin
     $app->method("listen", array($this, "listen")); //add listen method
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
     $app->method("redirect", array($this, "redirect")); //reopen redirect method
+    $app->method("getProcessClosureManager", array($this, "getProcessClosureManager")); //expose getProcessClosureManager
 
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
@@ -164,4 +165,16 @@ class Main extends Pupcake\Plugin
     }
   }
 
+  public function getCurrentDirectory()
+  {
+    return getcwd();
+  }
+
+  public function getProcessClosureManager()
+  {
+    if(!isset($this->process_closure_manager)){
+      $this->process_closure_manager = new ProcessClosureManager($this);
+    }
+    return $this->process_closure_manager;
+  }
 }
