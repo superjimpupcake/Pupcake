@@ -39,17 +39,6 @@ class Main extends Pupcake\Plugin
       $route_map = $app->getRouter()->getRouteMap(); //load route map only once 
       $request = new Request($app);
 
-      $timer = uv_timer_init();
-      uv_timer_start($timer, 1000, 1000, function($stat) use ($timer, $plugin){
-        //start the process manager, if it exists
-        if($plugin->processManagerExists()){
-          $plugin->startProcessManager();
-        }
-
-        uv_timer_stop($timer);
-        uv_unref($timer);
-      });
-
       uv_listen($plugin->getTCP(),100, function($server) use ($event, $plugin, $app, $route_map, $request){
         $client = uv_tcp_init();
         uv_accept($server, $client);

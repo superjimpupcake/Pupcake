@@ -16,6 +16,7 @@ declare(ticks=1){
     protected $signal_queue=array();   
     protected $parent_pid; 
     private $process_output; // the ouptut of the processes
+    private $process_dir; //the process's directory
 
     public function __construct($server)
     { 
@@ -23,6 +24,11 @@ declare(ticks=1){
       $this->server = $server;
       $this->parent_pid = getmypid(); 
       pcntl_signal(SIGCHLD, array($this, "childSignalHandler")); 
+    } 
+
+    public function setProcessDirectory($process_dir)
+    {
+      $this->process_dir = $process_dir;
     } 
 
     public function setMaxNumberOfProcess($max_num_of_processes)
@@ -64,8 +70,12 @@ declare(ticks=1){
      */
     public function getProcessOutput($job_id)
     {
-      $shm_id = \shm_attach();
-      return \shm_get_var($shm_id, "process_{$job_id}_output");
+      $result = false;
+      $job_output_file = "{$this->process_dir}/$job_id.output";
+      if(is_readable($job_output_file)){
+        $result = file_get_contents($job_output_file);
+      }
+      return $result;
     }
 
     /** 
@@ -98,7 +108,7 @@ declare(ticks=1){
         //Forked child, do your deeds.... 
         $job_handler = $this->jobs[$job_id];
         $output  = $job_handler();
-        //to do, need to fix this
+        file_put_contents("{$this->process_dir}/$job_id.output", $output);
         $exitStatus = 0; //Error code if you need to or whatever 
         exit($exitStatus); 
       } 
