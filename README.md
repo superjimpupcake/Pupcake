@@ -242,7 +242,6 @@ $pm->addProcess("server1", function() use ($app, $pm) {
 $pm->addProcess("server2", function() use ($app, $pm) {
   $app->listen("127.0.0.1", 8000);
   $app->on("system.server.response.body", function($event) use ($app, $pm){
-    print_r($memory);
     return "I am also listening port 8000, the output from test1 is ".$pm->getProcessOutput('test1');
   });
   $app->run();
