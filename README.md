@@ -20,6 +20,7 @@ Pupcake --- a micro framework for PHP 5.3+
 ###If you plan to use it as a standalone async server
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
 #### install pcntl extension for php (http://www.php.net/manual/en/book.pcntl.php)
+#### enable System V semaphore support in php (http://www.php.net/manual/en/sem.installation.php)
 #### install php-uv and php-httpparser
     git clone https://github.com/chobie/php-uv.git --recursive
     cd php-uv/libuv
@@ -180,7 +181,6 @@ $app->usePlugin("Pupcake\Plugin\AsyncServer");
 
 $pm = $app->getProcessManager();
 $pm->setMaxNumberOfProcess(10);
-$pm->setProcessDirectory(__DIR__."/processes"); 
 
 $pm->addProcess("test1", function(){
   sleep(10);
@@ -213,13 +213,11 @@ We have 2 different servers listening both port 8000 and 9000.
 <?php
 //Assuming this is server/server.php and the composer vendor directory is ../vendor
 require_once __DIR__.'/../vendor/autoload.php';
-
 $app = new Pupcake\Pupcake();
 $app->usePlugin("Pupcake\Plugin\AsyncServer");
 
 $pm = $app->getProcessManager();
-$pm->setMaxNumberOfProcess(10);
-$pm->setProcessDirectory(__DIR__."/processes"); 
+$pm->setMaxNumberOfProcessToRun(10);
 
 $pm->addProcess("test1", function(){
   sleep(10);
@@ -235,6 +233,7 @@ $pm->addProcess("server1", function() use ($app, $pm) {
   $app->on("system.server.response.body", function($event) use ($app, $pm){
     $test1_output = $pm->getProcessOutput("test1");
     $test2_output = $pm->getProcessOutput("test2");
+    $memory['9000'] = 1;
     return $test1_output.",".$test2_output;
   });
   $app->run();
@@ -243,6 +242,7 @@ $pm->addProcess("server1", function() use ($app, $pm) {
 $pm->addProcess("server2", function() use ($app, $pm) {
   $app->listen("127.0.0.1", 8000);
   $app->on("system.server.response.body", function($event) use ($app, $pm){
+    print_r($memory);
     return "I am also listening port 8000, the output from test1 is ".$pm->getProcessOutput('test1');
   });
   $app->run();

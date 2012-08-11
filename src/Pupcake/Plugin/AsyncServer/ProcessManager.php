@@ -10,30 +10,35 @@ declare(ticks=1){
   { 
     private $server; //the server that this process maanger belongs to
     private $jobs; //all jobs
-    public $max_processes = 25; //maximum number of processes to handle at one time
+    public $max_processes_to_run = 25; //maximum number of processes to handle at one time
     protected $job_started = 0; 
     protected $current_jobs = array(); 
     protected $signal_queue=array();   
     protected $parent_pid; 
-    private $process_output; // the ouptut of the processes
     private $process_dir; //the process's directory
+    private $shared_memory; //shared memory store
+    private $shared_memory_size; 
 
     public function __construct($server)
     { 
-      $this->process_output = array();
       $this->server = $server;
       $this->parent_pid = getmypid(); 
       pcntl_signal(SIGCHLD, array($this, "childSignalHandler")); 
     } 
+
+    public function setSharedMemorySize($shared_memory_size)
+    {
+      $this->shared_memory_size = $shared_memory_size;
+    }
 
     public function setProcessDirectory($process_dir)
     {
       $this->process_dir = $process_dir;
     } 
 
-    public function setMaxNumberOfProcess($max_num_of_processes)
+    public function setMaxNumberOfProcessToRun($max_num_of_processes)
     {
-      $this->max_processes = $max_num_of_processes;
+      $this->max_processes_to_run = $max_num_of_processes;
     }
 
     /** 
@@ -41,8 +46,9 @@ declare(ticks=1){
      */ 
     public function run()
     { 
+      $this->shared_memory = new SharedMemory($shared_memory_size);
       foreach($this->jobs as $job_id => $job_handler){ 
-        while(count($this->current_jobs) >= $this->max_processes){ 
+        while(count($this->current_jobs) >= $this->max_processes_to_run){ 
           //Maximum children allowed, waiting...
           sleep(1); 
         } 
@@ -71,10 +77,7 @@ declare(ticks=1){
     public function getProcessOutput($job_id)
     {
       $result = false;
-      $job_output_file = "{$this->process_dir}/$job_id.output";
-      if(is_readable($job_output_file)){
-        $result = unserialize(file_get_contents($job_output_file));
-      }
+      $result = json_decode($this->shared_memory->get("process_{$job_id}_output"));
       return $result;
     }
 
@@ -108,7 +111,7 @@ declare(ticks=1){
         //Forked child, do your deeds.... 
         $job_handler = $this->jobs[$job_id];
         $output  = $job_handler();
-        file_put_contents("{$this->process_dir}/$job_id.output", serialize($output));
+        $this->shared_memory->set("process_{$job_id}_output", json_encode($output));
         $exitStatus = 0; //Error code if you need to or whatever 
         exit($exitStatus); 
       } 
