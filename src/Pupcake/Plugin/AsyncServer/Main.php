@@ -25,7 +25,7 @@ class Main extends Pupcake\Plugin
     $app->method("listen", array($this, "listen")); //add listen method
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
     $app->method("redirect", array($this, "redirect")); //reopen redirect method
-    $app->method("getProcessClosureManager", array($this, "getProcessClosureManager")); //expose getProcessClosureManager
+    $app->method("getProcessManager", array($this, "getProcessManager")); //expose getProcessManager
 
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
@@ -34,12 +34,28 @@ class Main extends Pupcake\Plugin
     $plugin = $this;
 
     $app->handle("system.run", function($event) use ($plugin){
+
       $app = $event->props('app');
       $route_map = $app->getRouter()->getRouteMap(); //load route map only once 
       $request = new Request($app);
+
+      $timer = uv_timer_init();
+      uv_timer_start($timer, 1000, 1000, function($stat) use ($timer, $plugin){
+        //start the process manager, if it exists
+        if($plugin->processManagerExists()){
+          $plugin->startProcessManager();
+        }
+
+        uv_timer_stop($timer);
+        uv_unref($timer);
+      });
+
       uv_listen($plugin->getTCP(),100, function($server) use ($event, $plugin, $app, $route_map, $request){
         $client = uv_tcp_init();
         uv_accept($server, $client);
+
+
+
         uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin, $app, $route_map, $request){
           $client_info = uv_tcp_getpeername($client);
           if(is_array($client_info)){
@@ -170,11 +186,21 @@ class Main extends Pupcake\Plugin
     return getcwd();
   }
 
-  public function getProcessClosureManager()
+  public function getProcessManager()
   {
-    if(!isset($this->process_closure_manager)){
-      $this->process_closure_manager = new ProcessClosureManager($this);
+    if(!isset($this->process_manager)){
+      $this->process_manager = new ProcessManager($this);
     }
-    return $this->process_closure_manager;
+    return $this->process_manager;
+  }
+
+  public function processManagerExists()
+  {
+    return isset($this->process_manager);
+  } 
+
+  public function startProcessManager()
+  {
+    $this->process_manager->run();
   }
 }
