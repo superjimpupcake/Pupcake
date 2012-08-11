@@ -233,7 +233,6 @@ $pm->addProcess("server1", function() use ($app, $pm) {
   $app->on("system.server.response.body", function($event) use ($app, $pm){
     $test1_output = $pm->getProcessOutput("test1");
     $test2_output = $pm->getProcessOutput("test2");
-    $memory['9000'] = 1;
     return $test1_output.",".$test2_output;
   });
   $app->run();
