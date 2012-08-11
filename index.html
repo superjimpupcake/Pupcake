@@ -260,6 +260,52 @@ take a closure function as the main code body and run as a separate process.</p>
 
 <p>Now run php server/server.php and go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
 After 10 seconds, go to 127.0.0.1:9000, we should see "test 1,hello test2" since now process test1 return "test1". </p>
+
+<h3>(Experimental and Demo only) Parallel running processes and different servers</h3>
+
+<p>In the example below, we have 2 processes running in parallel, and we also have 2 servers listening to different ports. 
+We have 2 different servers listening both port 8000 and 9000. </p>
+
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
+
+<span class="nv">$pm</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getProcessManager</span><span class="p">();</span>
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">setMaxNumberOfProcess</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">setProcessDirectory</span><span class="p">(</span><span class="nx">__DIR__</span><span class="o">.</span><span class="s2">"/processes"</span><span class="p">);</span> 
+
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"test1"</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
+  <span class="nb">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+  <span class="k">return</span> <span class="s2">"test 1"</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"test2"</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
+  <span class="k">return</span> <span class="s2">"hello test2"</span><span class="p">;</span>
+<span class="p">});</span>
+
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"server1"</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
+    <span class="nv">$test1_output</span> <span class="o">=</span> <span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s2">"test1"</span><span class="p">);</span>
+    <span class="nv">$test2_output</span> <span class="o">=</span> <span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s2">"test2"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nv">$test1_output</span><span class="o">.</span><span class="s2">","</span><span class="o">.</span><span class="nv">$test2_output</span><span class="p">;</span>
+  <span class="p">});</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+<span class="p">});</span>
+
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"server2"</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">8000</span><span class="p">);</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
+    <span class="k">return</span> <span class="s2">"I am also listening port 8000, the output from test1 is "</span><span class="o">.</span><span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s1">'test1'</span><span class="p">);</span>
+  <span class="p">});</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+<span class="p">});</span>
+
+<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+</pre></div>
       </section>
 
     </div>
