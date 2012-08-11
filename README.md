@@ -204,3 +204,48 @@ $pm->run();
 ```
 Now run php server/server.php and go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
 After 10 seconds, go to 127.0.0.1:9000, we should see "test 1,hello test2" since now process test1 return "test1". 
+
+### (Experimental and Demo only) Parallel running processes and different servers
+In the example below, we have 2 processes running in parallel, and we also have 2 servers listening to different ports. 
+We have 2 different servers listening both port 8000 and 9000. 
+```php
+<?php
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$app->usePlugin("Pupcake\Plugin\AsyncServer");
+
+$pm = $app->getProcessManager();
+$pm->setMaxNumberOfProcess(10);
+$pm->setProcessDirectory(__DIR__."/processes"); 
+
+$pm->addProcess("test1", function(){
+  sleep(10);
+  return "test 1";
+});
+
+$pm->addProcess("test2", function(){
+  return "hello test2";
+});
+
+$pm->addProcess("server1", function() use ($app, $pm) {
+  $app->listen("127.0.0.1", 9000);
+  $app->on("system.server.response.body", function($event) use ($app, $pm){
+    $test1_output = $pm->getProcessOutput("test1");
+    $test2_output = $pm->getProcessOutput("test2");
+    return $test1_output.",".$test2_output;
+  });
+  $app->run();
+});
+
+$pm->addProcess("server2", function() use ($app, $pm) {
+  $app->listen("127.0.0.1", 8000);
+  $app->on("system.server.response.body", function($event) use ($app, $pm){
+    return "I am also listening port 8000, the output from test1 is ".$pm->getProcessOutput('test1');
+  });
+  $app->run();
+});
+
+$pm->run();
+```
