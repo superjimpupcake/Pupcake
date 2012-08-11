@@ -73,7 +73,7 @@ declare(ticks=1){
       $result = false;
       $job_output_file = "{$this->process_dir}/$job_id.output";
       if(is_readable($job_output_file)){
-        $result = file_get_contents($job_output_file);
+        $result = unserialize(file_get_contents($job_output_file));
       }
       return $result;
     }
@@ -108,7 +108,7 @@ declare(ticks=1){
         //Forked child, do your deeds.... 
         $job_handler = $this->jobs[$job_id];
         $output  = $job_handler();
-        file_put_contents("{$this->process_dir}/$job_id.output", $output);
+        file_put_contents("{$this->process_dir}/$job_id.output", serialize($output));
         $exitStatus = 0; //Error code if you need to or whatever 
         exit($exitStatus); 
       } 

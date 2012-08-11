@@ -177,11 +177,10 @@ require_once __DIR__.'/../vendor/autoload.php';
 $app = new Pupcake\Pupcake();
 $app->usePlugin("Pupcake\Plugin\AsyncServer");
 
-$app->listen("127.0.0.1", 9000);
-
-$pm = $app->getProcessClosureManager();
+$pm = $app->getProcessManager();
 $pm->setMaxNumberOfProcess(10);
-$pm->setProcessDirectory(__DIR__."/processes"); //tell the system where to store all the process related files
+$pm->setProcessDirectory(__DIR__."/processes"); 
+
 $pm->addProcess("test1", function(){
   sleep(10);
   return "test 1";
@@ -191,13 +190,17 @@ $pm->addProcess("test2", function(){
   return "hello test2";
 });
 
-$app->on("system.server.response.body", function($event) use ($app, $pm){
-  $test1_output = $pm->getProcessOutput("test1");
-  $test2_output = $pm->getProcessOutput("test2");
-  return $test1_output.",".$test2_output;
+$pm->addProcess(time(), function() use ($app, $pm) {
+  $app->listen("127.0.0.1", 9000);
+  $app->on("system.server.response.body", function($event) use ($app, $pm){
+    $test1_output = $pm->getProcessOutput("test1");
+    $test2_output = $pm->getProcessOutput("test2");
+    return $test1_output.",".$test2_output;
+  });
+  $app->run();
 });
 
-$app->run();
+$pm->run();
 ```
 Now run php server/server.php and go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
 After 10 seconds, go to 127.0.0.1:9000, we should see "test 1,hello test2" since now process test1 return "test1". 

@@ -182,14 +182,4 @@ class Main extends Pupcake\Plugin
     }
     return $this->process_manager;
   }
-
-  public function processManagerExists()
-  {
-    return isset($this->process_manager);
-  } 
-
-  public function startProcessManager()
-  {
-    $this->process_manager->run();
-  }
 }
