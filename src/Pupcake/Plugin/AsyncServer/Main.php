@@ -26,6 +26,9 @@ class Main extends Pupcake\Plugin
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
     $app->method("redirect", array($this, "redirect")); //reopen redirect method
     $app->method("getProcessManager", array($this, "getProcessManager")); //expose getProcessManager
+    $app->method("getTimer", function(){
+      return new Timer();
+    });
 
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
