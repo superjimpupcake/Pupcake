@@ -48,4 +48,10 @@ class Timer
     uv_timer_stop($this->timer);
     uv_unref($this->timer);
   }
+
+  public function stop()
+  {
+    uv_timer_stop($this->timer);
+    uv_unref($this->timer);
+  }
 }
