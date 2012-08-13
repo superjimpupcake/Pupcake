@@ -26,19 +26,18 @@ class Timer
   public function setInterval($callback, $repeat_at)
   {
     $timer_obj = $this;
-    uv_timer_start($this->timer, $this->start_at, $repeat_at, function($stat) use ($callback, &$timer_obj) {
+    uv_timer_start($this->timer, $repeat_at, $repeat_at, function($stat) use ($callback, &$timer_obj) {
       call_user_func_array($callback, array($timer_obj));
     });
     return $this;
   }
 
-  public function setTimeout($callback, $repeat_at)
+  public function setTimeout($callback, $start_at)
   {
     $timer_obj = $this;
     $timer = $this->timer;
-    uv_timer_start($this->timer, $this->start_at, $repeat_at, function($stat) use ($callback, &$timer_obj, $timer) {
+    uv_timer_start($this->timer, $start_at, 0, function($stat) use ($callback, &$timer_obj, $timer) {
       call_user_func_array($callback, array($timer_obj));
-      $timer_obj->stop();
     });
     return $this;
   }
@@ -49,9 +48,4 @@ class Timer
     uv_unref($this->timer);
   }
 
-  public function stop()
-  {
-    uv_timer_stop($this->timer);
-    uv_unref($this->timer);
-  }
 }
