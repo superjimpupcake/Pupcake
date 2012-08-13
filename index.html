@@ -220,6 +220,32 @@ Time per request:       0.257 [ms] (mean, across all concurrent requests)
 Transfer rate:          430.06 [Kbytes/sec] received
 </code></pre>
 
+<h3>(Experimental and Demo only) The server side timer like Node.js</h3>
+
+<p>In the example below, we set up a timer that execute a callback function every 1 second and increment the counter, then we store the 
+current counter value into the application's storage. Then on each request, we return the current counter value as the response.</p>
+
+<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">8000</span><span class="p">);</span>
+
+<span class="nv">$count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getTimer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setInterval</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$timer</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$pm</span><span class="p">,</span> <span class="nv">$app</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$count</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$count</span> <span class="o">++</span><span class="p">;</span>
+  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">storageSet</span><span class="p">(</span><span class="s2">"time_elapsed"</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
+<span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">storageGet</span><span class="p">(</span><span class="s2">"time_elapsed"</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+</pre></div>
+
 <h3>(Experimental and Demo only) Process forking in an async fashion</h3>
 
 <p>In the example below, we will create 2 processes, test1 and test2, test1 will sleep for 10 seconds and return a string "test 1", test2
