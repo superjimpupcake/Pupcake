@@ -165,6 +165,30 @@ ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script run w
     Time per request:       0.257 [ms] (mean, across all concurrent requests)
     Transfer rate:          430.06 [Kbytes/sec] received
 
+### (Experimental and Demo only) The server side timer like Node.js
+In the example below, we set up a timer that execute a callback function every 1 second and increment the counter, then we store the 
+current counter value into the application's storage. Then on each request, we return the current counter value as the response.
+```php
+<?php
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+$app = new Pupcake\Pupcake();
+$app->usePlugin("Pupcake\Plugin\AsyncServer");
+
+$app->listen("127.0.0.1", 8000);
+
+$app->getTimer()->setInterval(function($timer) use ($pm, $app, &$count) {
+  $count ++;
+  $app->storageSet("time_elapsed", $count);
+}, 1000);
+
+$app->on("system.server.response.body", function($event) use ($app, $pm){
+  return $app->storageGet("time_elapsed");
+});
+
+$app->run();
+```
+
 ### (Experimental and Demo only) Process forking in an async fashion
 In the example below, we will create 2 processes, test1 and test2, test1 will sleep for 10 seconds and return a string "test 1", test2
 will return a string "test 2" immediately, what we want is, run test1 and test2 as 2 separate process and return their outputs together 
