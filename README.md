@@ -178,12 +178,12 @@ $app->usePlugin("Pupcake\Plugin\AsyncServer");
 $app->listen("127.0.0.1", 8000);
 
 $count = 0;
-$app->getTimer()->setInterval(function($timer) use ($pm, $app, &$count) {
+$app->getTimer()->setInterval(function($timer) use ($app, &$count) {
   $count ++;
   $app->storageSet("time_elapsed", $count);
 }, 1000);
 
-$app->on("system.server.response.body", function($event) use ($app, $pm){
+$app->on("system.server.response.body", function($event) use ($app){
   return $app->storageGet("time_elapsed");
 });
 
