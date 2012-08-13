@@ -16,8 +16,6 @@ declare(ticks=1){
     protected $signal_queue=array();   
     protected $parent_pid; 
     private $process_dir; //the process's directory
-    private $shared_memory; //shared memory store
-    private $shared_memory_size; 
     private $job_caches = array();
 
     public function __construct($server)
@@ -48,7 +46,6 @@ declare(ticks=1){
      */ 
     public function run()
     { 
-      $this->shared_memory = new SharedMemory($shared_memory_size);
       foreach($this->jobs as $job_id => $job_handler){ 
         while(count($this->current_jobs) >= $this->max_processes_to_run){ 
           //Maximum children allowed, waiting...
