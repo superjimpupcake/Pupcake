@@ -26,16 +26,6 @@ declare(ticks=1){
       pcntl_signal(SIGCHLD, array($this, "childSignalHandler")); 
     } 
 
-    public function setSharedMemorySize($shared_memory_size)
-    {
-      $this->shared_memory_size = $shared_memory_size;
-    }
-
-    public function setProcessDirectory($process_dir)
-    {
-      $this->process_dir = $process_dir;
-    } 
-
     public function setMaxNumberOfProcessToRun($max_num_of_processes)
     {
       $this->max_processes_to_run = $max_num_of_processes;
