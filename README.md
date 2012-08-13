@@ -7,6 +7,7 @@ Pupcake --- a micro framework for PHP 5.3+
   (The standalone async server is at its very early stage and is under active development)
 + For more detail usages on using pupcake in general and on traditional web servers, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 + To see what pupcake can do as a standalone async server, see this readme page, a lot of the async server features are experimental now but it will demonstrate what Pupcake can do.
++ Also check out http://pamground.com/pupcakeframework, it contains examples explaining how to use Pupcake framework.
 
 ##Installation:
 
