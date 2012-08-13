@@ -18,11 +18,13 @@ declare(ticks=1){
     private $process_dir; //the process's directory
     private $shared_memory; //shared memory store
     private $shared_memory_size; 
+    private $job_caches = array();
 
     public function __construct($server)
     { 
       $this->server = $server;
       $this->parent_pid = getmypid(); 
+      $this->job_launched_count = 0;
       pcntl_signal(SIGCHLD, array($this, "childSignalHandler")); 
     } 
 
@@ -77,7 +79,7 @@ declare(ticks=1){
     public function getProcessOutput($job_id)
     {
       $result = false;
-      $result = json_decode($this->shared_memory->get("process_{$job_id}_output"));
+      $result = json_decode(file_get_contents($this->job_caches[$job_id]));
       return $result;
     }
 
@@ -86,6 +88,7 @@ declare(ticks=1){
      */ 
     protected function launchJob($job_id)
     { 
+      $this->job_caches[$job_id] = tempnam("/tmp","PROCESS");
       $pid = pcntl_fork(); 
       if($pid == -1){ 
         //Problem launching the job 
@@ -111,7 +114,7 @@ declare(ticks=1){
         //Forked child, do your deeds.... 
         $job_handler = $this->jobs[$job_id];
         $output  = $job_handler();
-        $this->shared_memory->set("process_{$job_id}_output", json_encode($output));
+        file_put_contents($this->job_caches[$job_id], json_encode($output));
         $exitStatus = 0; //Error code if you need to or whatever 
         exit($exitStatus); 
       } 

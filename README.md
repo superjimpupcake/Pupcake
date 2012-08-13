@@ -20,7 +20,6 @@ Pupcake --- a micro framework for PHP 5.3+
 ###If you plan to use it as a standalone async server
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
 #### install pcntl extension for php (http://www.php.net/manual/en/book.pcntl.php)
-#### enable System V semaphore, shared memory and messages support in php (http://www.php.net/manual/en/sem.installation.php)
 #### install php-uv and php-httpparser
     git clone https://github.com/chobie/php-uv.git --recursive
     cd php-uv/libuv
