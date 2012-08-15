@@ -10,7 +10,9 @@ use Pupcake;
 class Main extends Pupcake\Plugin
 {
   private $server; //the socket stream server
+  private $secure_credentials; //the secure credential
   private $http_host; //the http_host
+  private $server_port;
   private $header;
   private $protocol;
   private $status_code;
@@ -22,6 +24,7 @@ class Main extends Pupcake\Plugin
     $app = $this->getAppInstance();
 
     $this->app = $app;
+    $this->secure_credentials = null; //default we do not have secure credentials
 
     $app->method("listen", array($this, "listen")); //add listen method
     $app->method("setHeader", array($this, "setHeader")); //reopen setHeader method
@@ -30,6 +33,7 @@ class Main extends Pupcake\Plugin
     $app->method("getTimer", function(){
       return new Timer();
     });
+    $app->method("setSecure", array($this, "setSecure")); //set up ssl 
 
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
@@ -38,8 +42,29 @@ class Main extends Pupcake\Plugin
     $plugin = $this;
 
     $app->handle("system.run", function($event) use ($plugin){
-
-      $server = $plugin->getServer();
+      $ip = $plugin->getHTTPHost();
+      $port = $plugin->getSeverPort();
+      $protocol = "tcp"; //the default protocol is tcp
+      $secure_credentials = $plugin->getSecure();
+      $server = null;
+      if(is_array($secure_credentials)){
+        $protocol = "ssl";
+        $context = stream_context_create();
+        //merge certificate file with private key file
+        $cert_content = file_get_contents($secure_credentials['cert']);
+        $key_content = file_get_contents($secure_credentials['key']);
+        $cert_content = $cert_content.$key_content;
+        $certificate = dirname($secure_credentials['cert'])."/certificate_concat.pem";
+        file_put_contents($certificate, $cert_content);
+        stream_context_set_option($context, 'ssl', 'local_cert', $certificate);
+        stream_context_set_option($context, 'ssl', 'verify_peer', false);
+        $server = stream_socket_server("$protocol://$ip:$port", $errno, $errstr, STREAM_SERVER_BIND|STREAM_SERVER_LISTEN, $context);
+      }
+      else{
+        $server = stream_socket_server("$protocol://$ip:$port", $errno, $errstr);
+      }
+      $plugin->setServer($server);
+      
       $app = $event->props('app');
       $route_map = $app->getRouter()->getRouteMap(); //load route map only once 
       $request = new Request($app);
@@ -113,12 +138,31 @@ class Main extends Pupcake\Plugin
   public function listen($ip, $port = 8080)
   {
     $this->http_host = $ip;
-    $this->server = stream_socket_server("tcp://$ip:$port", $errno, $errstr);
+    $this->server_port = $port;
+  }
+
+  public function setSecure($secure_credentials){
+    $this->secure_credentials = $secure_credentials;
+  }
+
+  public function getSecure()
+  {
+    return $this->secure_credentials;
+  }
+
+  public function setServer($server)
+  {
+    $this->server = $server;
   }
 
   public function getServer()
   {
     return $this->server;
+  }
+
+  public function getSeverPort()
+  {
+    return $this->server_port;
   }
 
   public function getHTTPHost()
