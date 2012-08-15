@@ -9,7 +9,8 @@ use Pupcake;
 
 class Main extends Pupcake\Plugin
 {
-  private $tcp;
+  private $server; //the socket stream server
+  private $http_host; //the http_host
   private $header;
   private $protocol;
   private $status_code;
@@ -38,21 +39,24 @@ class Main extends Pupcake\Plugin
 
     $app->handle("system.run", function($event) use ($plugin){
 
+      $server = $plugin->getServer();
       $app = $event->props('app');
       $route_map = $app->getRouter()->getRouteMap(); //load route map only once 
       $request = new Request($app);
 
-      uv_listen($plugin->getTCP(),100, function($server) use ($event, $plugin, $app, $route_map, $request){
-        $client = uv_tcp_init();
-        uv_accept($server, $client);
+      $loop = uv_default_loop();
+      $poll = uv_poll_init_socket($loop, $server);
 
+      uv_poll_start($poll, \UV::READABLE, function($poll, $stat, $ev, $server) use ($loop, $event, $plugin, $app, $route_map, $request){
 
+        $client = stream_socket_accept($server);
+        $client_ip_info = stream_socket_get_name($client,true);
+        if($client_ip_info){
+          $client_ip_info_comps = explode(":", $client_ip_info);
+          $_SERVER['REMOTE_ADDR'] = $client_ip_info_comps[0];
+        }
 
-        uv_read_start($client, function($client, $nread, $buffer) use ($event, $plugin, $app, $route_map, $request){
-          $client_info = uv_tcp_getpeername($client);
-          if(is_array($client_info)){
-            $_SERVER['REMOTE_ADDR'] = $client_info['address'];
-          }
+        uv_fs_read($loop, $client, function($client, $nread, $buffer) use ($event, $plugin, $app, $route_map, $request){
           $result = $plugin->httpParseExecute($buffer);
           if(is_array($result)){
             $request_method = $result['REQUEST_METHOD'];
@@ -60,8 +64,10 @@ class Main extends Pupcake\Plugin
             //constructing server variables
             $_SERVER['REQUEST_METHOD'] = $result['REQUEST_METHOD'];
             $_SERVER['PATH_INFO'] = $result['path'];
-            $_SERVER['HTTP_HOST'] = $result['headers']['Host'];
+            $_SERVER['HTTP_HOST'] = $plugin->getHTTPHost();
             $_SERVER['HTTP_USER_AGENT'] = $result['headers']['User-Agent'];
+
+            print_r($_SERVER);
 
             //constructing global variables
             if($request_method == 'GET'){
@@ -88,11 +94,8 @@ class Main extends Pupcake\Plugin
             $status_message = $plugin->getStatusMessage();
 
             $buffer = "$protocol $status_code $status_message\r\n$header\r\n$output";
-            uv_write($client, $buffer, function($client, $stat){
-              uv_close($client,function(){
-                //    echo "connection closed\n";
-              });
-            });
+            fwrite($client, $buffer);
+            fclose($client);
           }
         });
       });
@@ -111,13 +114,18 @@ class Main extends Pupcake\Plugin
 
   public function listen($ip, $port = 8080)
   {
-    $this->tcp = uv_tcp_init();
-    uv_tcp_bind($this->tcp, uv_ip4_addr($ip, $port));
+    $this->http_host = $ip;
+    $this->server = stream_socket_server("tcp://$ip:$port", $errno, $errstr);
   }
 
-  public function getTCP()
+  public function getServer()
   {
-    return $this->tcp;
+    return $this->server;
+  }
+
+  public function getHTTPHost()
+  {
+    return $this->http_host;
   }
 
   public function setProtocol($protocol)
