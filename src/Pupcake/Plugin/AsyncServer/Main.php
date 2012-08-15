@@ -67,8 +67,6 @@ class Main extends Pupcake\Plugin
             $_SERVER['HTTP_HOST'] = $plugin->getHTTPHost();
             $_SERVER['HTTP_USER_AGENT'] = $result['headers']['User-Agent'];
 
-            print_r($_SERVER);
-
             //constructing global variables
             if($request_method == 'GET'){
               $result['headers']['body'] = $result['query']; //bind body to query if it is a get request
