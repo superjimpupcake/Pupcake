@@ -1,6 +1,6 @@
 {
     "name": "pupcake/pupcake",
-    "description": "A PHP Microframework for PHP 5.3+",
+    "description": "A PHP Microframework for PHP 5.3+ that can be run on top of a web server or as a standalone web server",
     "keywords": ["microframework", "micro", "framework", "lightweight", "extensible","nodejs"],
     "homepage": "https://github.com/superjimpupcake/Pupcake",
     "license": "MIT",
@@ -22,7 +22,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.2.22-dev"
+            "dev-master": "3.2.23-dev"
         }
     }
 }
