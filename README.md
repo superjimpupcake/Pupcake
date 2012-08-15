@@ -166,6 +166,34 @@ ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script run w
     Time per request:       0.257 [ms] (mean, across all concurrent requests)
     Transfer rate:          430.06 [Kbytes/sec] received
 
+### (Experimental and Demo only) A simple HTTPS server
+The HTTP servers requires two files, privatekey.pem and certificate.pem
+In our testing server in local, we can create these 2 files with the following commands:
+
+  openssl genrsa -out privatekey.pem 1024 
+  openssl req -new -key privatekey.pem -out certrequest.csr 
+  openssl x509 -req -in certrequest.csr -signkey privatekey.pem -out certificate.pem
+
+Assume we created those files in the server folder, we then can write a simple server as follows:
+```php
+<?php
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+$app = new Pupcake\Pupcake();
+$app->usePlugin("Pupcake\Plugin\AsyncServer");
+
+$app->setSecure(array(
+  'key' => __DIR__.'/privatekey.pem',
+  'cert' => __DIR__.'/certificate.pem'
+));
+
+$app->listen("127.0.0.1", 9000);
+$app->on("system.server.response.body", function($event) use ($app, $pm){
+  return "hello";
+});
+$app->run();
+```
+
 ### (Experimental and Demo only) The server side timer like Node.js
 In the example below, we set up a timer that execute a callback function every 1 second and increment the counter, then we store the 
 current counter value into the application's storage. Then on each request, we return the current counter value as the response.
