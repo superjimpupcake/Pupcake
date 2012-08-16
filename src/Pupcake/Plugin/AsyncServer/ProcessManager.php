@@ -61,6 +61,14 @@ declare(ticks=1){
     }
 
     /**
+     * run a specific process
+     */
+    public function runProcess($job_id)
+    {
+      return $this->launchJob($job_id);
+    }
+
+    /**
      * get output of a process
      */
     public function getProcessOutput($job_id)
