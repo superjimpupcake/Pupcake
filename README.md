@@ -20,16 +20,17 @@ Pupcake --- a micro framework for PHP 5.3+
 
 ###If you plan to use it as a standalone async server
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
+#### install sockets extension (http://www.php.net/manual/en/sockets.installation.php)
 #### install pcntl extension for php (http://www.php.net/manual/en/book.pcntl.php)
 #### enable openssl support  for php (http://www.php.net/manual/en/openssl.installation.php)
 #### install php-uv and php-httpparser
     git clone https://github.com/chobie/php-uv.git --recursive
     cd php-uv/libuv
-    make && cp uv.a libuv.a (my experience on both centos and ubuntu server is, we need to add -fPIC flag to cc)
+    make && cp uv.a libuv.a (my experience on both centos 64bit and ubuntu 64bit server is, we need to add -fPIC flag in config.m4)
     cd ..
     phpize
     ./configure
-    make && make install (my experience on both centos and ubuntu server is, we need to add -fPIC flag to cc)
+    make && make install (my experience on both centos64bit and ubuntu64bit  server is, we need to add -fPIC flag in config.m4)
 
     git clone https://github.com/chobie/php-httpparser.git --recursive
     cd php-httpparser
