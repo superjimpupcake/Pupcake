@@ -169,6 +169,7 @@ ab -n 100000 -c 200 http://127.0.0.1:1337/ (the node.js hello world script run w
     Transfer rate:          430.06 [Kbytes/sec] received
 
 ### (Experimental and Demo only) A simple HTTPS server
+#### A bit of warning, this https server mode is blocking and not in 100% async fashion
 The HTTP servers requires two files, privatekey.pem and certificate.pem
 In our testing server in local, we can create these 2 files with the following commands:
 
