@@ -21,7 +21,11 @@ class Main extends \Pupcake\Plugin
       'process' => new GlobalObject\Process($this),
     );
 
-    uv_run();
+    $app = $this->getAppInstance();
+    $app->on("system.run", function(){
+      uv_run();
+    });
+
   }
 
   /**
