@@ -113,6 +113,7 @@ class Pupcake extends Object
       $this->plugins[$plugin_name] = new $plugin_class_name();
       $this->plugins[$plugin_name]->setAppInstance($this);
       $this->plugins[$plugin_name]->load($config);
+      return $this->plugins[$plugin_name];
     }
   }
 
