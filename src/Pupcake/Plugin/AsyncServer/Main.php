@@ -18,6 +18,7 @@ class Main extends Pupcake\Plugin
   private $status_code;
   private $status_message;
   private $router;
+  private $event_loop;
 
   public function load($config = array())
   {
@@ -34,6 +35,9 @@ class Main extends Pupcake\Plugin
       return new Timer();
     });
     $app->method("setSecure", array($this, "setSecure")); //set up ssl 
+    $app->method("setEventLoop", array($this, "setEventLoop"));
+    $app->method("getEventLoop", array($this, "getEventLoop"));
+
 
     $this->protocol = "HTTP/1.1"; // default protocol
     $this->status_code = 200; //default status code
@@ -70,6 +74,10 @@ class Main extends Pupcake\Plugin
       $request = new Request($app);
 
       $loop = uv_default_loop();
+
+      //set the event loop
+      $app->setEventLoop($loop);
+
       $poll = uv_poll_init_socket($loop, $server);
 
       uv_poll_start($poll, \UV::READABLE, function($poll, $stat, $ev, $server) use ($loop, $event, $plugin, $app, $route_map, $request){
@@ -234,5 +242,14 @@ class Main extends Pupcake\Plugin
       $this->process_manager = new ProcessManager($this);
     }
     return $this->process_manager;
+  }
+
+  public function setEventLoop($event_loop){
+    $this->event_loop = $event_loop;
+  }
+
+  public function getEventLoop()
+  {
+    return $this->event_loop; 
   }
 }
