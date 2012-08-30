@@ -43,7 +43,7 @@ Pupcake --- a micro framework for PHP 5.3+
 
 
 ###Simple requests when running on Apache
-## For more details on running Pupcake in general and in traditional web server, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
+#### For more details on running Pupcake in general and in traditional web server, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 ```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
@@ -85,4 +85,4 @@ $app->run();
 ```
 
 ### Using pupcake like Node.js: console.log
-## TO DO...
+#### TO DO...
