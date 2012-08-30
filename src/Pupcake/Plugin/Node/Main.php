@@ -28,7 +28,7 @@ class Main extends \Pupcake\Plugin
     $this->modules = array();
 
     $app = $this->getAppInstance();
-    $app->on("system.run", function(){
+    $app->on("system.shutdown", function(){
       uv_run();
     });
 
