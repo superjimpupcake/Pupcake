@@ -41,9 +41,9 @@ class Process extends GlobalObject
         $callback = $plugin->getTickCallback($tick);
         if(is_callable($callback)){
           $callback();
-          uv_async_send($r);
           $plugin->removeTickCallback($tick);
           $tick ++;
+          uv_async_send($r);
         }
         else{
           uv_close($r); 
