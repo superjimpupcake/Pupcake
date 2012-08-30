@@ -4,9 +4,9 @@ Pupcake --- a micro framework for PHP 5.3+
 ##About Pupcake Framework
 + Pupcake is a minimal but extensible microframework for PHP 5.3+
 + Pupcake can be run in traditional web server such as Apache.
-+ Pupcake can be run in command line with event based functionalities like Node.js by using php-uv and php-httpparser plugins
++ Pupcake can be run in command line with event based functionalities like Node.js by using the Node plugin together withg php-uv and php-httpparser extensions
 + For more detail usages on using pupcake in general and on traditional web servers, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
-+ To see what pupcake can do like Node.js, check out this README page
++ To see what pupcake can do like Node.js, check out this README page, the Node plugin is under actively development and will provide more features down the road
 
 ##Installation:
 
@@ -17,7 +17,7 @@ Pupcake --- a micro framework for PHP 5.3+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php/$1 [L]
 
-###If you plan to use it as a standalone async server
+###If you plan to use it like Node.js
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
 #### install sockets extension (http://www.php.net/manual/en/sockets.installation.php)
 #### install pcntl extension for php (http://www.php.net/manual/en/book.pcntl.php)
@@ -99,4 +99,24 @@ $console->log("hello");
 To run the code above, type php server/server.php
 In the code above, we simply use the node plugin and then import the console module to output "hello" to the console.
 
+### Using the node plugin: process.nextTick
+In the script below, we define a dynamic method named "hello" in a Node plugin instance, then we use the process module to keep calling the hello method in every single "tick" 
+in an async fashion.
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
 
+$app = new Pupcake\Pupcake();
+$node = $app->usePlugin("Pupcake.Plugin.Node");
+$node->method("hello", function() use ($node){
+  $console = $node->import("console"); //use the console module
+  $console->log("doing some tasks");
+  $process = $node->import("process"); //use the process module
+  $process->nextTick(function() use ($node){
+    $node->hello(); 
+  });
+});
+
+$node->hello();
+```
