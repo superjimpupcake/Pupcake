@@ -1,7 +1,7 @@
 <?php
-namespace Pupcake\Plugin\Node\GlobalObject;
+namespace Pupcake\Plugin\Node;
 
-class GlobalObject
+class Module 
 {
   private $node;
 
@@ -15,4 +15,3 @@ class GlobalObject
     return $this->node; 
   }
 }
-
