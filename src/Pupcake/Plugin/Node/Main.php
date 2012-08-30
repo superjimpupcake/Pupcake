@@ -23,6 +23,7 @@ class Main extends \Pupcake\Plugin
       'console' => 'Console',
       'process' => 'Process',
       'os' => 'OS', 
+      'http' => 'HTTP',
     );
 
     $this->modules = array();
