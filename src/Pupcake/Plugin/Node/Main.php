@@ -47,6 +47,9 @@ class Main extends \Pupcake\Plugin
         $this->modules[$name] = $object;
       }
     }
+    else{
+      $object = $this->modules[$name]; 
+    }
 
     return $object;
 
