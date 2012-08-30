@@ -1,7 +1,7 @@
 <?php
-namespace Pupcake\Plugin\Node\GlobalObject;
+namespace Pupcake\Plugin\Node\Module;
 
-class Process extends \Pupcake\Plugin\Node\GlobalObject
+class Process extends \Pupcake\Plugin\Node\Module
 {
   private $tick_callbacks = array();
   private $tick = 0;
