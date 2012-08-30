@@ -3,17 +3,55 @@ namespace Pupcake\Plugin\Node\GlobalObject;
 
 class Process extends GlobalObject
 {
-  private $tick_callback;
-  private $tick;
+  private $tick_callbacks = array();
+  private $tick = 0;
+
+  public function addTickCallback($callback)
+  {
+    $this->tick ++;
+    $this->tick_callbacks[$this->tick] = $callback;
+  }
+
+  public function getTickCallback($tick)
+  {
+    return $this->tick_callbacks[$tick]; 
+  }
+
+  public function removeTickCallback($tick)
+  {
+    unset($this->tick_callbacks[$tick]); 
+  }
+
+  public function getTickCallbacks()
+  {
+    return $this->tick_callbacks; 
+  }
 
   public function nextTick($callback)
   {
     $loop = $this->getNode()->getEventLoop();
 
-    $this->tick = uv_async_init($loop, function($r, $status) use ($callback){
-      $callback();
-    });
+    $plugin = $this;
+    $plugin->addTickCallback($callback);
 
-    uv_async_send($this->tick);
+    $tick = $this->tick;
+
+    if($tick == 1){
+      $f = function($r, $status) use ($plugin, &$tick){
+        $callback = $plugin->getTickCallback($tick);
+        if(is_callable($callback)){
+          $callback();
+          uv_async_send($r);
+          $plugin->removeTickCallback($tick);
+          $tick ++;
+        }
+        else{
+          uv_close($r); 
+        }
+      };
+
+      $r = uv_async_init($loop, $f);
+      uv_async_send($r);
+    }
   }
 }
