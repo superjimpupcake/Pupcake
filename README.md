@@ -84,7 +84,7 @@ $app->map("/api/hello/:action", function($req, $res){
 $app->run();
 ```
 
-### Using pupcake like Node.js: console.log
+### Using the node plugin: console.log
 ```php
 <?php
 //Assuming this is server/server.php and the composer vendor directory is ../vendor
