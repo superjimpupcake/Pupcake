@@ -85,4 +85,18 @@ $app->run();
 ```
 
 ### Using pupcake like Node.js: console.log
-#### TO DO...
+```php
+<?php
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
+
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$node = $app->usePlugin("Pupcake.Plugin.Node"); //here we import the node plugin
+$console = $node->import("console");
+$console->log("hello");
+```
+To run the code above, type php server/server.php
+In the code above, we simply use the node plugin and then import the console module to output "hello" to the console.
+
+
