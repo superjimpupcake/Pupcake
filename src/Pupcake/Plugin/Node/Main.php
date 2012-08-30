@@ -29,9 +29,9 @@ class Main extends \Pupcake\Plugin
   }
 
   /**
-   * import a package, similar to node.js's require
+   * import a module based on name, similar to node.js's require
    */
-  public function import($package_name)
+  public function import($module_name)
   {
   
   }
