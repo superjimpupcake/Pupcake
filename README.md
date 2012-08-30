@@ -120,3 +120,65 @@ $node->method("hello", function() use ($node){
 
 $node->hello();
 ```
+
+### Using the node plugin: http.createServer, benchmarked with Node.js v0.8.8, our php server is about 100% faster!
+In the example below, we mimic the node.js's http server creation process and send "Hello World" to the browser
+```php
+<?php
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$node = $app->usePlugin("Pupcake.Plugin.Node");
+
+$console = $node->import("console");
+$http = $node->import("http");
+
+$http->createServer(function($req, $res) {
+  $res->writeHead(200, array('Content-Type' => 'text/plain'));
+  $res->end("Hello World\n");
+})->listen(1337, '127.0.0.1');
+$console->log('Server running at http://127.0.0.1:1337/');
+```
+Simply run php server/server.php and you can see the result from http://127.0.0.1:1337/
+
+Below is the benchmark comparison with Node.js
+
+Benchmarking compared with the following node.js script
+```javascript
+var http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello World\n');
+    }).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+```
+
+Below are the data return by apache ab:
+ab -n 1000 -c 20 http://127.0.0.1:1337/ (our php "hello world" script above)
+
+    Concurrency Level:      20
+    Time taken for tests:   0.052 seconds
+    Complete requests:      1000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      57000 bytes
+    HTML transferred:       12000 bytes
+    Requests per second:    19086.15 [#/sec] (mean)
+    Time per request:       1.048 [ms] (mean)
+    Time per request:       0.052 [ms] (mean, across all concurrent requests)
+    Transfer rate:          1062.41 [Kbytes/sec] received
+
+ab -n 1000 -c 20 http://127.0.0.1:1337/ (the node.js "hello world" script above)
+
+    Concurrency Level:      20
+    Time taken for tests:   0.110 seconds
+    Complete requests:      1000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      113000 bytes
+    HTML transferred:       12000 bytes
+    Requests per second:    9096.45 [#/sec] (mean)
+    Time per request:       2.199 [ms] (mean)
+    Time per request:       0.110 [ms] (mean, across all concurrent requests)
+    Transfer rate:          1003.81 [Kbytes/sec] received
