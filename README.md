@@ -95,6 +95,7 @@ $console = $node->import("console");
 $console->log("hello");
 ```
 To run the code above, type php server/server.php
+
 In the code above, we simply use the node plugin and then import the console module to output "hello" to the console.
 
 ### Using the node plugin: process.nextTick
@@ -183,7 +184,7 @@ The Node.js "hello world" script above
     Transfer rate:          466.38 [Kbytes/sec] received
 
 ### Using the node plugin: http.createServer and multiple servers on different ports
-In the example below, we created 3 different server instances to server port 1337, 9000 and 9001, all in one single event loop
+In the example below, we created 3 different server instances to serve port 1337, 9000 and 9001, all in one single event loop
 ```php
 <?php
 //Assuming this is server/server.php and the composer vendor directory is ../vendor
