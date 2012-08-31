@@ -164,7 +164,7 @@ Our php "hello world" script above
     Write errors:           0
     Total transferred:      5730381 bytes
     HTML transferred:       1206396 bytes
-    Requests per second:    **5862.34** [#/sec] (mean)
+    Requests per second:    5862.34 [#/sec] (mean)
     Time per request:       341.161 [ms] (mean)
     Time per request:       0.171 [ms] (mean, across all concurrent requests)
     Transfer rate:          328.06 [Kbytes/sec] received
@@ -178,7 +178,7 @@ The Node.js "hello world" script above
     Write errors:           0
     Total transferred:      11300000 bytes
     HTML transferred:       1200000 bytes
-    Requests per second:    **4226.29** [#/sec] (mean)
+    Requests per second:    4226.29 [#/sec] (mean)
     Time per request:       473.228 [ms] (mean)
     Time per request:       0.237 [ms] (mean, across all concurrent requests)
     Transfer rate:          466.38 [Kbytes/sec] received
