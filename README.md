@@ -103,7 +103,7 @@ In the script below, we define a dynamic method named "hello" in a Node plugin i
 in an async fashion.
 ```php
 <?php
-//Assuming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
