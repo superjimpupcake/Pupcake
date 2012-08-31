@@ -183,3 +183,35 @@ The Node.js "hello world" script above
     Time per request:       473.228 [ms] (mean)
     Time per request:       0.237 [ms] (mean, across all concurrent requests)
     Transfer rate:          466.38 [Kbytes/sec] received
+
+### Using the node plugin: http.createServer and multiple servers on different ports
+In the example below, we created 3 different server instance to server port 1337, 9000 and 9001
+```php
+<?php
+//Assuming this is public/index.php and the composer vendor directory is ../vendor
+require_once __DIR__.'/../vendor/autoload.php';
+
+$app = new Pupcake\Pupcake();
+$node = $app->usePlugin("Pupcake.Plugin.Node");
+
+$console = $node->import("console");
+$http = $node->import("http");
+
+$http->createServer(function($req, $res) use ($node){
+  $res->writeHead(200, array('Content-Type' => 'text/plain'));
+  $res->end("Hello World On Port 1337\n");
+})->listen(1337, '127.0.0.1');
+$console->log('Server running at http://127.0.0.1:1337/');
+
+$http->createServer(function($req, $res) {
+  $res->writeHead(200, array('Content-Type' => 'text/plain'));
+  $res->end("Hello World On Port 9000\n");
+})->listen(9000, '127.0.0.1');
+$console->log('Server running at http://127.0.0.1:9000/');
+
+$http->createServer(function($req, $res) {
+  $res->writeHead(200, array('Content-Type' => 'text/plain'));
+  $res->end("Hello World On Port 9001\n");
+})->listen(9001, '127.0.0.1');
+$console->log('Server running at http://127.0.0.1:9001/');
+```
