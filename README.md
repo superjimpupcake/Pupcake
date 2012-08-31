@@ -185,7 +185,7 @@ The Node.js "hello world" script above
     Transfer rate:          466.38 [Kbytes/sec] received
 
 ### Using the node plugin: http.createServer and multiple servers on different ports
-In the example below, we created 3 different server instance to server port 1337, 9000 and 9001
+In the example below, we created 3 different server instances to server port 1337, 9000 and 9001, all in one single event loop
 ```php
 <?php
 //Assuming this is public/index.php and the composer vendor directory is ../vendor
