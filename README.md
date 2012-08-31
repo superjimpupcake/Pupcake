@@ -188,7 +188,7 @@ The Node.js "hello world" script above
 In the example below, we created 3 different server instances to server port 1337, 9000 and 9001, all in one single event loop
 ```php
 <?php
-//Assuming this is public/index.php and the composer vendor directory is ../vendor
+//Assuming this is server/server.php and the composer vendor directory is ../vendor
 require_once __DIR__.'/../vendor/autoload.php';
 
 $app = new Pupcake\Pupcake();
