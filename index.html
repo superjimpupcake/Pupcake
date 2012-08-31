@@ -44,12 +44,11 @@
 
 <ul>
 <li>Pupcake is a minimal but extensible microframework for PHP 5.3+</li>
-<li>Pupcake can be run in traditional web server such as Apache and can also run as a standalone async server using the AsyncServer plugin together with php-uv and php-httpparser
-(The standalone async server is at its very early stage and is under active development)</li>
+<li>Pupcake can be run in traditional web server such as Apache.</li>
+<li>Pupcake can be run in command line with event based functionalities like Node.js by using the Node plugin together withg php-uv and php-httpparser extensions</li>
 <li>For more detail usages on using pupcake in general and on traditional web servers, please see <a href="https://github.com/superjimpupcake/Pupcake/wiki/_pages">https://github.com/superjimpupcake/Pupcake/wiki/_pages</a>
 </li>
-<li>To see what pupcake can do as a standalone async server, see this readme page, a lot of the async server features are experimental now but it will demonstrate what Pupcake can do.</li>
-<li>Also check out <a href="http://pamground.com/pupcakeframework">http://pamground.com/pupcakeframework</a>, it contains examples explaining how to use Pupcake framework.</li>
+<li>To see what pupcake can do like Node.js, check out this README page, the Node plugin is under actively development and will provide more features down the road</li>
 </ul><h2>Installation:</h2>
 
 <h3>If you plan to use it on Apache</h3>
@@ -63,7 +62,7 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ index.php/$1 [L]
 </code></pre>
 
-<h3>If you plan to use it as a standalone async server</h3>
+<h3>If you plan to use it like Node.js</h3>
 
 <h4>install package "Pupcake/Pupcake" using composer (<a href="http://getcomposer.org/">http://getcomposer.org/</a>)</h4>
 
@@ -96,7 +95,10 @@ extension=httpparser.so
 
 <h3>Simple requests when running on Apache</h3>
 
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<h4>For more details on running Pupcake in general and in traditional web server, please see <a href="https://github.com/superjimpupcake/Pupcake/wiki/_pages">https://github.com/superjimpupcake/Pupcake/wiki/_pages</a>
+</h4>
+
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
 <span class="c1">//Assuming this is public/index.php and the composer vendor directory is ../vendor</span>
 
 <span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
@@ -135,54 +137,69 @@ extension=httpparser.so
 <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
 </pre></div>
 
-<h3>A simple standalone server to listen to port 9000 in local</h3>
+<h3>Using the node plugin: console.log</h3>
 
-<p>Write a php script named server.php in the server folder</p>
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
 
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+<span class="nv">$node</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake.Plugin.Node"</span><span class="p">);</span> <span class="c1">//here we import the node plugin</span>
+<span class="nv">$console</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"console"</span><span class="p">);</span>
+<span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">"hello"</span><span class="p">);</span>
+</pre></div>
+
+<p>To run the code above, type php server/server.php
+In the code above, we simply use the node plugin and then import the console module to output "hello" to the console.</p>
+
+<h3>Using the node plugin: process.nextTick</h3>
+
+<p>In the script below, we define a dynamic method named "hello" in a Node plugin instance, then we use the process module to keep calling the hello method in every single "tick" 
+in an async fashion.</p>
+
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">//Assuming this is public/index.php and the composer vendor directory is ../vendor</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+<span class="nv">$node</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake.Plugin.Node"</span><span class="p">);</span>
+<span class="nv">$node</span><span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s2">"hello"</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$node</span><span class="p">){</span>
+  <span class="nv">$console</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"console"</span><span class="p">);</span> <span class="c1">//use the console module</span>
+  <span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">"doing some tasks"</span><span class="p">);</span>
+  <span class="nv">$process</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"process"</span><span class="p">);</span> <span class="c1">//use the process module</span>
+  <span class="nv">$process</span><span class="o">-&gt;</span><span class="na">nextTick</span><span class="p">(</span><span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$node</span><span class="p">){</span>
+    <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">hello</span><span class="p">();</span> 
+  <span class="p">});</span>
+<span class="p">});</span>
+
+<span class="nv">$node</span><span class="o">-&gt;</span><span class="na">hello</span><span class="p">();</span>
+</pre></div>
+
+<h3>Using the node plugin: http.createServer, benchmarked with Node.js v0.8.8, our php server is faster than node.js and can handle high number of concurrent requests</h3>
+
+<p>In the example below, we mimic the node.js's http server creation process and send "Hello World" to the browser</p>
+
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
 <span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
 <span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
 
 <span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+<span class="nv">$node</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake.Plugin.Node"</span><span class="p">);</span>
 
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
+<span class="nv">$console</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"console"</span><span class="p">);</span>
+<span class="nv">$http</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span>
 
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
-  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">sendJSON</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'ok'</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">));</span>
-<span class="p">});</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s2">"/hello"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">){</span>
-  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">sendJSON</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">'word'</span> <span class="o">=&gt;</span> <span class="s1">'hello'</span><span class="p">));</span>
-<span class="p">});</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+<span class="nv">$http</span><span class="o">-&gt;</span><span class="na">createServer</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/plain'</span><span class="p">));</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">(</span><span class="s2">"Hello World</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+<span class="p">})</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="mi">1337</span><span class="p">,</span> <span class="s1">'127.0.0.1'</span><span class="p">);</span>
+<span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:1337/'</span><span class="p">);</span>
 </pre></div>
 
-<p>Now run php server/server.php and go to <a href="http://127.0.0.1:9000">http://127.0.0.1:9000</a> to see the result</p>
+<p>Simply run php server/server.php and you can see the result from <a href="http://127.0.0.1:1337/">http://127.0.0.1:1337/</a></p>
 
-<h3>A simple standalone server returning "Hello Word", benchmarked with node.js</h3>
-
-<p>We can return any custom output by skipping the whole routing process by hooking up to system.server.response.body event</p>
-
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
-
-<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">){</span>
-  <span class="k">return</span> <span class="s2">"hello world</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-</pre></div>
-
-<p>This might need more investigation, but the script above seems to be able to handle more requests per seconds than Node.js</p>
+<p>Below is the benchmark comparison with Node.js</p>
 
 <p>Benchmarking compared with the following node.js script</p>
 
@@ -194,178 +211,37 @@ extension=httpparser.so
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:1337/'</span><span class="p">);</span>
 </pre></div>
 
-<p>Below are the data return by apache ab:
-ab -n 100000 -c 200 <a href="http://127.0.0.1:9000/">http://127.0.0.1:9000/</a> (our php server)</p>
+<p>Below are the data return by apache ab, apache ab is set with n=100000 and c=2000</p>
 
-<pre><code>Concurrency Level:      200
-Time taken for tests:   22.338 seconds
+<p>Our php "hello world" script above</p>
+
+<pre><code>Concurrency Level:      2000
+Time taken for tests:   17.058 seconds
 Complete requests:      100000
 Failed requests:        0
 Write errors:           0
-Total transferred:      3100000 bytes
-HTML transferred:       1200000 bytes
-Requests per second:    4476.65 [#/sec] (mean)
-Time per request:       44.676 [ms] (mean)
-Time per request:       0.223 [ms] (mean, across all concurrent requests)
-Transfer rate:          135.52 [Kbytes/sec] received
+Total transferred:      5730381 bytes
+HTML transferred:       1206396 bytes
+Requests per second:    5862.34 [#/sec] (mean)
+Time per request:       341.161 [ms] (mean)
+Time per request:       0.171 [ms] (mean, across all concurrent requests)
+Transfer rate:          328.06 [Kbytes/sec] received
 </code></pre>
 
-<p>ab -n 100000 -c 200 <a href="http://127.0.0.1:1337/">http://127.0.0.1:1337/</a> (the node.js hello world script run with node version 0.8.5)</p>
+<p>The Node.js "hello world" script above</p>
 
-<pre><code>Concurrency Level:      200
-Time taken for tests:   25.660 seconds
+<pre><code>Concurrency Level:      2000
+Time taken for tests:   23.661 seconds
 Complete requests:      100000
 Failed requests:        0
 Write errors:           0
 Total transferred:      11300000 bytes
 HTML transferred:       1200000 bytes
-Requests per second:    3897.19 [#/sec] (mean)
-Time per request:       51.319 [ms] (mean)
-Time per request:       0.257 [ms] (mean, across all concurrent requests)
-Transfer rate:          430.06 [Kbytes/sec] received
+Requests per second:    4226.29 [#/sec] (mean)
+Time per request:       473.228 [ms] (mean)
+Time per request:       0.237 [ms] (mean, across all concurrent requests)
+Transfer rate:          466.38 [Kbytes/sec] received
 </code></pre>
-
-<h3>(Experimental and Demo only) A simple HTTPS server</h3>
-
-<p>The HTTP servers requires two files, privatekey.pem and certificate.pem
-In our testing server in local, we can create these 2 files with the following commands:</p>
-
-<pre><code>openssl genrsa -out privatekey.pem 1024 
-openssl req -new -key privatekey.pem -out certrequest.csr 
-openssl x509 -req -in certrequest.csr -signkey privatekey.pem -out certificate.pem
-</code></pre>
-
-<p>Assume we created those files in the server folder, we then can write a simple server as follows:</p>
-
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
-<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">setSecure</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
-  <span class="s1">'key'</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/privatekey.pem'</span><span class="p">,</span>
-  <span class="s1">'cert'</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/certificate.pem'</span>
-<span class="p">));</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
-  <span class="k">return</span> <span class="s2">"hello"</span><span class="p">;</span>
-<span class="p">});</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-</pre></div>
-
-<h3>(Experimental and Demo only) The server side timer like Node.js</h3>
-
-<p>In the example below, we set up a timer that execute a callback function every 1 second and increment the counter, then we store the 
-current counter value into the application's storage. Then on each request, we return the current counter value as the response.</p>
-
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
-<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">8000</span><span class="p">);</span>
-
-<span class="nv">$count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getTimer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setInterval</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$timer</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="o">&amp;</span><span class="nv">$count</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nv">$count</span> <span class="o">++</span><span class="p">;</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">storageSet</span><span class="p">(</span><span class="s2">"time_elapsed"</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
-<span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
-  <span class="k">return</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">storageGet</span><span class="p">(</span><span class="s2">"time_elapsed"</span><span class="p">);</span>
-<span class="p">});</span>
-
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-</pre></div>
-
-<h3>(Experimental and Demo only) Process forking in an async fashion</h3>
-
-<p>In the example below, we will create 2 processes, test1 and test2, test1 will sleep for 10 seconds and return a string "test 1", test2
-will return a string "test 2" immediately, what we want is, run test1 and test2 as 2 separate process and return their outputs together 
-on each request, and we do not want to block all the incoming requests. The process test1 and test2 are called process closures, since it 
-take a closure function as the main code body and run as a separate process.</p>
-
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
-
-<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
-
-<span class="nv">$pm</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getProcessManager</span><span class="p">();</span>
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">setMaxNumberOfProcess</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"test1"</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
-  <span class="nb">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-  <span class="k">return</span> <span class="s2">"test 1"</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"test2"</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
-  <span class="k">return</span> <span class="s2">"hello test2"</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="nb">time</span><span class="p">(),</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
-    <span class="nv">$test1_output</span> <span class="o">=</span> <span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s2">"test1"</span><span class="p">);</span>
-    <span class="nv">$test2_output</span> <span class="o">=</span> <span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s2">"test2"</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nv">$test1_output</span><span class="o">.</span><span class="s2">","</span><span class="o">.</span><span class="nv">$test2_output</span><span class="p">;</span>
-  <span class="p">});</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-</pre></div>
-
-<p>Now run php server/server.php and go to 127.0.0.1:9000, we should see ",hello test2", since process test1 does not return yet, it is still sleeping. 
-After 10 seconds, go to 127.0.0.1:9000, we should see "test 1,hello test2" since now process test1 return "test1". </p>
-
-<h3>(Experimental and Demo only) Parallel running processes and different servers</h3>
-
-<p>In the example below, we have 2 processes running in parallel, and we also have 2 servers listening to different ports. 
-We have 2 different servers listening both port 8000 and 9000. </p>
-
-<div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
-<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
-<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
-<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake\Plugin\AsyncServer"</span><span class="p">);</span>
-
-<span class="nv">$pm</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getProcessManager</span><span class="p">();</span>
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">setMaxNumberOfProcessToRun</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"test1"</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
-  <span class="nb">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
-  <span class="k">return</span> <span class="s2">"test 1"</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"test2"</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
-  <span class="k">return</span> <span class="s2">"hello test2"</span><span class="p">;</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"server1"</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">9000</span><span class="p">);</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
-    <span class="nv">$test1_output</span> <span class="o">=</span> <span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s2">"test1"</span><span class="p">);</span>
-    <span class="nv">$test2_output</span> <span class="o">=</span> <span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s2">"test2"</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nv">$test1_output</span><span class="o">.</span><span class="s2">","</span><span class="o">.</span><span class="nv">$test2_output</span><span class="p">;</span>
-  <span class="p">});</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">addProcess</span><span class="p">(</span><span class="s2">"server2"</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="s2">"127.0.0.1"</span><span class="p">,</span> <span class="mi">8000</span><span class="p">);</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s2">"system.server.response.body"</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$event</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$app</span><span class="p">,</span> <span class="nv">$pm</span><span class="p">){</span>
-    <span class="k">return</span> <span class="s2">"I am also listening port 8000, the output from test1 is "</span><span class="o">.</span><span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">getProcessOutput</span><span class="p">(</span><span class="s1">'test1'</span><span class="p">);</span>
-  <span class="p">});</span>
-  <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-<span class="p">});</span>
-
-<span class="nv">$pm</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
-</pre></div>
       </section>
 
     </div>
