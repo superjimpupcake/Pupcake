@@ -242,6 +242,39 @@ Time per request:       473.228 [ms] (mean)
 Time per request:       0.237 [ms] (mean, across all concurrent requests)
 Transfer rate:          466.38 [Kbytes/sec] received
 </code></pre>
+
+<h3>Using the node plugin: http.createServer and multiple servers on different ports</h3>
+
+<p>In the example below, we created 3 different server instances to server port 1337, 9000 and 9001, all in one single event loop</p>
+
+<div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
+<span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
+<span class="nv">$node</span> <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">usePlugin</span><span class="p">(</span><span class="s2">"Pupcake.Plugin.Node"</span><span class="p">);</span>
+
+<span class="nv">$console</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"console"</span><span class="p">);</span>
+<span class="nv">$http</span> <span class="o">=</span> <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">import</span><span class="p">(</span><span class="s2">"http"</span><span class="p">);</span>
+
+<span class="nv">$http</span><span class="o">-&gt;</span><span class="na">createServer</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$node</span><span class="p">){</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/plain'</span><span class="p">));</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">(</span><span class="s2">"Hello World On Port 1337</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+<span class="p">})</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="mi">1337</span><span class="p">,</span> <span class="s1">'127.0.0.1'</span><span class="p">);</span>
+<span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:1337/'</span><span class="p">);</span>
+
+<span class="nv">$http</span><span class="o">-&gt;</span><span class="na">createServer</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/plain'</span><span class="p">));</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">(</span><span class="s2">"Hello World On Port 9000</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+<span class="p">})</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="mi">9000</span><span class="p">,</span> <span class="s1">'127.0.0.1'</span><span class="p">);</span>
+<span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:9000/'</span><span class="p">);</span>
+
+<span class="nv">$http</span><span class="o">-&gt;</span><span class="na">createServer</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$req</span><span class="p">,</span> <span class="nv">$res</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">'Content-Type'</span> <span class="o">=&gt;</span> <span class="s1">'text/plain'</span><span class="p">));</span>
+  <span class="nv">$res</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">(</span><span class="s2">"Hello World On Port 9001</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+<span class="p">})</span><span class="o">-&gt;</span><span class="na">listen</span><span class="p">(</span><span class="mi">9001</span><span class="p">,</span> <span class="s1">'127.0.0.1'</span><span class="p">);</span>
+<span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:9001/'</span><span class="p">);</span>
+</pre></div>
       </section>
 
     </div>
