@@ -121,7 +121,7 @@ $node->method("hello", function() use ($node){
 $node->hello();
 ```
 
-### Using the node plugin: http.createServer, benchmarked with Node.js v0.8.8, our php server is about 100% faster!
+### Using the node plugin: http.createServer, benchmarked with Node.js v0.8.8, our php server is faster than node.js and can handle high number of concurrent requests
 In the example below, we mimic the node.js's http server creation process and send "Hello World" to the browser
 ```php
 <?php
@@ -154,31 +154,31 @@ http.createServer(function (req, res) {
 console.log('Server running at http://127.0.0.1:1337/');
 ```
 
-Below are the data return by apache ab:
-ab -n 1000 -c 20 http://127.0.0.1:1337/ (our php "hello world" script above)
+Below are the data return by apache ab, apache ab is set with n=100000 and c=2000
+Our php "hello world" script above
 
-    Concurrency Level:      20
-    Time taken for tests:   0.052 seconds
-    Complete requests:      1000
+    Concurrency Level:      2000
+    Time taken for tests:   17.058 seconds
+    Complete requests:      100000
     Failed requests:        0
     Write errors:           0
-    Total transferred:      57000 bytes
-    HTML transferred:       12000 bytes
-    Requests per second:    19086.15 [#/sec] (mean)
-    Time per request:       1.048 [ms] (mean)
-    Time per request:       0.052 [ms] (mean, across all concurrent requests)
-    Transfer rate:          1062.41 [Kbytes/sec] received
+    Total transferred:      5730381 bytes
+    HTML transferred:       1206396 bytes
+    Requests per second:    **5862.34** [#/sec] (mean)
+    Time per request:       341.161 [ms] (mean)
+    Time per request:       0.171 [ms] (mean, across all concurrent requests)
+    Transfer rate:          328.06 [Kbytes/sec] received
 
-ab -n 1000 -c 20 http://127.0.0.1:1337/ (the node.js "hello world" script above)
+The Node.js "hello world" script above
 
-    Concurrency Level:      20
-    Time taken for tests:   0.110 seconds
-    Complete requests:      1000
+    Concurrency Level:      2000
+    Time taken for tests:   23.661 seconds
+    Complete requests:      100000
     Failed requests:        0
     Write errors:           0
-    Total transferred:      113000 bytes
-    HTML transferred:       12000 bytes
-    Requests per second:    9096.45 [#/sec] (mean)
-    Time per request:       2.199 [ms] (mean)
-    Time per request:       0.110 [ms] (mean, across all concurrent requests)
-    Transfer rate:          1003.81 [Kbytes/sec] received
+    Total transferred:      11300000 bytes
+    HTML transferred:       1200000 bytes
+    Requests per second:    **4226.29** [#/sec] (mean)
+    Time per request:       473.228 [ms] (mean)
+    Time per request:       0.237 [ms] (mean, across all concurrent requests)
+    Transfer rate:          466.38 [Kbytes/sec] received
