@@ -120,7 +120,7 @@ $node->method("hello", function() use ($node){
 $node->hello();
 ```
 
-### Using the node plugin: http.createServer
+### Using the node plugin: http.createServer, benchmarked with PHP 5.4.6 and Node.js v0.8.8, our php server is faster than node.js and can handle high number of concurrent requests
 In the example below, we mimic the node.js's http server creation process and send "Hello World" to the browser
 ```php
 <?php
@@ -140,6 +140,48 @@ $http->createServer(function($req, $res) {
 $console->log('Server running at http://127.0.0.1:1337/');
 ```
 Simply run php server/server.php and you can see the result from http://127.0.0.1:1337/
+
+Below is the benchmark comparison with Node.js
+
+Benchmarking compared with the following node.js script
+```javascript
+var http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello World\n');
+    }).listen(1337, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:1337/');
+```
+
+Below are the data return by apache ab, apache ab is set with n=200000 and c=5000
+
+Our php "hello world" script above
+
+    Concurrency Level:      5000
+    Time taken for tests:   44.222 seconds
+    Complete requests:      200000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      11422515 bytes
+    HTML transferred:       2404740 bytes
+    Requests per second:    4522.67 [#/sec] (mean)
+    Time per request:       1105.543 [ms] (mean)
+    Time per request:       0.221 [ms] (mean, across all concurrent requests)
+    Transfer rate:          252.25 [Kbytes/sec] received
+
+The Node.js "hello world" script above
+
+    Concurrency Level:      5000
+    Time taken for tests:   50.638 seconds
+    Complete requests:      200000
+    Failed requests:        0
+    Write errors:           0
+    Total transferred:      22667122 bytes
+    HTML transferred:       2407128 bytes
+    Requests per second:    3949.60 [#/sec] (mean)
+    Time per request:       1265.950 [ms] (mean)
+    Time per request:       0.253 [ms] (mean, across all concurrent requests)
+    Transfer rate:          437.14 [Kbytes/sec] received
 
 ### Using the node plugin: http.createServer and multiple servers on different ports
 In the example below, we created 3 different server instances to serve port 1337, 9000 and 9001, all in one single event loop
