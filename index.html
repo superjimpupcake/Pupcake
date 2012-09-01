@@ -146,8 +146,9 @@ extension=httpparser.so
 <span class="nv">$console</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="s2">"hello"</span><span class="p">);</span>
 </pre></div>
 
-<p>To run the code above, type php server/server.php
-In the code above, we simply use the node plugin and then import the console module to output "hello" to the console.</p>
+<p>To run the code above, type php server/server.php</p>
+
+<p>In the code above, we simply use the node plugin and then import the console module to output "hello" to the console.</p>
 
 <h3>Using the node plugin: process.nextTick</h3>
 
@@ -155,7 +156,7 @@ In the code above, we simply use the node plugin and then import the console mod
 in an async fashion.</p>
 
 <div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
-<span class="c1">//Assuming this is public/index.php and the composer vendor directory is ../vendor</span>
+<span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
 <span class="k">require_once</span> <span class="nx">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">;</span>
 
 <span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Pupcake\Pupcake</span><span class="p">();</span>
@@ -172,7 +173,7 @@ in an async fashion.</p>
 <span class="nv">$node</span><span class="o">-&gt;</span><span class="na">hello</span><span class="p">();</span>
 </pre></div>
 
-<h3>Using the node plugin: http.createServer, benchmarked with Node.js v0.8.8, our php server is faster than node.js and can handle high number of concurrent requests</h3>
+<h3>Using the node plugin: http.createServer, benchmarked with PHP 5.4.6 and Node.js v0.8.8, our php server is faster than node.js and can handle high number of concurrent requests</h3>
 
 <p>In the example below, we mimic the node.js's http server creation process and send "Hello World" to the browser</p>
 
@@ -207,41 +208,41 @@ in an async fashion.</p>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Server running at http://127.0.0.1:1337/'</span><span class="p">);</span>
 </pre></div>
 
-<p>Below are the data return by apache ab, apache ab is set with n=100000 and c=2000</p>
+<p>Below are the data return by apache ab, apache ab is set with n=200000 and c=5000</p>
 
 <p>Our php "hello world" script above</p>
 
-<pre><code>Concurrency Level:      2000
-Time taken for tests:   17.058 seconds
-Complete requests:      100000
+<pre><code>Concurrency Level:      5000
+Time taken for tests:   44.222 seconds
+Complete requests:      200000
 Failed requests:        0
 Write errors:           0
-Total transferred:      5730381 bytes
-HTML transferred:       1206396 bytes
-Requests per second:    5862.34 [#/sec] (mean)
-Time per request:       341.161 [ms] (mean)
-Time per request:       0.171 [ms] (mean, across all concurrent requests)
-Transfer rate:          328.06 [Kbytes/sec] received
+Total transferred:      11422515 bytes
+HTML transferred:       2404740 bytes
+Requests per second:    4522.67 [#/sec] (mean)
+Time per request:       1105.543 [ms] (mean)
+Time per request:       0.221 [ms] (mean, across all concurrent requests)
+Transfer rate:          252.25 [Kbytes/sec] received
 </code></pre>
 
 <p>The Node.js "hello world" script above</p>
 
-<pre><code>Concurrency Level:      2000
-Time taken for tests:   23.661 seconds
-Complete requests:      100000
+<pre><code>Concurrency Level:      5000
+Time taken for tests:   50.638 seconds
+Complete requests:      200000
 Failed requests:        0
 Write errors:           0
-Total transferred:      11300000 bytes
-HTML transferred:       1200000 bytes
-Requests per second:    4226.29 [#/sec] (mean)
-Time per request:       473.228 [ms] (mean)
-Time per request:       0.237 [ms] (mean, across all concurrent requests)
-Transfer rate:          466.38 [Kbytes/sec] received
+Total transferred:      22667122 bytes
+HTML transferred:       2407128 bytes
+Requests per second:    3949.60 [#/sec] (mean)
+Time per request:       1265.950 [ms] (mean)
+Time per request:       0.253 [ms] (mean, across all concurrent requests)
+Transfer rate:          437.14 [Kbytes/sec] received
 </code></pre>
 
 <h3>Using the node plugin: http.createServer and multiple servers on different ports</h3>
 
-<p>In the example below, we created 3 different server instances to server port 1337, 9000 and 9001, all in one single event loop</p>
+<p>In the example below, we created 3 different server instances to serve port 1337, 9000 and 9001, all in one single event loop</p>
 
 <div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
 <span class="c1">//Assuming this is server/server.php and the composer vendor directory is ../vendor</span>
