@@ -60,7 +60,7 @@ class HTTP extends \Pupcake\Plugin\Node\Module
         $response = $self->getServerResponse();
         $request_listener = $self->getRequestListener();
 
-        $request_listener($request, $response);
+        call_user_func_array($request_listener, array($request, $response));
 
         $status_code = $response->getStatusCode();
         $status_message = $response->getReasonPhrase();
