@@ -3,7 +3,7 @@ namespace Pupcake\Plugin\Node\Module\HTTP;
 
 class ServerResponse
 {
-  private $data;
+  private $data = "";
   private $status_code = 200;
   private $reason_phrase = "OK";
   private $headers = array();
@@ -26,7 +26,9 @@ class ServerResponse
 
   public function end($data, $encoding)
   {
-    $this->data = $data; 
+    if($data){
+      $this->data = $data; 
+    }
   }
 
   public function getStatusCode()
