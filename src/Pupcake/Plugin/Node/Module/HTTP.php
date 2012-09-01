@@ -31,14 +31,17 @@ class HTTP extends \Pupcake\Plugin\Node\Module
     $this->server = uv_tcp_init();
 
     $parser = http_parser_init();
+    $request = $self->getServerRequest();
+    $response = $self->getServerResponse();
+    $request_listener = $self->getRequestListener();
 
     uv_tcp_bind($this->server, uv_ip4_addr($host, $port));
 
-    uv_listen($this->server,100, function($server) use ($self, $parser, $process) {
+    uv_listen($this->server,100, function($server) use ($self, $parser, $process, &$request, &$response, &$request_listener) {
       $client = uv_tcp_init();
       uv_accept($server, $client);
 
-      uv_read_start($client, function($socket, $nread, $buffer) use ($self, $parser, $process){
+      uv_read_start($client, function($socket, $nread, $buffer) use ($self, $parser, $process, &$request, &$response, &$request_listener){
         $result = array();
         http_parser_execute($parser, $buffer, $result);
 
@@ -55,10 +58,6 @@ class HTTP extends \Pupcake\Plugin\Node\Module
         }
 
         $GLOBALS["_$request_method"] = explode("&", $result['headers']['body']); 
-
-        $request = $self->getServerRequest();
-        $response = $self->getServerResponse();
-        $request_listener = $self->getRequestListener();
 
         call_user_func_array($request_listener, array($request, $response));
 
