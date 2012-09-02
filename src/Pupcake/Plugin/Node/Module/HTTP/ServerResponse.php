@@ -26,8 +26,11 @@ class ServerResponse
 
   public function end($data, $encoding)
   {
-    if($data){
+    if(strlen($data) > 0){
       $this->data = $data; 
+    }
+    else{
+      $this->data = "\r\n";
     }
   }
 
