@@ -89,7 +89,7 @@ $app->run();
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-$app = new Pupcake\Pupcake();
+$app = new Pupcake\CLI();
 $node = $app->usePlugin("Pupcake.Plugin.Node"); //here we import the node plugin
 $console = $node->import("console");
 $console->log("hello");
@@ -127,7 +127,7 @@ In the example below, we mimic the node.js's http server creation process and se
 //Assuming this is server/server.php and the composer vendor directory is ../vendor
 require_once __DIR__.'/../vendor/autoload.php';
 
-$app = new Pupcake\Pupcake();
+$app = new Pupcake\CLI();
 $node = $app->usePlugin("Pupcake.Plugin.Node");
 
 $console = $node->import("console");
@@ -190,7 +190,7 @@ In the example below, we created 3 different server instances to serve port 1337
 //Assuming this is server/server.php and the composer vendor directory is ../vendor
 require_once __DIR__.'/../vendor/autoload.php';
 
-$app = new Pupcake\Pupcake();
+$app = new Pupcake\CLI();
 $node = $app->usePlugin("Pupcake.Plugin.Node");
 
 $console = $node->import("console");
