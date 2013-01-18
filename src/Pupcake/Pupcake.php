@@ -223,11 +223,6 @@ class Pupcake extends Object
         return $this->map($route_pattern, $callback)->via('OPTIONS');
     }
 
-    public function patch($route_pattern, $callback = "")
-    {
-        return $this->map($route_pattern, $callback)->via('PATCH');
-    }
-
     public function any($route_pattern, $callback = "")
     {
         return $this->map($route_pattern, $callback)->via('*');
