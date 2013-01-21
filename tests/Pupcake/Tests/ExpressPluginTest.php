@@ -15,12 +15,12 @@ class ExpressPluginTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
 
-        $app->get("date/:year/:month/:day", function($req, $res){
+        $app->get("date/:year/:month/:day", function($req, $res) {
             $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
             $res->send($output);
         });
 
-        $app->get("hello", function($req, $res){
+        $app->get("hello", function($req, $res) {
             $res->send("hello world");
         });
 
@@ -43,12 +43,12 @@ class ExpressPluginTest extends Pupcake\TestCase
         });
 
 
-        $app->get("date/:year/:month/:day", function($req, $res){
+        $app->get("date/:year/:month/:day", function($req, $res) {
             $output = $req->params('year').'-'.$req->params('month').'-'.$req->params('day');
             $res->send($output);
         });
 
-        $app->get("hello", function($req, $res){
+        $app->get("hello", function($req, $res) {
             $res->send("hello world");
         });
 
@@ -65,27 +65,27 @@ class ExpressPluginTest extends Pupcake\TestCase
 
         $app = new Pupcake\Pupcake();
 
-        $app->get("/hello/:name", function($req, $res){
+        $app->get("/hello/:name", function($req, $res) {
             $res->send($req->params('name'));
         });
-        $app->post("/hello/:name", function($req, $res){
+        $app->post("/hello/:name", function($req, $res) {
             $res->send("posting ".$req->params('name')." to hello");
         });
 
-        $app->get("test", function($req, $res){
+        $app->get("test", function($req, $res) {
             $res->redirect("test2");
         });
 
-        $app->any("date/:year/:month/:day", function($req, $res){
+        $app->any("date/:year/:month/:day", function($req, $res) {
             $output = $req->params('year')."-".$req->params('month')."-".$req->params('day');
             $res->send($output);
         });
 
-        $app->get("/test2", function($req, $res){
+        $app->get("/test2", function($req, $res) {
             $res->send("gettest2");
         });
 
-        $app->get("test_internal", function($req, $res){
+        $app->get("test_internal", function($req, $res) {
             $content = "";
             $content .= $res->forward("POST", "hello/world");
             $content .= $res->forward("GET", "hello/world2");
@@ -103,32 +103,32 @@ class ExpressPluginTest extends Pupcake\TestCase
     public function testNextRouteMatching()
     {
         $this->simulateRequest("get", "/api/12");
-        
+
         $app = new Pupcake\Pupcake();
 
         $app->usePlugin("Pupcake\Plugin\RouteConstraint"); //load Plugin
 
-        $app->any("api/12", function($req, $res, $next){
+        $app->any("api/12", function($req, $res, $next) {
             $next();
         });
 
-        $app->any("api/:number", function($req, $res, $next){
+        $app->any("api/:number", function($req, $res, $next) {
             $next();
         })->constraint(array(
-            'number' => function($value){
+            'number' => function($value) {
                 $result = true;
-                if($value < 15){
+                if ($value < 15) {
                     $result = false;
                 }
                 return $result;
             }
         ));
 
-        $app->get("api/12", function($req, $res, $next){
+        $app->get("api/12", function($req, $res, $next) {
             $next();
         });
 
-        $app->get("api/:number", function($req, $res, $next){
+        $app->get("api/:number", function($req, $res, $next) {
             $res->send("this is finally number ".$req->params('number'));
         });
 

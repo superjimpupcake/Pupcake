@@ -12,7 +12,7 @@ class MultiplePluginsTest extends Pupcake\TestCase
         $expectations[] = array('input' => '10.0.0.1', 'output' => 'api#ip');
         $expectations[] = array('input' => 'random', 'output' => 'Invalid Request');
 
-        foreach($expectations as $expectation){
+        foreach ($expectations as $expectation) {
             $this->simulateRequest("get", "/api/ip/".$expectation['input']);
 
             $app = new Pupcake\Pupcake();
@@ -23,17 +23,17 @@ class MultiplePluginsTest extends Pupcake\TestCase
             $app->get("api/ip/:ip", function($req, $res) use ($app) {
                 $res->send($app->getRouter()->getMatchedRoute()->getAction());
             })
-            ->to("api#ip")
-            ->constraint(array(
-                'ip' =>  function($value){
-                    $value_comps = explode(".", $value);
-                    if(count($value_comps) == 4){
-                        return true;
+                ->to("api#ip")
+                ->constraint(array(
+                    'ip' =>  function($value) {
+                        $value_comps = explode(".", $value);
+                        if (count($value_comps) == 4) {
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
                     }
-                    else{
-                        return false;
-                    }
-                }
             ));
 
             $app->run();
