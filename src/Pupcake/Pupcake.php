@@ -39,10 +39,6 @@ class Pupcake extends Object
 
         //use express plugin by default
         $this->usePlugin("Pupcake\Plugin\Express"); //load Express Plugin by default
-
-        //use async plugin by default
-        $this->usePlugin("Pupcake\Plugin\Async"); //load Async Plugin by default
-
     }
 
     /**
