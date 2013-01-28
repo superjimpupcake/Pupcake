@@ -35,7 +35,10 @@ class Response extends Pupcake\Object
             $this->plugin->storageSet('output', $output); 
         }
     }
-
+    
+    /**
+     * send json response
+     */
     public function sendJSON($data = array())
     {
         $this->contentType("application/json")->send(json_encode($data));
@@ -47,16 +50,25 @@ class Response extends Pupcake\Object
         return $this;
     }
 
+    /**
+     * redirect to a specific URL
+     */
     public function redirect($uri)
     {
         $this->plugin->getAppInstance()->redirect($uri);
     }
 
+    /**
+     * forward an internal request to a specific url
+     */
     public function forward($request_type, $uri, $request_params = array())
     {
         return $this->app_instance->forward($request_type, $uri, $request_params);
     }
 
+    /**
+     * call a specific route 
+     */
     public function toRoute($request_type, $route_pattern, $params)
     {
         $this->in_inner_route = true;
@@ -70,6 +82,9 @@ class Response extends Pupcake\Object
         return $this->plugin->storageGet('inner_route_output');
     }
 
+    /**
+     * see if the response is in an inner route or not
+     */
     public function inInnerRoute()
     {
         return $this->in_inner_route;
