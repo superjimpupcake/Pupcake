@@ -15,11 +15,11 @@ class Main extends Pupcake\Plugin
     {
         $this->help("system.routing.route.create", function($event) {
             $route = $event->props('route');
-            $route->method("to", function($action) use ($route, $time) {
+            $route->method("to", function($action) use ($route) {
                 $route->storageSet("route_action", $action); 
                 return $route; //return route for further extension
             });
-            $route->method("getAction", function() use ($route, $time) {
+            $route->method("getAction", function() use ($route) {
                 return $route->storageGet("route_action");
             });
             return $route;
