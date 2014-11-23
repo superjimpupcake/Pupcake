@@ -75,7 +75,7 @@ class Event
     public function register()
     {
         $this->helper_callbacks = array();
-        $arguments= func_get_args();
+        $arguments = func_get_args();
         if(count($arguments) > 0){
             foreach($arguments as $argument){
                 if($argument instanceof Plugin){ //this is a plugin object
