@@ -78,8 +78,7 @@ class Main extends Pupcake\Plugin
 
         if ($request_type == 'GET') {
             $getdata = $data;
-        }
-        else if ($request_type == 'POST') {
+        } else if ($request_type == 'POST') {
             $postdata = $data;
         }
 
@@ -110,14 +109,14 @@ class Main extends Pupcake\Plugin
         if (!empty($cookie_str))
             $req .= 'Cookie: '. substr($cookie_str, 0, -2) . $crlf;
 
-        if ($request_type == 'POST' && !empty($postdata_str))
-        {
+        if ($request_type == 'POST' && !empty($postdata_str)) {
             $postdata_str = substr($postdata_str, 0, -1);
             $req .= 'Content-Type: application/x-www-form-urlencoded' . $crlf;
             $req .= 'Content-Length: '. strlen($postdata_str) . $crlf . $crlf;
             $req .= $postdata_str;
+        } else {
+            $req .= $crlf;
         }
-        else $req .= $crlf;
 
         if (($fp = @fsockopen($host, $port, $errno, $errstr)) == false)
             return "Error $errno: $errstr\n";

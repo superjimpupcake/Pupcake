@@ -30,8 +30,7 @@ class Main extends Pupcake\Plugin
 
             if ($plugin->getRouteMapToLookup() === NULL) {
                 $route_map = $plugin->getAppInstance()->getRouter()->getRouteMap();
-            }
-            else{
+            } else{
                 $route_map = $plugin->getRouteMapToLookup();
             }
 

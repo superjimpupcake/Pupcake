@@ -29,8 +29,7 @@ class MultiplePluginsTest extends Pupcake\TestCase
                         $value_comps = explode(".", $value);
                         if (count($value_comps) == 4) {
                             return true;
-                        }
-                        else{
+                        } else{
                             return false;
                         }
                     }

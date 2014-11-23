@@ -54,8 +54,7 @@ class Event
     {
         if($key == ""){
             return $this->getProperties();
-        }
-        else{
+        } else{
             return $this->getProperty($key);
         }
     }
@@ -84,8 +83,7 @@ class Event
                     if(is_callable($callback)){
                         $this->helper_callbacks[] = $callback;
                     }                 
-                }
-                else if(is_callable($argument)){ //this is a closure
+                } else if(is_callable($argument)){ //this is a closure
                     $this->helper_callbacks[] = $argument;
                 }
             }

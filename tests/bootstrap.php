@@ -9,8 +9,7 @@ function getAutoLoader()
         if (is_readable($autoloader_path)) {
             $found_autoloader = true;
             break;
-        }
-        else{
+        } else{
             $relative_dir .= "../";
         }
     }

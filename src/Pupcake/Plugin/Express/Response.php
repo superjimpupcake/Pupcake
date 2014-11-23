@@ -30,8 +30,7 @@ class Response extends Pupcake\Object
     {
         if ($this->in_inner_route) {
             $this->plugin->storageSet('inner_route_output', $output); 
-        }
-        else{
+        } else{
             $this->plugin->storageSet('output', $output); 
         }
     }

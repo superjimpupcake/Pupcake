@@ -9,7 +9,7 @@ class Object
     public function __construct()
     {
         $this->methods = array();
-        $this->storage= array();
+        $this->storage = array();
     }
 
     public function __call($method_name, $params)

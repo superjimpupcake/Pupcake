@@ -38,7 +38,7 @@ class Pupcake extends Object
         $this->router->belongsTo($this);
 
         //use express plugin by default
-        $this->usePlugin("Pupcake\Plugin\Express"); //load Express Plugin by default
+        $this->usePlugin("Pupcake\Plugin\Express"); //load Express Plugin by default 
     }
 
     /**
@@ -80,8 +80,7 @@ class Pupcake extends Object
                 $result = call_user_func_array($handler_callback, array($event));
                 $event->setHandlerCallbackReturnValue($result);
             }
-        }
-        else{ //event does not exist yet, use the default handler callback
+        } else{ //event does not exist yet, use the default handler callback
             $event = new Event($event_name);
             $event->setProperties($event_properties);
             if (is_callable($default_handler_callback)) {
@@ -294,8 +293,7 @@ class Pupcake extends Object
     {
         if ($this->request_mode == 'external') {
             header("Location: $uri");
-        }
-        else if ($this->request_mode == 'internal') {
+        } else if ($this->request_mode == 'internal') {
             return $this->forward('GET', $uri);
         }
     }

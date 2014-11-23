@@ -71,14 +71,12 @@ class Request extends Pupcake\Object
         if ($value === NULL) {
             if ($key == "") {
                 return $GLOBALS["_$request_method"];
-            }
-            else{
+            } else{
                 if (isset($GLOBALS["_$request_method"][$key])) {
                     return $GLOBALS["_$request_method"][$key];
                 }
             }
-        }
-        else{
+        } else {
             $GLOBALS["_$request_method"][$key] = $value;
         }
     }
