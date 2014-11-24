@@ -2,7 +2,7 @@ Pupcake --- a micro framework for PHP 5.3+
 =======================================
 
 ##About Pupcake Framework
-+ Pupcake is a minimal but extensible microframework for PHP 5.3+
++ Pupcake is a minimal but extensible microframework for PHP 5.4+
 + Pupcake can be run in traditional web server such as Apache.
 + For more detail usages on using pupcake in general and on traditional web servers, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 
@@ -31,28 +31,27 @@ $app->get("date/:year/:month/:day", function($req, $res){
 });
 
 $app->get("/hello/:name", function($req, $res){
-  $res->send("hello ".$req->params('name')." in get");
+    $res->send("hello ".$req->params('name')." in get");
 });
 
 $app->post("/hello/:name", function($req, $res){
-  $res->send("hello ".$req->params('name')." in post");
+    $res->send("hello ".$req->params('name')." in post");
 });
 
 $app->put("/hello/:name", function($req, $res){
-  $res->send("hello ".$req->params('name')." in put");
+    $res->send("hello ".$req->params('name')." in put");
 });
 
 $app->delete("/hello/:name", function($req, $res){
-  $res->send("hello ".$req->params('name')." in delete");
+    $res->send("hello ".$req->params('name')." in delete");
 });
 
 /**
  * Multiple request methods for one route
  */
 $app->map("/api/hello/:action", function($req, $res){
-  $res->send("hello ".$req->params('action')." in get and post");
+    $res->send("hello ".$req->params('action')." in get and post");
 })->via('GET','POST');
-
 
 $app->run();
 ```
