@@ -1,7 +1,7 @@
 Pupcake --- a micro framework for PHP 5.3+
 =======================================
 
-##About Pupcake Framework
+## About Pupcake Framework
 + Pupcake is a minimal but extensible microframework for PHP 5.3+
 + Pupcake can be run in traditional web server such as Apache.
 + For more detail usages on using pupcake in general and on traditional web servers, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
