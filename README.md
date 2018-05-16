@@ -6,16 +6,16 @@ Pupcake --- a micro framework for PHP 5.3+
 + Pupcake can be run in traditional web server such as Apache.
 + For more detail usages on using pupcake in general and on traditional web servers, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 
-##Installation:
+## Installation:
 
-###If you plan to use it on Apache
+### If you plan to use it on Apache
 #### install package "Pupcake/Pupcake" using composer (http://getcomposer.org/)
-####.htaccess File for Apache
+#### .htaccess File for Apache
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ index.php/$1 [L]
 
-###Simple requests when running on Apache
+### Simple requests when running on Apache
 #### For more details on running Pupcake in general and in traditional web server, please see https://github.com/superjimpupcake/Pupcake/wiki/_pages
 ```php
 <?php
