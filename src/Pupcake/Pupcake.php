@@ -98,6 +98,14 @@ class Pupcake extends Object
     }
 
     /**
+     * emit an event, an alias to trigger
+     */
+    public function emit($event_name, $default_handler_callback = "", $event_properties = array())
+    {
+        return $this->trigger($event_name, $default_handler_callback, $event_properties);
+    }
+
+    /**
      * tell the sytem to use a plugin
      */
     public function usePlugin($plugin_name, $config = array())
